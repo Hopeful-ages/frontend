@@ -13,7 +13,7 @@ Este é o frontend do projeto **Hopeful**, desenvolvido com **Next.js**.
 Clone o repositório e instale as dependências:
 
 ```bash
-git clone https://tools.ages.pucrs.br/gestao-de-planos-de-contingencia-em-desastres/hopeful-frontend.git
+git clone https://tools.ages.pucrs.br/gestao-de-planos-de-contingencia-em-desastres/hopeful-frontend.git](https://github.com/Hopeful-ages/frontend.git
 cd hopeful-frontend
 ```
 Para instalar as dependências, execute:
