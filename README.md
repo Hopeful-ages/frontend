@@ -14,7 +14,7 @@ Clone o repositório e instale as dependências:
 
 ```bash
 git clone https://github.com/Hopeful-ages/frontend.git
-cd hopeful-frontend
+cd frontend
 ```
 Para instalar as dependências, execute:
 
