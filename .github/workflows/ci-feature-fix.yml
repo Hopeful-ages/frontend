@@ -1,14 +1,10 @@
-name: CI - Feature & Fix Branches
+name: CI - All Branches
 
 on:
   push:
-    branches:
-      - 'feature/**'
-      - 'fix/**'
+    branches: ['**']   # roda em qualquer branch
   pull_request:
-    branches:
-      - dev
-      - main
+    branches: ['**']   # dispara para PRs de qualquer branch
 
 jobs:
   ci:
@@ -34,14 +30,9 @@ jobs:
       - name: Lint code
         run: npm run lint
 
-      # 5. Checar formatação com Prettier
-      - name: Check code format
-        run: npx prettier --check .
-
-      # 6. Build Next.js
+      # 5. Build Next.js
       - name: Build project
         run: npm run build
 
-      # 7. Start Next.js (opcional, valida runtime)
-      - name: Start Next.js in background
-        run: npm run start &
+      # 6. Start Next.js (opcional, valida runtime)
+      - name: Start Next.js in
