@@ -1,21 +1,21 @@
-name: CI - All Branches
+name: CI - Build & Lint
 
 on:
   push:
-    branches: ['**']  # roda em qualquer branch
+    branches: ['**']   # roda em qualquer branch
   pull_request:
-    branches: ['**']  # dispara para PRs de qualquer branch
+    branches: ['**']   # dispara para PRs de qualquer branch
 
 jobs:
   ci:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout do repositório
+      # 1. Checkout do código
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Setup Node.js com cache de npm
+      # 2. Setup Node.js com cache do npm
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -33,7 +33,3 @@ jobs:
       # 5. Build Next.js
       - name: Build project
         run: npm run build
-
-      # 6. Start Next.js (opcional, valida runtime)
-      - name: Start Next.js in
-        run: npm run start
