@@ -2,9 +2,9 @@ name: CI - All Branches
 
 on:
   push:
-    branches: ['**']   # roda em qualquer branch
+    branches: ['**']  # roda em qualquer branch
   pull_request:
-    branches: ['**']   # dispara para PRs de qualquer branch
+    branches: ['**']  # dispara para PRs de qualquer branch
 
 jobs:
   ci:
@@ -36,3 +36,4 @@ jobs:
 
       # 6. Start Next.js (opcional, valida runtime)
       - name: Start Next.js in
+        run: npm run start
