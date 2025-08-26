@@ -1,0 +1,25 @@
+
+#!/usr/bin/env sh
+# . "$(dirname -- "$0")/_/husky.sh"
+
+current_branch=$(git symbolic-ref --short HEAD)
+
+if [[ "$current_branch" == "main" ]] || [[ "$current_branch" == "development" ]] || [[ "$current_branch" == "develop" ]]; then
+    echo "✅ Branch principal '$current_branch' - Push realizado com sucesso"
+    exit 0
+fi
+
+if [[ "$current_branch" =~ ^(feature|fix)/ ]] || [[ "$current_branch" =~ ^(feature|fix)/NOUS ]]; then
+    echo "✅ Nome da branch de acordo com o formato: 'feature/id_descrição' ou 'fix/descrição' ou 'feature/NOUS' ou 'fix/NOUS' - Push realizado com sucesso"
+    exit 0
+else
+    echo "❌ Erro - Nome da branch não está de acordo com o formato solicitado:"
+    echo "   Formatos aceitos:"
+    echo "   • feature/id_descricao"
+    echo "   • fix/descricao" 
+    echo "   • feature/NOUS"
+    echo "   • fix/NOUS"
+    echo ""
+    echo "   Branch atual: '$current_branch'"
+    exit 1
+fi
