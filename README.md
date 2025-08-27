@@ -47,3 +47,8 @@ o projeto estará disponível em [http://localhost:3000](http://localhost:3000).
 └── README.md          # Documentação do projeto
 
 ```
+
+
+```plaintext    
+    Dica: Utiliza o comando npm run lint para verificar a formatação do código.
+```
