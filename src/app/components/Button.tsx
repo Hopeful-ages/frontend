@@ -1,117 +1,142 @@
-import React, { ComponentProps, ReactNode } from 'react';
-import { cva, VariantProps } from 'class-variance-authority';
+'use client';
+import React, { forwardRef } from 'react';
 
-const buttonStyles = cva(
-  'inline-flex items-center justify-center font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200',
-  {
-    variants: {
-      // 1. Variações de Estilo (variant)
-      variant: {
-        primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-        secondary:
-          'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-      },
-      // 2. Variações de Tamanho (size)
-      size: {
-        sm: 'px-3 py-1.5 text-sm',
-        md: 'px-4 py-2 text-base',
-        lg: 'px-6 py-3 text-lg',
-      },
-      // 3. Variações de Estado (disabled)
-      // As classes `disabled:` do Tailwind são aplicadas automaticamente quando o atributo `disabled` está no botão.
-      disabled: {
-        true: 'opacity-50 cursor-not-allowed',
-      },
-    },
-    // Valores padrão
-    defaultVariants: {
-      variant: 'primary',
-      size: 'md',
-    },
-  },
-);
-
-// --- Definição dos Ícones e Spinner ---
-
-// Um componente simples para o spinner de loading
-const Spinner = () => (
-  <svg
-    className="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    ></circle>
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    ></path>
-  </svg>
-);
-
-// --- Definição das Props do Componente ---
-
-// Usamos `extends` para incluir todas as props de um botão HTML padrão (como `type`, `name`, etc.)
-export interface ButtonProps
-  extends ComponentProps<'button'>,
-    VariantProps<typeof buttonStyles> {
-  isLoading?: boolean;
-  icon?: ReactNode; // Aceita qualquer elemento React como ícone
+/** util simples para juntar classes */
+function cn(...classes: Array<string | undefined | false | null>) {
+  return classes.filter(Boolean).join(' ');
 }
 
-// --- O Componente Button ---
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'outline'
+  | 'danger'
+  | 'safe';
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  loading?: boolean;
+  leftIcon?: React.ReactNode;
+}
+
+const sizeClasses: Record<ButtonSize, string> = {
+  sm: 'h-8 px-3 text-sm rounded-lg',
+  md: 'h-10 px-4 text-sm rounded-xl',
+  lg: 'h-12 px-6 text-base rounded-xl',
+  xl: 'h-14 px-8 text-lg rounded-2xl',
+};
+
+const variantClasses: Record<ButtonVariant, string> = {
+  primary:
+    'bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-700 cursor-pointer ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ring-offset-2 ring-offset-white cursor-pointer ' +
+    'dark:ring-offset-gray-900',
+  secondary:
+    'bg-gray-900 text-white shadow-sm hover:bg-gray-800 active:bg-gray-800 ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 ring-offset-2 ring-offset-white cursor-pointer ' +
+    'dark:ring-offset-gray-900',
+  outline:
+    'border border-gray-300 text-gray-900 hover:bg-gray-50 active:bg-gray-100 ' +
+    'dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-800 ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 ring-offset-2 ring-offset-white cursor-pointer ' +
+    'dark:ring-offset-gray-900 cursor-pointer',
+  ghost:
+    'bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 cursor-pointer ' +
+    'dark:ring-offset-gray-900 cursor-pointer',
+  danger:
+    'bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-700 cursor-pointer ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ring-offset-2 ring-offset-white cursor-pointer ' +
+    'dark:ring-offset-gray-900',
+  safe:
+    'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-700  cursor-pointer ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ring-offset-2 ring-offset-white cursor-pointer ' +
+    'dark:ring-offset-gray-900',
+};
+
+const baseClasses =
+  'inline-flex items-center justify-center gap-2 font-medium transition-colors select-none whitespace-nowrap ' +
+  'disabled:cursor-not-allowed disabled:opacity-60';
+
+export const Spinner: React.FC<{ className?: string; srLabel?: string }> = ({
+  className,
+  srLabel = 'Carregando…',
+}) => (
+  <span role="status" aria-live="polite" className="inline-flex items-center">
+    <svg
+      className={cn('animate-spin', className || 'h-4 w-4')}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+    <span className="sr-only">{srLabel}</span>
+  </span>
+);
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      className,
-      variant,
-      size,
-      isLoading = false,
-      disabled = false,
-      icon,
       children,
-      ...props
+      className,
+      variant = 'primary',
+      size = 'md',
+      loading = false,
+      leftIcon,
+      onClick,
+      type,
+      ...rest
     },
     ref,
   ) => {
-    // O estado de desabilitado é verdadeiro se `isLoading` ou `disabled` for verdadeiro.
-    const isDisabled = isLoading || disabled;
+    const isDisabled = rest.disabled || loading;
 
     return (
       <button
         ref={ref}
-        className={buttonStyles({
-          variant,
-          size,
-          disabled: isDisabled,
-          className,
-        })}
+        type={type ?? 'button'}
+        className={cn(baseClasses, sizeClasses[size], variantClasses[variant])}
+        aria-disabled={isDisabled || undefined}
+        aria-busy={loading || undefined}
         disabled={isDisabled}
-        {...props}
+        onClick={(e) => {
+          if (isDisabled) return;
+          onClick?.(e);
+        }}
+        {...rest}
       >
-        {/* Renderiza o Spinner se isLoading for true */}
-        {isLoading && <Spinner />}
+        {loading ? (
+          <Spinner className={size === 'lg' ? 'h-5 w-5' : 'h-4 w-4'} />
+        ) : leftIcon ? (
+          <span
+            className={cn(
+              size === 'lg' ? 'h-5 w-5' : 'h-4 w-4',
+              'inline-flex items-center justify-center',
+            )}
+          >
+            {leftIcon}
+          </span>
+        ) : null}
 
-        {/* Renderiza o ícone se não estiver em loading e se o ícone for passado */}
-        {!isLoading && icon && <span className="mr-2">{icon}</span>}
-
-        {/* Renderiza o texto do botão */}
-        {children}
+        <span>{children}</span>
       </button>
     );
   },
 );
-
 Button.displayName = 'Button';
-
-export default Button;
