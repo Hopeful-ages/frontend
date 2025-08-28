@@ -35,14 +35,14 @@ const variantClasses: Record<ButtonVariant, string> = {
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ring-offset-2 ring-offset-white cursor-pointer ' +
     'dark:ring-offset-gray-900',
   secondary:
-    'bg-gray-900 text-white shadow-sm hover:bg-gray-800 active:bg-gray-800 ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 ring-offset-2 ring-offset-white cursor-pointer ' +
-    'dark:ring-offset-gray-900',
+    'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:opacity-90 active:opacity-100 ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/50 ring-offset-2 ring-offset-[var(--background)] ' +
+    'cursor-pointer',
   outline:
-    'border border-gray-300 text-gray-900 hover:bg-gray-50 active:bg-gray-100 ' +
-    'dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-800 ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 ring-offset-2 ring-offset-white cursor-pointer ' +
-    'dark:ring-offset-gray-900 cursor-pointer',
+    'border border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] ' +
+    'hover:bg-[var(--foreground)]/5 active:bg-[var(--foreground)]/10 ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/40 ring-offset-2 ring-offset-[var(--background)] ' +
+    'cursor-pointer',
   ghost:
     'bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 cursor-pointer ' +
     'dark:ring-offset-gray-900 cursor-pointer',
