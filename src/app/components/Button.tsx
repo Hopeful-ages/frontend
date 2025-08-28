@@ -1,7 +1,6 @@
 'use client';
 import React, { forwardRef } from 'react';
 
-/** util simples para juntar classes */
 function cn(...classes: Array<string | undefined | false | null>) {
   return classes.filter(Boolean).join(' ');
 }
