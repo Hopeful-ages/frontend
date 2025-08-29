@@ -1,12 +1,7 @@
-import { Button } from './components/Button';
-
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-4">
       <div className="flex w-full max-w-md flex-col items-center rounded-xl bg-white/80 p-8 shadow-lg">
-        <Button variant="primary" size="md" loading={false}>
-          Criar cenário
-        </Button>
         <h1 className="mb-4 text-center text-4xl font-extrabold text-gray-900 drop-shadow">
           Bem-vindo ao Projeto Next.js!
         </h1>

@@ -1,5 +1,6 @@
 'use client';
 import React, { forwardRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 function cn(...classes: Array<string | undefined | false | null>) {
   return classes.filter(Boolean).join(' ');
@@ -12,53 +13,48 @@ export type ButtonVariant =
   | 'ghost'
   | 'outline'
   | 'danger'
-  | 'safe';
+  | 'save';
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonClasses> {
   loading?: boolean;
   leftIcon?: React.ReactNode;
 }
 
-const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-sm rounded-lg',
-  md: 'h-10 px-4 text-sm rounded-xl',
-  lg: 'h-12 px-6 text-base rounded-xl',
-  xl: 'h-14 px-8 text-lg rounded-2xl',
-};
-
-const variantClasses: Record<ButtonVariant, string> = {
-  primary:
-    'bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-700 cursor-pointer ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ring-offset-2 ring-offset-white cursor-pointer ' +
-    'dark:ring-offset-gray-900',
-  secondary:
-    'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:opacity-90 active:opacity-100 ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/50 ring-offset-2 ring-offset-[var(--background)] ' +
-    'cursor-pointer',
-  outline:
-    'border border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] ' +
-    'hover:bg-[var(--foreground)]/5 active:bg-[var(--foreground)]/10 ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/40 ring-offset-2 ring-offset-[var(--background)] ' +
-    'cursor-pointer',
-  ghost:
-    'bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 cursor-pointer ' +
-    'dark:ring-offset-gray-900 cursor-pointer',
-  danger:
-    'bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-700 cursor-pointer ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ring-offset-2 ring-offset-white cursor-pointer ' +
-    'dark:ring-offset-gray-900',
-  safe:
-    'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-700  cursor-pointer ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ring-offset-2 ring-offset-white cursor-pointer ' +
-    'dark:ring-offset-gray-900',
-};
+const buttonClasses = cva(
+  'inline-flex items-center justify-center gap-2 font-medium transition-colors select-none whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer',
+  {
+    variants: {
+      variant: {
+        primary:
+          'bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
+        secondary:
+          'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:opacity-90 active:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/50 ring-offset-2 ring-offset-[var(--background)]',
+        outline:
+          'border border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--foreground)]/5 active:bg-[var(--foreground)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/40 ring-offset-2 ring-offset-[var(--background)]',
+        ghost:
+          'bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 dark:ring-offset-gray-900',
+        danger:
+          'bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
+        save: 'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
+      },
+      size: {
+        sm: 'h-8 px-3 text-sm rounded-lg',
+        md: 'h-10 px-4 text-sm rounded-xl',
+        lg: 'h-12 px-6 text-base rounded-xl',
+        xl: 'h-14 px-8 text-lg rounded-2xl',
+      },
+    },
+    defaultVariants: {
+      variant: 'primary',
+      size: 'md',
+    },
+  },
+);
 
 const baseClasses =
-  'inline-flex items-center justify-center gap-2 font-medium transition-colors select-none whitespace-nowrap ' +
-  'disabled:cursor-not-allowed disabled:opacity-60';
+  'inline-flex items-center justify-center gap-2 font-medium transition-colors select-none whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer ';
 
 export const Spinner: React.FC<{ className?: string; srLabel?: string }> = ({
   className,
@@ -110,7 +106,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         type={type ?? 'button'}
-        className={cn(baseClasses, sizeClasses[size], variantClasses[variant])}
+        className={cn(buttonClasses({ variant, size }), className)}
         aria-disabled={isDisabled || undefined}
         aria-busy={loading || undefined}
         disabled={isDisabled}
