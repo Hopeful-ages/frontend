@@ -15,8 +15,8 @@ type dropdownProps = {
   onSelect: (item: string) => void;
   size?: 'small' | 'medium' | 'large' | 'long';
   icon?: React.ReactNode;
-  textColor?: 'black' | 'gray';
-  bgColor?: 'white' | 'gray';
+  textColor?: 'black' | 'gray' | 'foreground';
+  bgColor?: 'white' | 'gray' | 'surface';
   border?: BorderType;
   roundedBorder?: boolean;
   fullWidth?: boolean;
@@ -36,7 +36,11 @@ const buttonClasses = cva(
         large: 'h-11 text-lg px-5 w-48 md:w-60 lg:w-72',
         long: 'h-10 text-base px-4 w-64 md:w-80 lg:w-96',
       },
-      bgColor: { white: 'bg-white', gray: 'bg-gray-200' },
+      bgColor: {
+        white: 'bg-white',
+        gray: 'bg-gray-200',
+        surface: 'bg-background',
+      },
       border: {
         none: 'border-none',
         gray: 'border border-gray-400',
@@ -112,7 +116,13 @@ export const Dropdown: React.FC<dropdownProps> = ({
   };
 
   const maxH = `${rowHeights[size] * maxItemsVisible}px`;
-  const tone = textColor === 'black' ? 'text-black' : 'text-gray-400';
+  const toneByText = {
+    black: 'text-black',
+    gray: 'text-gray-400',
+    foreground: 'text-foreground',
+  } as const;
+
+  const tone = toneByText[textColor];
 
   return (
     <div
