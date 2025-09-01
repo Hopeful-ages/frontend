@@ -48,7 +48,7 @@ const buttonClasses = cva(
         black: 'border border-black',
       },
       radius: { md: 'rounded-md', full: 'rounded-full' },
-      width: { auto: '', full: 'w-full' },
+      width: { auto: '', full: '!w-full' },
     },
     defaultVariants: {
       size: 'medium',
