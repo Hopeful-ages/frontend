@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Barlow } from 'next/font/google'; // Importa a fonte Barlow aqui
 import './globals.css';
-import Header from './components/Header';
+import Header, { Role } from './components/Header';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,7 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${barlow.variable} antialiased`}
       >
-        <Header />
+        <Header role={Role.USER} />
         {children}
       </body>
     </html>
