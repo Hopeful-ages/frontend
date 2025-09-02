@@ -54,14 +54,14 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         className={clsx(
-          'relative flex flex-col rounded-2xl bg-white shadow-lg',
+          'relative flex flex-col rounded-[8px] border border-black bg-white shadow-lg',
           'max-h-[90vh]',
           sizeClasses[size],
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
-          <div className="relative flex justify-center border-b px-4 py-3">
+          <div className="relative flex justify-center px-4 py-3">
             <h2 className="text-center text-lg font-semibold text-black">
               {title}
             </h2>
@@ -79,9 +79,7 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
 
         {footer && (
-          <div className="flex justify-center gap-2 border-t px-4 py-3">
-            {footer}
-          </div>
+          <div className="flex justify-center gap-2 px-4 py-3">{footer}</div>
         )}
       </div>
     </div>

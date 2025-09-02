@@ -45,7 +45,7 @@ export default function Home() {
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           title="Cadastro de Usuários"
-          size="auto"
+          size="xl"
           footer={
             <>
               <Button type="submit" form="userForm" variant="outline">
