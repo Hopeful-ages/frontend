@@ -9,7 +9,6 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('oie');
   };
 
   return (
