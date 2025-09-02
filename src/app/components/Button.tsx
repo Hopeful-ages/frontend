@@ -28,22 +28,23 @@ const buttonClasses = cva(
     variants: {
       variant: {
         primary:
-          'bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-700 focus-visible:outline-none focus-visible:ring-0',
+          'bg-blue-600 text-white shadow-sm hover:bg-blue-900 active:bg-blue-800 focus-visible:outline-none focus-visible:ring-0',
         secondary:
-          'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:opacity-90 active:opacity-100 focus-visible:outline-none focus-visible:ring-0',
+          'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:brightness-90 active:brightness-75 focus-visible:outline-none focus-visible:ring-0',
+
         outline:
-          'bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--foreground)]/5 active:bg-[var(--foreground)]/10 focus-visible:outline-none focus-visible:ring-0',
+          'border border-gray-300 bg-[var(--background)] text-[var(--foreground)]  focus-visible:outline-none focus-visible:ring-0 hover:text-gray-400',
         ghost:
-          'bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 focus-visible:outline-none focus-visible:ring-0',
+          'border border-gray-200 bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 focus-visible:outline-none focus-visible:ring-0',
         danger:
-          'bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-700 focus-visible:outline-none focus-visible:ring-0',
-        save: 'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-700 focus-visible:outline-none focus-visible:ring-0',
+          'bg-red-600 text-white shadow-sm hover:bg-red-900 active:bg-red-900 focus-visible:outline-none focus-visible:ring-0',
+        save: 'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-0',
       },
       size: {
-        sm: 'h-8 px-3 text-sm rounded-lg',
-        md: 'h-10 px-4 text-sm rounded-xl',
-        lg: 'h-12 px-6 text-base rounded-xl',
-        xl: 'h-14 px-8 text-lg rounded-2xl',
+        sm: 'h-8 px-3 text-sm rounded-[8px]',
+        md: 'h-10 px-4 text-sm rounded-[8px]',
+        lg: 'h-12 px-6 text-base rounded-[8px]',
+        xl: 'h-14 px-8 text-lg rounded-[8px]',
       },
     },
     defaultVariants: {

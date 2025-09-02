@@ -68,7 +68,7 @@ export const Modal: React.FC<ModalProps> = ({
             {!hideCloseIcon && (
               <button
                 onClick={onClose}
-                className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 text-black transition hover:bg-gray-200"
+                className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer p-1 text-black transition hover:text-red-500"
               >
                 <X className="h-5 w-5" />
               </button>
