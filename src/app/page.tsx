@@ -1,4 +1,12 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from './components/Button';
+import { Modal } from './components/Modal';
+
 export default function Home() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-4">
       <div className="flex w-full max-w-md flex-col items-center rounded-xl bg-white/80 p-8 shadow-lg">
@@ -19,6 +27,33 @@ export default function Home() {
         >
           Documentação Tailwind
         </a>
+      </div>
+      <div className="p-6">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+        >
+          Abrir Modal
+        </button>
+
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Cadastro de Usuários"
+          size="auto"
+          footer={
+            <>
+              <Button variant="outline">Salvar</Button>
+              <Button variant="danger" onClick={() => setIsOpen(false)}>
+                Cancelar
+              </Button>
+            </>
+          }
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <Button>Novo Usuário</Button>
+          </div>
+        </Modal>
       </div>
     </main>
   );
