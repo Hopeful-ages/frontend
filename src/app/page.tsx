@@ -7,6 +7,11 @@ import { Modal } from './components/Modal';
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('oie');
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-4">
       <div className="flex w-full max-w-md flex-col items-center rounded-xl bg-white/80 p-8 shadow-lg">
@@ -43,16 +48,20 @@ export default function Home() {
           size="auto"
           footer={
             <>
-              <Button variant="outline">Salvar</Button>
+              <Button type="submit" form="userForm" variant="outline">
+                Salvar
+              </Button>
               <Button variant="danger" onClick={() => setIsOpen(false)}>
                 Cancelar
               </Button>
             </>
           }
         >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            <Button>Novo Usuário</Button>
-          </div>
+          <form
+            id="userForm"
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
+          ></form>
         </Modal>
       </div>
     </main>
