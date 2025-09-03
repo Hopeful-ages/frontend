@@ -1,6 +1,6 @@
 'use client';
-import React, { forwardRef } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import React, { forwardRef } from 'react';
 
 function cn(...classes: Array<string | undefined | false | null>) {
   return classes.filter(Boolean).join(' ');
@@ -28,22 +28,23 @@ const buttonClasses = cva(
     variants: {
       variant: {
         primary:
-          'bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
+          'bg-blue-600 text-white shadow-sm hover:bg-blue-900 active:bg-blue-800 focus-visible:outline-none focus-visible:ring-0',
         secondary:
-          'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:opacity-90 active:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/50 ring-offset-2 ring-offset-[var(--background)]',
+          'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:brightness-90 active:brightness-75 focus-visible:outline-none focus-visible:ring-0',
+
         outline:
-          'border border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--foreground)]/5 active:bg-[var(--foreground)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/40 ring-offset-2 ring-offset-[var(--background)]',
+          'border border-gray-300 bg-[var(--background)] text-[var(--foreground)]  focus-visible:outline-none focus-visible:ring-0 hover:text-gray-400',
         ghost:
-          'bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 dark:ring-offset-gray-900',
+          'border border-gray-200 bg-transparent text-gray-900 hover:bg-gray-100 active:bg-gray-200 focus-visible:outline-none focus-visible:ring-0',
         danger:
-          'bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
-        save: 'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
+          'bg-red-600 text-white shadow-sm hover:bg-red-900 active:bg-red-900 focus-visible:outline-none focus-visible:ring-0',
+        save: 'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-0',
       },
       size: {
-        sm: 'h-8 px-3 text-sm rounded-lg',
-        md: 'h-10 px-4 text-sm rounded-xl',
-        lg: 'h-12 px-6 text-base rounded-xl',
-        xl: 'h-14 px-8 text-lg rounded-2xl',
+        sm: 'h-8 px-3 text-sm rounded-[8px] min-w-[100px]',
+        md: 'h-10 px-4 text-sm rounded-[8px] min-w-[120px]',
+        lg: 'h-12 px-6 text-base rounded-[8px] min-w-[140px]',
+        xl: 'h-14 px-8 text-lg rounded-[8px] min-w-[180px]',
       },
     },
     defaultVariants: {
