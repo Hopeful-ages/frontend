@@ -1,5 +1,71 @@
-import React from 'react';
+'use client';
+import React, { forwardRef, ReactNode } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-export default function Input({ children }: { children: React.ReactNode }) {
-  return <div>{children}</div>;
+function cn(...classes: Array<string | undefined | false | null>) {
+  return classes.filter(Boolean).join(' ');
 }
+
+const inputClasses = cva(
+  'flex w-full rounded-xl border bg-white text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-60',
+  {
+    variants: {
+      variant: {
+        default:
+          'border-gray-300 focus-visible:ring-blue-500 focus-visible:border-transparent',
+        error:
+          'border-red-500 text-red-700 focus-visible:ring-red-500 focus-visible:border-transparent',
+      },
+      size: {
+        md: 'h-10 px-4',
+        lg: 'h-12 px-4',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'md',
+    },
+  },
+);
+
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'variant'>,
+    VariantProps<typeof inputClasses> {
+  icon?: ReactNode;
+  error?: string;
+}
+
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, variant, size, icon, error, ...props }, ref) => {
+    const inputVariant = error ? 'error' : variant;
+
+    return (
+      <div className="w-full">
+        <div className="relative w-full">
+          {icon && (
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span className={cn('text-gray-400', error && 'text-red-500')}>
+                {icon}
+              </span>
+            </div>
+          )}
+
+          <input
+            ref={ref}
+            className={cn(
+              inputClasses({ variant: inputVariant, size, className }),
+              icon ? 'pl-10' : '',
+            )}
+            {...props}
+          />
+        </div>
+
+        {error && (
+          <p className="mt-1.5 text-xs font-medium text-red-600">{error}</p>
+        )}
+      </div>
+    );
+  },
+);
+
+Input.displayName = 'Input';
