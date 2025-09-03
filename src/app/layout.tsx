@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Barlow } from 'next/font/google'; // Importa a fonte Barlow aqui
+import { Geist, Geist_Mono, Barlow } from 'next/font/google'; 
 import './globals.css';
 import Header, { Role } from './components/Header';
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
