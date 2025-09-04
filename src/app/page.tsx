@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from './components/Button';
-import { Modal } from './components/Modal';
+import { Button } from '../components/Button';
+import { Modal } from '../components/Modal';
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
