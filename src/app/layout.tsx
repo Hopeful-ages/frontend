@@ -1,8 +1,8 @@
+import { LoadingProvider } from '@/providers/LoadingProvider';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Barlow } from 'next/font/google'; 
-import './globals.css';
+import { Barlow, Geist, Geist_Mono } from 'next/font/google';
 import Header, { Role } from './components/Header';
-
+import './globals.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,8 +35,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${barlow.variable} antialiased`}
       >
-        <Header role={Role.USER} />
-        {children}
+        <LoadingProvider>
+          <Header role={Role.USER} />
+          {children}
+        </LoadingProvider>
       </body>
     </html>
   );
