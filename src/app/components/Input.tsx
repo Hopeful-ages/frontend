@@ -7,7 +7,7 @@ function cn(...classes: Array<string | undefined | false | null>) {
 }
 
 const inputClasses = cva(
-  'flex w-full rounded-xl border bg-white text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-60 text-black',
+  'flex rounded-xl border bg-white text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-60 text-black',
   {
     variants: {
       variant: {
@@ -53,8 +53,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={cn(
-              inputClasses({ variant: inputVariant, size, className }),
+              inputClasses({ variant: inputVariant, size }),
               icon ? 'pl-10' : '',
+              className,
             )}
             {...props}
           />
