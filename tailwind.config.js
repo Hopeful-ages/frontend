@@ -7,7 +7,11 @@ const config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        barlow: ['"Barlow"', "sans-serif"],
+      },
+    },
   },
   plugins: [],
 };
