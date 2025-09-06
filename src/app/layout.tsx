@@ -35,10 +35,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${barlow.variable} antialiased`}
       >
-        <LoadingProvider>
-          <Header role={Role.USER} />
-          {children}
-        </LoadingProvider>
+        <LoadingProvider>{children}</LoadingProvider>
       </body>
     </html>
   );
