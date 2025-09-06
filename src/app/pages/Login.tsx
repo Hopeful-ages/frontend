@@ -3,36 +3,34 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
-import { FaUser, FaLock } from 'react-icons/fa';
-import { IoPaperPlaneOutline } from 'react-icons/io5';
+import { User, Lock, Send } from 'lucide-react';
+import { api } from '@/lib/api';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Simulação de uma chamada de API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Lógica de validação (substitua por sua chamada de API real)
-    if (username === 'usuario' && password === 'senha123') {
-      alert('Login bem-sucedido!');
-      // Aqui você redirecionaria o usuário: router.push('/dashboard')
-    } else {
-      setError('Usuário ou senha inválidos. Por favor, tente novamente.');
+    try {
+      await api.login(username, password);
+      router.push('/dashboard');
+    } catch (error) {
+      setError('Usuário ou senha inválidos. Tente novamente.');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -52,7 +50,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <Input
-            icon={<FaUser />}
+            icon={<User />}
             type="text"
             placeholder="Usuário ou Email"
             value={username}
@@ -62,7 +60,7 @@ export default function LoginPage() {
           />
 
           <Input
-            icon={<FaLock />}
+            icon={<Lock />}
             type="password"
             placeholder="Digite sua senha"
             value={password}
@@ -88,7 +86,7 @@ export default function LoginPage() {
               size="lg"
               className="w-full bg-black text-white hover:bg-gray-800 focus-visible:ring-black"
               loading={isLoading}
-              leftIcon={<IoPaperPlaneOutline size={20} />}
+              leftIcon={<Send size={20} />}
             >
               Entrar
             </Button>
