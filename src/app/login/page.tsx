@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 
 import { User, Lock, Send } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -18,20 +19,37 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      await api.login(username, password);
-      router.push('/dashboard');
-    } catch (error) {
+      const result = await api.login(username, password);
+
+      if (result.redirectTo) {
+        router.push(result.redirectTo);
+      }
+    } catch {
       setError('Usuário ou senha inválidos. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <main className="flex min-h-screen w-full items-center justify-center bg-white">
+        <div className="text-lg">Verificando autenticação...</div>
+      </main>
+    );
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white p-4">

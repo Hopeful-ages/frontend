@@ -1,7 +1,6 @@
 import { LoadingProvider } from '@/providers/LoadingProvider';
 import type { Metadata } from 'next';
 import { Barlow, Geist, Geist_Mono } from 'next/font/google';
-import Header, { Role } from './components/Header';
 import './globals.css';
 
 const geistSans = Geist({
@@ -34,6 +33,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${barlow.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
         <LoadingProvider>{children}</LoadingProvider>
       </body>
