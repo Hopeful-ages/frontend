@@ -7,14 +7,12 @@ function cn(...classes: Array<string | undefined | false | null>) {
 }
 
 const inputClasses = cva(
-  'flex rounded-xl border bg-white text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-60 text-black',
+  'w-full flex rounded-xl border bg-white text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 text-black',
   {
     variants: {
       variant: {
-        default:
-          'border-gray-300 focus-visible:ring-blue-500 focus-visible:border-transparent',
-        error:
-          'border-red-500 text-red-700 focus-visible:ring-red-500 focus-visible:border-transparent',
+        default: 'border-gray-300 focus:border-blue-500',
+        error: 'border-red-500 text-red-700 focus:border-red-600',
       },
       size: {
         md: 'h-10 px-4',
