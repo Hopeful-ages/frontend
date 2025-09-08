@@ -14,6 +14,7 @@ import { UsersTable } from './_components/UsersTable';
 import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
 import { useProtectedPage } from '@/hooks/useProtectedPage';
+import { useToast } from '@/hooks/useToast';
 
 type Field =
   | 'name'
@@ -49,7 +50,9 @@ export default function AdminUsersPage() {
   );
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const { isLoading, userInfo, hasAccess, logout } = useProtectedPage({
+  const { success, error, warning } = useToast();
+
+  const { isLoading, userInfo, hasAccess } = useProtectedPage({
     requiredRole: 'ROLE_USER',
   });
 
@@ -127,7 +130,11 @@ export default function AdminUsersPage() {
       cityId: validateField('cityId', form.cityId),
     };
     setErrors(next);
-    return Object.values(next).every((v) => !v);
+    const ok = Object.values(next).every((v) => !v);
+    if (!ok) {
+      warning('Corrija os campos destacados!');
+    }
+    return ok;
   }
 
   const canClickSave = isEdit
@@ -162,6 +169,7 @@ export default function AdminUsersPage() {
         setCities(c);
       } catch (e) {
         console.error(e);
+        error('Falha ao carregar dados');
       } finally {
         if (mounted) setLoading(false);
       }
@@ -226,9 +234,8 @@ export default function AdminUsersPage() {
       setErrors({});
       setIsCreateOpen(true);
     } catch (err) {
-      alert(
-        err instanceof Error ? err.message : 'Falha ao carregar o usuário.',
-      );
+      console.error(err);
+      error('Falha ao carregar o usuário');
     }
   };
 
@@ -247,8 +254,10 @@ export default function AdminUsersPage() {
       setConfirmLoading(true);
       if (confirmTarget.accountStatus) {
         await api.disableUser(confirmTarget.id);
+        success('Usuário desativado com sucesso');
       } else {
         await api.enableUser(confirmTarget.id);
+        success('Usuário ativado com sucesso');
       }
       setUsers((prev) =>
         prev.map((x) =>
@@ -259,11 +268,8 @@ export default function AdminUsersPage() {
       );
       closeConfirm();
     } catch (err) {
-      alert(
-        err instanceof Error
-          ? err.message
-          : 'Falha ao alterar o status do usuário.',
-      );
+      console.error(err);
+      error('Falha ao alterar status do usuário');
       setConfirmLoading(false);
     }
   };
@@ -287,8 +293,10 @@ export default function AdminUsersPage() {
           prev.map((u) => (u.id === updated.id ? updated : u)),
         );
         closeCreate();
+        success('Usuário atualizado com sucesso');
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Não foi possível editar.');
+        console.error(err);
+        error('Não foi possível editar o usuário');
       }
     } else {
       const payload = {
@@ -304,8 +312,10 @@ export default function AdminUsersPage() {
         const created = await api.createUser(payload);
         setUsers((prev) => [created, ...prev]);
         closeCreate();
+        success('Usuário criado com sucesso');
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Não foi possível criar.');
+        console.error(err);
+        error('Não foi possível criar o usuário');
       }
     }
   };
