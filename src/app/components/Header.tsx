@@ -1,8 +1,12 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LogOut } from 'lucide-react';
 import { Button } from './Button';
+import { useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
 
 export enum Role {
   ADMIN = 'admin',
@@ -24,6 +28,16 @@ type HeaderProps = { role: Role };
 
 export default function Header({ role }: HeaderProps) {
   const links = role === Role.ADMIN ? ADMIN_LINKS : USER_LINKS;
+  const router = useRouter();
+
+  async function handleLogout() {
+    try {
+      await api.logout();
+    } finally {
+      router.push('/login');
+      router.refresh();
+    }
+  }
 
   return (
     <header className="fixed top-0 left-0 z-50 flex w-full items-center justify-between bg-black px-6 py-2 text-gray-300">
@@ -87,12 +101,12 @@ export default function Header({ role }: HeaderProps) {
             </Link>
           </>
         ) : (
-          <Link
-            href="http://localhost:3000/"
+          <button
+            onClick={handleLogout}
             className="inline-flex h-10 w-9 items-center justify-center rounded-md hover:bg-gray-800"
           >
             <LogOut className="h-6 w-6" />
-          </Link>
+          </button>
         )}
       </div>
     </header>

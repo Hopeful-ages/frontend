@@ -13,6 +13,7 @@ import { FiltersBar } from './_components/FiltersBar';
 import { UsersTable } from './_components/UsersTable';
 import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
+import { useProtectedPage } from '@/hooks/useProtectedPage';
 
 type Field =
   | 'name'
@@ -47,6 +48,10 @@ export default function AdminUsersPage() {
     null,
   );
   const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const { isLoading, userInfo, hasAccess, logout } = useProtectedPage({
+    requiredRole: 'ROLE_USER',
+  });
 
   const [form, setForm] = useState<UserFormState>({
     name: '',
@@ -312,6 +317,18 @@ export default function AdminUsersPage() {
       setErrors((prev) => ({ ...prev, [field]: msg || undefined }));
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-lg">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!hasAccess || !userInfo) {
+    return null;
+  }
 
   return (
     <main className="mx-auto mt-20 w-full px-6 py-6">

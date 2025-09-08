@@ -73,7 +73,7 @@ export const api = {
       });
 
       if (userInfo.roles.includes('ROLE_ADMIN')) {
-        data.redirectTo = '/admin';
+        data.redirectTo = '/admin/users';
       } else if (userInfo.roles.includes('ROLE_USER')) {
         data.redirectTo = '/user';
       }
