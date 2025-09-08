@@ -1,6 +1,6 @@
 'use client';
 
-import Loading from '@/app/components/Loading';
+import Loading from '@/components/Loading';
 import { AnimatePresence } from 'framer-motion';
 import { createContext, ReactNode, useContext, useState } from 'react';
 
