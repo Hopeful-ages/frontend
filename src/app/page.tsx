@@ -1,26 +1,55 @@
 'use client';
 
-import LoginPage from './login/page';
+import Header, { Role } from '@/components/Header';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
+import { useToast } from '@/hooks/useToast';
+import { useLoading } from '@/providers/LoadingProvider';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 export default function Home() {
-  const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
+  const router = useRouter();
+  const { isCheckingAuth, isAuthenticated, role } = useAuthRedirect();
+  const { showLoading, hideLoading } = useLoading();
+  const { success, error, warning } = useToast();
+
+  const successShown = useRef(false);
+
+  useEffect(() => {
+    if (isCheckingAuth) {
+      showLoading('Verificando autenticação...');
+      warning('Atenção!!', 'Verificando autenticação...');
+    } else {
+      setTimeout(() => {
+        hideLoading();
+      }, 1000);
+    }
+  }, [isCheckingAuth, showLoading, hideLoading]);
+
+  useEffect(() => {
+    if (!isCheckingAuth && (!isAuthenticated || !role)) {
+      showLoading('Redirecionando para login...');
+      error('Sessão expirada', 'Por favor, faça login novamente.');
+      router.push('/login');
+    }
+
+    if (!isCheckingAuth && isAuthenticated && role && !successShown.current) {
+      success('Autenticação verificada com sucesso!');
+      successShown.current = true;
+    }
+  }, [isCheckingAuth, isAuthenticated, role, router, showLoading]);
 
   if (isCheckingAuth) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-white">
-        <div className="text-lg">Verificando autenticação...</div>
-      </main>
-    );
+    return null;
   }
 
-  if (isAuthenticated) {
+  if (!isAuthenticated || !role) {
     return null;
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-4">
-      <LoginPage />
+    <main>
+      <Header role={role as Role} />
     </main>
   );
 }

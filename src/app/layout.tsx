@@ -1,6 +1,7 @@
 import { LoadingProvider } from '@/providers/LoadingProvider';
 import type { Metadata } from 'next';
 import { Barlow, Geist, Geist_Mono } from 'next/font/google';
+import { Toaster } from './components/Toaster';
 import './globals.css';
 import { Toaster } from './components/Toaster';
 
@@ -38,6 +39,7 @@ export default function RootLayout({
       >
         <Toaster />
         <LoadingProvider>{children}</LoadingProvider>
+        <Toaster />
       </body>
     </html>
   );

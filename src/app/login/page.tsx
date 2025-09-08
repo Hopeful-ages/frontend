@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 
-import { User, Lock, Send } from 'lucide-react';
 import { api } from '@/lib/api';
+import { Lock, Send, User } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,17 +39,17 @@ export default function LoginPage() {
     }
   };
 
-  if (isCheckingAuth) {
-    return (
-      <main className="flex min-h-screen w-full items-center justify-center bg-white">
-        <div className="text-lg">Verificando autenticação...</div>
-      </main>
-    );
-  }
+  // if (isCheckingAuth) {
+  //   return (
+  //     <main className="flex min-h-screen w-full items-center justify-center bg-white">
+  //       <div className="text-lg">Verificando autenticação...</div>
+  //     </main>
+  //   );
+  // }
 
-  if (isAuthenticated) {
-    return null;
-  }
+  // if (isAuthenticated) {
+  //   return null;
+  // }
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white p-4">
