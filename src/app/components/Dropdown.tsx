@@ -16,11 +16,13 @@ type dropdownProps = {
   size?: 'small' | 'medium' | 'large' | 'long';
   icon?: React.ReactNode;
   textColor?: 'black' | 'gray' | 'foreground';
+  textSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   bgColor?: 'white' | 'gray' | 'surface';
   border?: BorderType;
-  roundedBorder?: boolean;
+  roundedBorder?: 'md' | 'lg' | 'full';
   fullWidth?: boolean;
   maxItemsVisible?: number;
+  value?: string | null;
 };
 
 const rowHeights = { small: 32, medium: 40, large: 44, long: 40 } as const;
@@ -31,10 +33,10 @@ const buttonClasses = cva(
   {
     variants: {
       size: {
-        small: 'h-8 text-sm px-3 w-26 md:w-28 lg:w-30',
-        medium: 'h-10 text-base px-4 w-40 md:w-50 lg:w-62',
-        large: 'h-11 text-lg px-5 w-52 md:w-60 lg:w-72',
-        long: 'h-10 text-base px-4 w-64 md:w-80 lg:w-96',
+        small: 'h-8 px-3 w-26 md:w-28 lg:w-30',
+        medium: 'h-10 px-4 w-40 md:w-50 lg:w-62',
+        large: 'h-11 px-5 w-52 md:w-60 lg:w-72',
+        long: 'h-10 px-4 w-64 md:w-80 lg:w-96',
       },
       bgColor: {
         white: 'bg-white',
@@ -43,12 +45,19 @@ const buttonClasses = cva(
       },
       border: {
         none: 'border-none',
-        gray: 'border border-gray-400',
+        gray: 'border border-gray-300',
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
-      radius: { md: 'rounded-md', full: 'rounded-full' },
+      radius: { md: 'rounded-md', lg: 'rounded-xl', full: 'rounded-full' },
       width: { auto: '', full: '!w-full' },
+      textSize: {
+        xs: 'text-xs',
+        sm: 'text-sm',
+        md: 'text-base',
+        lg: 'text-lg',
+        xl: 'text-xl',
+      },
     },
     defaultVariants: {
       size: 'medium',
@@ -56,6 +65,7 @@ const buttonClasses = cva(
       border: 'black',
       radius: 'md',
       width: 'auto',
+      textSize: 'md',
     },
   },
 );
@@ -71,7 +81,7 @@ const menuClasses = cva(
       },
       border: {
         none: 'border-0',
-        gray: 'border border-gray-400',
+        gray: 'border border-gray-300',
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
@@ -85,10 +95,10 @@ const itemClasses = cva(
   {
     variants: {
       size: {
-        small: 'py-2 text-xs md:text-sm',
-        medium: 'py-2.5 text-sm md:text-base',
-        large: 'py-3 text-base',
-        long: 'py-2.5 text-sm md:text-base',
+        small: 'py-2',
+        medium: 'py-2.5',
+        large: 'py-3',
+        long: 'py-2.5',
       },
       selected: {
         true: 'text-gray-400',
@@ -105,12 +115,20 @@ const itemClasses = cva(
         blue: 'focus-visible:ring-blue-500',
         black: 'focus-visible:ring-black',
       },
+      textSize: {
+        xs: 'text-xs',
+        sm: 'text-sm',
+        md: 'text-base',
+        lg: 'text-lg',
+        xl: 'text-xl',
+      },
     },
     defaultVariants: {
       size: 'medium',
       selected: false,
       tone: 'white',
       ringTone: 'gray',
+      textSize: 'md',
     },
   },
 );
@@ -122,11 +140,13 @@ export const Dropdown: React.FC<dropdownProps> = ({
   size = 'medium',
   icon,
   textColor = 'black',
+  textSize = 'md',
   bgColor = 'white',
   border = 'black',
-  roundedBorder = false,
+  roundedBorder = 'md',
   fullWidth = false,
   maxItemsVisible = 4,
+  value,
 }) => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -134,6 +154,12 @@ export const Dropdown: React.FC<dropdownProps> = ({
 
   const triggerId = useId();
   const menuId = `${triggerId}-menu`;
+
+  useEffect(() => {
+    if (typeof value !== 'undefined') {
+      setSelected(value ?? null);
+    }
+  }, [value]);
 
   useEffect(() => {
     const out = (e: MouseEvent) => {
@@ -175,13 +201,19 @@ export const Dropdown: React.FC<dropdownProps> = ({
           size,
           bgColor,
           border,
-          radius: roundedBorder ? 'full' : 'md',
+          radius: roundedBorder,
           width: fullWidth ? 'full' : 'auto',
+          textSize,
         })}
       >
         {icon && <span className={cn('shrink-0', tone)}>{icon}</span>}
 
-        <span className={cn('min-w-0 flex-1 truncate', tone)}>
+        <span
+          className={cn(
+            'min-w-0 flex-1 truncate',
+            selected ? 'text-black' : tone,
+          )}
+        >
           {selected ?? label}
         </span>
 
@@ -221,6 +253,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
                     selected: isSelected ? true : false,
                     tone: bgColor,
                     ringTone: border,
+                    textSize,
                   })}
                 >
                   {item}
