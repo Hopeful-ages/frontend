@@ -1,68 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '../components/Button';
-import { Modal } from '../components/Modal';
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
+import LoginPage from './login/page';
 
 export default function Home() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
+  if (isCheckingAuth) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <div className="text-lg">Verificando autenticação...</div>
+      </main>
+    );
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-4">
-      <div className="flex w-full max-w-md flex-col items-center rounded-xl bg-white/80 p-8 shadow-lg">
-        <h1 className="mb-4 text-center text-4xl font-extrabold text-gray-900 drop-shadow">
-          Bem-vindo ao Projeto Next.js!
-        </h1>
-        <p className="mb-6 text-center text-lg text-gray-700">
-          Esta é sua nova Home usando{' '}
-          <span className="font-semibold text-blue-600">Tailwind CSS</span>.
-          <br />
-          Edite este arquivo para começar a criar!
-        </p>
-        <a
-          href="https://tailwindcss.com/docs"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white shadow transition-colors hover:bg-blue-700"
-        >
-          Documentação Tailwind
-        </a>
-      </div>
-      <div className="p-6">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-        >
-          Abrir Modal
-        </button>
-
-        <Modal
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          title="Cadastro de Usuários"
-          size="xl"
-          footer={
-            <>
-              <Button type="submit" form="userForm" variant="outline">
-                Salvar
-              </Button>
-              <Button variant="danger" onClick={() => setIsOpen(false)}>
-                Cancelar
-              </Button>
-            </>
-          }
-        >
-          <form
-            id="userForm"
-            onSubmit={handleSubmit}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
-          ></form>
-        </Modal>
-      </div>
+      <LoginPage />
     </main>
   );
 }
