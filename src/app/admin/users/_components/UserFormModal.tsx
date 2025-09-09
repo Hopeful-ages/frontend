@@ -1,7 +1,7 @@
 'use client';
-import { Dropdown } from '@/app/components/Dropdown';
-import { Input } from '@/app/components/Input';
-import { Modal } from '@/app/components/Modal';
+import { Dropdown } from '@/components/Dropdown';
+import { Input } from '@/components/Input';
+import { Modal } from '@/components/Modal';
 import {
   Check,
   Hammer,

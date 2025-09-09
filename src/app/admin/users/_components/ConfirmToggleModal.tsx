@@ -1,6 +1,5 @@
 'use client';
-import React from 'react';
-import { Modal } from '@/app/components/Modal';
+import { Modal } from '@/components/Modal';
 import { Check, X } from 'lucide-react';
 
 type ConfirmToggleModalProps = {

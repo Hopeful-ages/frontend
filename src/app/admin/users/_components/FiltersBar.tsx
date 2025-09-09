@@ -1,6 +1,5 @@
 'use client';
-import React from 'react';
-import { Dropdown } from '@/app/components/Dropdown';
+import { Dropdown } from '@/components/Dropdown';
 import { UserPlus } from 'lucide-react';
 
 type FiltersBarProps = {

@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
-import { Button } from '../components/Button';
-import { Input } from '../components/Input';
+import { Input } from '../../components/Input';
 
+import { Button } from '@/components/Button';
 import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
 import { useLoading } from '@/providers/LoadingProvider';

@@ -1,8 +1,7 @@
 'use client';
-import React from 'react';
-import Table from '@/app/components/Table';
-import { Pencil, User as UserIcon, UserRoundX } from 'lucide-react';
+import Table from '@/components/Table';
 import { UserResponseDTO } from '@/lib/types';
+import { Pencil, User as UserIcon, UserRoundX } from 'lucide-react';
 
 type UsersTableProps = {
   rows: UserResponseDTO[];

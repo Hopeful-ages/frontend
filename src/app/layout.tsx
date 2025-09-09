@@ -1,8 +1,8 @@
 import HeaderWrapper from '@/components/HeaderWrapper';
+import { Toaster } from '@/components/Toaster';
 import { LoadingProvider } from '@/providers/LoadingProvider';
 import type { Metadata } from 'next';
 import { Barlow, Geist, Geist_Mono } from 'next/font/google';
-import { Toaster } from './components/Toaster';
 import './globals.css';
 
 const geistSans = Geist({
