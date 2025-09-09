@@ -238,7 +238,7 @@ function Root<T>({
         paginatedRows,
       }}
     >
-      <div className={cx('mx-auto w-[95%] overflow-x-auto', className)}>
+      <div className={cx('mx-auto w-[98%] overflow-x-auto', className)}>
         <table className="min-w-full border-collapse overflow-hidden rounded-xl">
           {children}
         </table>

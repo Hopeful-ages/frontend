@@ -1,3 +1,5 @@
+import HeaderWrapper from '@/components/HeaderWrapper';
+import { Toaster } from '@/components/Toaster';
 import { LoadingProvider } from '@/providers/LoadingProvider';
 import type { Metadata } from 'next';
 import { Barlow, Geist, Geist_Mono } from 'next/font/google';
@@ -35,7 +37,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${barlow.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <LoadingProvider>{children}</LoadingProvider>
+        <LoadingProvider>
+          <HeaderWrapper />
+          <Toaster />
+          {children}
+        </LoadingProvider>
       </body>
     </html>
   );
