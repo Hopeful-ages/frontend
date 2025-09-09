@@ -3,13 +3,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
+import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
+import { useLoading } from '@/providers/LoadingProvider';
 import { Lock, Send, User } from 'lucide-react';
 
 export default function LoginPage() {
@@ -21,35 +23,61 @@ export default function LoginPage() {
 
   const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
 
+  const { showLoading, hideLoading } = useLoading();
+  const { success, warning } = useToast();
+
+  const loadingShown = useRef(false);
+
+  useEffect(() => {
+    if (isCheckingAuth) {
+      showLoading('Verificando autenticação...');
+      if (!loadingShown.current) {
+        // warning('Atenção!!', 'Verificando autenticação...');
+        loadingShown.current = true;
+      }
+    } else {
+      hideLoading();
+      if (isAuthenticated) {
+        showLoading('Redirecionando...');
+        router.push('/');
+      }
+    }
+  }, [
+    isCheckingAuth,
+    isAuthenticated,
+    showLoading,
+    hideLoading,
+    warning,
+    router,
+  ]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
+      showLoading('Entrando...');
       const result = await api.login(username, password);
 
       if (result.redirectTo) {
         router.push(result.redirectTo);
+        success('Autenticado com sucesso!');
+      } else {
+        router.push('/');
+        success('Autenticado com sucesso!');
       }
     } catch {
       setError('Usuário ou senha inválidos. Tente novamente.');
     } finally {
+      hideLoading();
       setIsLoading(false);
     }
   };
 
-  // if (isCheckingAuth) {
-  //   return (
-  //     <main className="flex min-h-screen w-full items-center justify-center bg-white">
-  //       <div className="text-lg">Verificando autenticação...</div>
-  //     </main>
-  //   );
-  // }
-
-  // if (isAuthenticated) {
-  //   return null;
-  // }
+  if (isCheckingAuth || isAuthenticated) {
+    return null;
+  }
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white p-4">

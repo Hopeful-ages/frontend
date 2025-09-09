@@ -31,11 +31,18 @@ export const useAuthRedirect = () => {
           } else {
             Cookies.remove('token');
             Cookies.remove('user');
+            setIsAuthenticated(false);
+            setRole(null);
           }
         } catch {
           Cookies.remove('token');
           Cookies.remove('user');
+          setIsAuthenticated(false);
+          setRole(null);
         }
+      } else {
+        setIsAuthenticated(false);
+        setRole(null);
       }
 
       setIsCheckingAuth(false);
@@ -44,5 +51,11 @@ export const useAuthRedirect = () => {
     checkAuth();
   }, [router]);
 
-  return { isCheckingAuth, isAuthenticated, role };
+  const logout = () => {
+    Cookies.remove('token');
+    Cookies.remove('user');
+    router.push('/login');
+  };
+
+  return { isCheckingAuth, isAuthenticated, role, logout };
 };

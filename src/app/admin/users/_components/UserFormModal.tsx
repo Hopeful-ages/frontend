@@ -1,18 +1,17 @@
 'use client';
-import React from 'react';
-import { Modal } from '@/app/components/Modal';
-import { Input } from '@/app/components/Input';
 import { Dropdown } from '@/app/components/Dropdown';
+import { Input } from '@/app/components/Input';
+import { Modal } from '@/app/components/Modal';
 import {
   Check,
-  X,
-  User as UserIcon,
+  Hammer,
   IdCard,
   Lock,
   Mail,
-  Phone,
   MapPin,
-  Hammer,
+  Phone,
+  User as UserIcon,
+  X,
 } from 'lucide-react';
 
 type Field =
@@ -73,6 +72,21 @@ export function UserFormModal({
   onSelectServiceByName,
   onSelectCityByName,
 }: UserFormModalProps) {
+  function formatCPF(value: string) {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  }
+
+  function formatPhone(value: string) {
+    return value
+      .replace(/\D/g, '')
+      .replace(/^(\d{2})(\d)/g, '($1) $2')
+      .replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -110,7 +124,7 @@ export function UserFormModal({
 
         <Input
           value={form.cpf}
-          onChange={(e) => onUpdate('cpf', e.target.value)}
+          onChange={(e) => onUpdate('cpf', formatCPF(e.target.value))}
           placeholder="CPF"
           icon={<IdCard className="h-4 w-4" />}
           error={errors.cpf}
@@ -191,10 +205,11 @@ export function UserFormModal({
 
         <Input
           value={form.phone}
-          onChange={(e) => onUpdate('phone', e.target.value)}
+          onChange={(e) => onUpdate('phone', formatPhone(e.target.value))}
           placeholder="Telefone"
           icon={<Phone className="h-4 w-4" />}
           error={errors.phone}
+          maxLength={15}
         />
       </div>
     </Modal>

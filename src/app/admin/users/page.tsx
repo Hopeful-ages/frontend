@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import {
   CityResponseDTO,
@@ -8,13 +7,15 @@ import {
   UserResponseDTO,
   UserUpdateDTO,
 } from '@/lib/types';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { FiltersBar } from './_components/FiltersBar';
-import { UsersTable } from './_components/UsersTable';
-import { UserFormModal, UserFormState } from './_components/UserFormModal';
-import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 import { useToast } from '@/hooks/useToast';
+import { useLoading } from '@/providers/LoadingProvider';
+import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
+import { FiltersBar } from './_components/FiltersBar';
+import { UserFormModal, UserFormState } from './_components/UserFormModal';
+import { UsersTable } from './_components/UsersTable';
 
 type Field =
   | 'name'
@@ -51,6 +52,8 @@ export default function AdminUsersPage() {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const { success, error, warning } = useToast();
+  const { showLoading, hideLoading } = useLoading();
+  const loadingShown = useRef(false);
 
   const { isLoading, userInfo, hasAccess } = useProtectedPage({
     requiredRole: 'ROLE_USER',
@@ -70,6 +73,20 @@ export default function AdminUsersPage() {
 
   const serviceNames = services.map((s) => s.name);
   const cityNames = cities.map((c) => c.name);
+
+  useEffect(() => {
+    if (isLoading) {
+      showLoading('Verificando autenticação...');
+      if (!loadingShown.current) {
+        // warning('Atenção!!', 'Verificando autenticação...');
+        loadingShown.current = true;
+      }
+    } else {
+      setTimeout(() => {
+        hideLoading();
+      }, 1000);
+    }
+  }, [isLoading, showLoading, hideLoading, warning]);
 
   const serviceNameById = (id: string) =>
     services.find((s) => s.id === id)?.name ?? null;

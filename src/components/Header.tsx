@@ -1,6 +1,13 @@
+'use client';
+
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
+import { useToast } from '@/hooks/useToast';
+import { useLoading } from '@/providers/LoadingProvider';
 import { LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { Button } from './Button';
 
 export enum Role {
@@ -10,7 +17,7 @@ export enum Role {
 
 const ADMIN_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/usuarios', label: 'Usuários' },
+  { href: '/admin/users', label: 'Usuários' },
   { href: '/pesquisa', label: 'Pesquisa' },
 ];
 
@@ -19,9 +26,50 @@ const USER_LINKS = [
   { href: '/pesquisa', label: 'Pesquisa' },
 ];
 
-type HeaderProps = { role: Role };
+export default function Header() {
+  const router = useRouter();
+  const { isCheckingAuth, isAuthenticated, role, logout } = useAuthRedirect();
+  const { showLoading, hideLoading } = useLoading();
+  const { success, error, warning } = useToast();
 
-export default function Header({ role }: HeaderProps) {
+  const successShown = useRef(false);
+
+  useEffect(() => {
+    if (isCheckingAuth) {
+      showLoading('Verificando autenticação...');
+      warning('Atenção!!', 'Verificando autenticação...');
+    } else {
+      setTimeout(() => {
+        hideLoading();
+      }, 1000);
+    }
+  }, [isCheckingAuth, showLoading, hideLoading, warning]);
+
+  useEffect(() => {
+    if (!isCheckingAuth && (!isAuthenticated || !role)) {
+      showLoading('Redirecionando para login...');
+      error('Sessão expirada', 'Por favor, faça login novamente.');
+      router.push('/login');
+    }
+
+    if (!isCheckingAuth && isAuthenticated && role && !successShown.current) {
+      success('Autenticação verificada com sucesso!');
+      successShown.current = true;
+    }
+  }, [
+    isCheckingAuth,
+    isAuthenticated,
+    role,
+    router,
+    showLoading,
+    error,
+    success,
+  ]);
+
+  if (isCheckingAuth) {
+    return null;
+  }
+
   const links = role === Role.ADMIN ? ADMIN_LINKS : USER_LINKS;
 
   return (
@@ -78,20 +126,20 @@ export default function Header({ role }: HeaderProps) {
             >
               <Link href="/criar-cenario">Criar Cenário</Link>
             </Button>
-            <Link
-              href="/criar-cenario"
+            <button
+              onClick={logout}
               className="inline-flex h-10 w-9 items-center justify-center rounded-md hover:bg-gray-800"
             >
               <LogOut className="h-6 w-6" />
-            </Link>
+            </button>
           </>
         ) : (
-          <Link
-            href="http://localhost:3000/"
+          <button
+            onClick={logout}
             className="inline-flex h-10 w-9 items-center justify-center rounded-md hover:bg-gray-800"
           >
             <LogOut className="h-6 w-6" />
-          </Link>
+          </button>
         )}
       </div>
     </header>
