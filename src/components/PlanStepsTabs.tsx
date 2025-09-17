@@ -12,7 +12,7 @@ const rl = readline.createInterface({
 function showMenu() {
   console.log("\nEtapas do plano:");
   steps.forEach((s) => {
-    console.log(s === currentStep ? `👉 [${s}] (ativo)` : `   ${s}`);
+    console.log(s === currentStep ? ` [${s}] (ativo)` : `   ${s}`);
   });
 
   rl.question("Digite a etapa (antes, durante, depois): ", (answer) => {
