@@ -1,13 +1,8 @@
 'use client';
-import { cva } from 'class-variance-authority';
 import { ChevronDown } from 'lucide-react';
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-function cn(...cls: Array<string | false | null | undefined>) {
-  return cls.filter(Boolean).join(' ');
-}
-
-type BorderType = 'none' | 'gray' | 'blue' | 'black';
+type BorderType = keyof typeof borderClasses;
 
 type dropdownProps = {
   label: string;
@@ -15,123 +10,49 @@ type dropdownProps = {
   onSelect: (item: string) => void;
   size?: 'small' | 'medium' | 'large' | 'long';
   icon?: React.ReactNode;
-  textColor?: 'black' | 'gray' | 'foreground';
-  textSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  bgColor?: 'white' | 'gray' | 'surface';
+  textColor?: 'black' | 'gray';
+  bgColor?: 'white' | 'gray';
   border?: BorderType;
-  roundedBorder?: 'md' | 'lg' | 'full';
+  roundedBorder?: boolean;
   fullWidth?: boolean;
   maxItemsVisible?: number;
-  value?: string | null;
+  useAutoComplete?: boolean;
+};
+
+const sizeStyles = {
+  small: {
+    btn: 'h-8 text-sm px-3 w-28 md:w-32 lg:w-36',
+    item: 'py-2 text-xs md:text-sm',
+    icon: 16,
+  },
+  medium: {
+    btn: 'h-10 text-base px-4 w-36 md:w-44 lg:w-56',
+    item: 'py-2.5 text-sm md:text-base',
+    icon: 18,
+  },
+  large: {
+    btn: 'h-11 text-lg px-5 w-48 md:w-60 lg:w-72',
+    item: 'py-3 text-base',
+    icon: 20,
+  },
+  long: {
+    btn: 'h-10 text-base px-4 w-64 md:w-80 lg:w-96',
+    item: 'py-2.5 text-sm md:text-base',
+    icon: 18,
+  },
 };
 
 const rowHeights = { small: 32, medium: 40, large: 44, long: 40 } as const;
-const chevronBySize = { small: 16, medium: 18, large: 20, long: 18 } as const;
 
-const buttonClasses = cva(
-  'flex items-center gap-2 cursor-pointer text-left whitespace-nowrap select-none hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300',
-  {
-    variants: {
-      size: {
-        small: 'h-8 px-3 w-26 md:w-28 lg:w-30',
-        medium: 'h-10 px-4 w-40 md:w-50 lg:w-62',
-        large: 'h-11 px-5 w-52 md:w-60 lg:w-72',
-        long: 'h-10 px-4 w-64 md:w-80 lg:w-96',
-      },
-      bgColor: {
-        white: 'bg-white',
-        gray: 'bg-gray-200',
-        surface: 'bg-background',
-      },
-      border: {
-        none: 'border-none',
-        gray: 'border border-gray-300',
-        blue: 'border border-blue-500',
-        black: 'border border-black',
-      },
-      radius: { md: 'rounded-md', lg: 'rounded-xl', full: 'rounded-full' },
-      width: { auto: '', full: '!w-full' },
-      textSize: {
-        xs: 'text-xs',
-        sm: 'text-sm',
-        md: 'text-base',
-        lg: 'text-lg',
-        xl: 'text-xl',
-      },
-    },
-    defaultVariants: {
-      size: 'medium',
-      bgColor: 'white',
-      border: 'black',
-      radius: 'md',
-      width: 'auto',
-      textSize: 'md',
-    },
-  },
-);
-
-const menuClasses = cva(
-  'absolute left-0 right-0 z-20 mt-1 w-full overflow-y-auto overscroll-contain rounded-md shadow-lg',
-  {
-    variants: {
-      bgColor: {
-        white: 'bg-white',
-        gray: 'bg-gray-200',
-        surface: 'bg-background',
-      },
-      border: {
-        none: 'border-0',
-        gray: 'border border-gray-300',
-        blue: 'border border-blue-500',
-        black: 'border border-black',
-      },
-    },
-    defaultVariants: { bgColor: 'white', border: 'black' },
-  },
-);
-
-const itemClasses = cva(
-  'w-full text-left px-4 rounded-none first:rounded-t-md last:rounded-b-md transition-colors focus:outline-none ring-inset focus-visible:ring-1',
-  {
-    variants: {
-      size: {
-        small: 'py-2',
-        medium: 'py-2.5',
-        large: 'py-3',
-        long: 'py-2.5',
-      },
-      selected: {
-        true: 'text-gray-400',
-        false: 'text-gray-400',
-      },
-      tone: {
-        white: 'bg-white hover:bg-gray-100',
-        gray: 'bg-gray-200 hover:bg-gray-300',
-        surface: 'bg-background hover:bg-foreground/10',
-      },
-      ringTone: {
-        none: 'focus-visible:ring-0',
-        gray: 'focus-visible:ring-gray-400',
-        blue: 'focus-visible:ring-blue-500',
-        black: 'focus-visible:ring-black',
-      },
-      textSize: {
-        xs: 'text-xs',
-        sm: 'text-sm',
-        md: 'text-base',
-        lg: 'text-lg',
-        xl: 'text-xl',
-      },
-    },
-    defaultVariants: {
-      size: 'medium',
-      selected: false,
-      tone: 'white',
-      ringTone: 'gray',
-      textSize: 'md',
-    },
-  },
-);
+const textColorClasses = { black: 'text-black', gray: 'text-gray-500' };
+const bgColorClasses = { white: 'bg-white', gray: 'bg-gray-200' };
+const borderClasses = {
+  none: 'border-none',
+  gray: 'border border-gray-300',
+  blue: 'border border-blue-500',
+  black: 'border border-black',
+};
+const roundedBorderClasses = { true: 'rounded-full', false: 'rounded-md' };
 
 export const Dropdown: React.FC<dropdownProps> = ({
   label,
@@ -140,128 +61,135 @@ export const Dropdown: React.FC<dropdownProps> = ({
   size = 'medium',
   icon,
   textColor = 'black',
-  textSize = 'md',
   bgColor = 'white',
   border = 'black',
-  roundedBorder = 'md',
+  roundedBorder = false,
   fullWidth = false,
   maxItemsVisible = 4,
-  value,
+  useAutoComplete = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const triggerId = useId();
-  const menuId = `${triggerId}-menu`;
+  const [filterText, setFilterText] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof value !== 'undefined') {
-      setSelected(value ?? null);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    const out = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node))
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
+      }
     };
-    document.addEventListener('mousedown', out);
-    return () => document.removeEventListener('mousedown', out);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const { btn, item, icon: chevronSize } = sizeStyles[size];
+  const colorText = textColorClasses[textColor];
+  const maxH = `${rowHeights[size] * maxItemsVisible}px`;
 
   const pick = (val: string) => {
     setSelected(val || null);
     onSelect(val);
     setOpen(false);
+    if (useAutoComplete) setFilterText(val);
   };
 
-  const maxH = `${rowHeights[size] * maxItemsVisible}px`;
-  const toneByText = {
-    black: 'text-black',
-    gray: 'text-gray-400',
-    foreground: 'text-foreground',
-  } as const;
-
-  const tone = toneByText[textColor];
+  const filteredItems = useAutoComplete
+    ? items.filter((it) => it.toLowerCase().includes(filterText.toLowerCase()))
+    : items;
 
   return (
     <div
-      ref={ref}
-      className={cn('relative inline-block', fullWidth && 'w-full')}
+      ref={dropdownRef}
+      className={`relative inline-block ${fullWidth ? 'w-full' : ''}`}
     >
-      <button
-        id={triggerId}
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={menuId}
-        className={buttonClasses({
-          size,
-          bgColor,
-          border,
-          radius: roundedBorder,
-          width: fullWidth ? 'full' : 'auto',
-          textSize,
-        })}
-      >
-        {icon && <span className={cn('shrink-0', tone)}>{icon}</span>}
-
-        <span
-          className={cn(
-            'min-w-0 flex-1 truncate',
-            selected ? 'text-black' : tone,
-          )}
+      {useAutoComplete ? (
+        <div
+          className={[
+            'flex items-center gap-2',
+            bgColorClasses[bgColor],
+            borderClasses[border],
+            roundedBorderClasses[String(roundedBorder) as 'true' | 'false'],
+            colorText,
+            btn,
+            fullWidth ? 'w-full' : '',
+            'focus-within:ring-2 focus-within:ring-blue-400 hover:bg-blue-50',
+          ].join(' ')}
+          onClick={() => setOpen((prev) => !prev)}
         >
-          {selected ?? label}
-        </span>
-
-        <ChevronDown
-          size={chevronBySize[size]}
-          className={cn(
-            'ml-auto shrink-0 transition-transform duration-200',
-            open ? 'rotate-180' : 'rotate-0',
-            tone,
-          )}
-        />
-      </button>
+          {icon && <span className="shrink-0">{icon}</span>}
+          <input
+            type="text"
+            value={filterText}
+            placeholder={selected ?? label}
+            onChange={(e) => {
+              setFilterText(e.target.value);
+              setOpen(true);
+            }}
+            className="min-w-0 flex-grow bg-transparent placeholder-gray-500 outline-none"
+          />
+          <ChevronDown
+            size={chevronSize}
+            className={`shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
+          />
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className={[
+            'flex cursor-pointer items-center gap-2 text-left whitespace-nowrap select-none',
+            bgColorClasses[bgColor],
+            borderClasses[border],
+            roundedBorderClasses[String(roundedBorder) as 'true' | 'false'],
+            colorText,
+            btn,
+            fullWidth ? 'w-full' : '',
+            'hover:bg-blue-50 focus:ring-2 focus:ring-blue-400 focus:outline-none',
+          ].join(' ')}
+        >
+          {icon && <span className="shrink-0">{icon}</span>}
+          <span
+            className={`min-w-0 flex-1 truncate ${selected ? 'text-black' : 'text-gray-500'}`}
+          >
+            {selected ?? label}
+          </span>
+          <ChevronDown
+            size={chevronSize}
+            className={`shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
+          />
+        </button>
+      )}
 
       {open && (
-        <ul
-          id={menuId}
-          role="listbox"
-          aria-labelledby={triggerId}
-          className={menuClasses({ bgColor, border })}
-          style={{ maxHeight: `${maxH}` }}
+        <div
+          style={{ maxHeight: maxH }}
+          className="absolute right-0 left-0 z-20 mt-1 w-full overflow-y-auto overscroll-contain rounded-md border border-gray-200 bg-white shadow-lg"
         >
-          {items.map((item, i) => {
-            const isSelected = selected === item;
-            const optionId = `${menuId}-option-${i}`;
-            return (
-              <li
-                key={optionId}
-                role="option"
-                aria-selected={isSelected}
-                id={optionId}
+          {filteredItems.length === 0 ? (
+            <div className={`px-4 ${item} text-gray-400 select-none`}>
+              Sem resultados
+            </div>
+          ) : (
+            filteredItems.map((itemText) => (
+              <button
+                type="button"
+                key={itemText}
+                onClick={() => pick(itemText)}
+                className={`block w-full cursor-pointer px-4 text-left ${item} ${
+                  selected === itemText
+                    ? 'font-medium text-gray-500'
+                    : 'text-gray-500'
+                } hover:bg-gray-100`}
               >
-                <button
-                  type="button"
-                  onClick={() => pick(item)}
-                  className={itemClasses({
-                    size,
-                    selected: isSelected ? true : false,
-                    tone: bgColor,
-                    ringTone: border,
-                    textSize,
-                  })}
-                >
-                  {item}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                {itemText}
+              </button>
+            ))
+          )}
+        </div>
       )}
     </div>
   );

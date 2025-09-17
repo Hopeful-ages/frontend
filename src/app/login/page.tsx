@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
 import { useLoading } from '@/providers/LoadingProvider';
 import { Lock, Send, User } from 'lucide-react';
+import { Dropdown } from '@/components/Dropdown';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -136,6 +137,13 @@ export default function LoginPage() {
             >
               Entrar
             </Button>
+
+            <Dropdown
+              label="Selecione um item"
+              items={['Uva', 'Banana', 'Laranja']}
+              onSelect={(v) => console.log(v)}
+              useAutoComplete
+            />
           </div>
         </form>
       </div>
