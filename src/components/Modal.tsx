@@ -42,7 +42,7 @@ export const Modal: React.FC<ModalProps> = ({
   const sizeClasses = {
     sm: 'w-[500px] h-[250px]',
     md: 'w-[583px] h-[342px]',
-    lg: 'w-[500px] h-[500px]',
+    lg: 'w-[700px] h-[500px]',
     xl: 'w-[813px] h-[547px]',
     auto: 'max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
   };
@@ -54,14 +54,14 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         className={clsx(
-          'relative flex flex-col rounded-[8px] border border-black bg-white shadow-lg',
+          'relative flex flex-col rounded-[8px] bg-white shadow-lg',
           'max-h-[90vh]',
           sizeClasses[size],
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
-          <div className="relative flex justify-center px-4 py-3">
+          <div className="relative mt-3 flex justify-center px-4 py-3">
             <h2 className="text-center text-lg font-semibold text-black">
               {title}
             </h2>
@@ -76,10 +76,14 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+        <div className="mr-3 ml-3 flex-1 overflow-y-auto px-4 py-4">
+          {children}
+        </div>
 
         {footer && (
-          <div className="flex justify-center gap-2 px-4 py-3">{footer}</div>
+          <div className="mb-3 flex justify-center gap-2 px-4 py-3">
+            {footer}
+          </div>
         )}
       </div>
     </div>
