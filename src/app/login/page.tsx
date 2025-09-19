@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
 
@@ -137,13 +138,6 @@ export default function LoginPage() {
             >
               Entrar
             </Button>
-
-            <Dropdown
-              label="Selecione um item"
-              items={['Uva', 'Banana', 'Laranja']}
-              onSelect={(v) => console.log(v)}
-              useAutoComplete
-            />
           </div>
         </form>
       </div>

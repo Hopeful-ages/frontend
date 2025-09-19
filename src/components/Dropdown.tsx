@@ -10,12 +10,14 @@ type dropdownProps = {
   onSelect: (item: string) => void;
   size?: 'small' | 'medium' | 'large' | 'long';
   icon?: React.ReactNode;
-  textColor?: 'black' | 'gray';
+  textColor?: 'black' | 'gray' | 'foreground';
+  textSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   bgColor?: 'white' | 'gray';
   border?: BorderType;
-  roundedBorder?: boolean;
+  roundedBorder?: 'md' | 'lg' | 'full';
   fullWidth?: boolean;
   maxItemsVisible?: number;
+  value?: string | null;
   useAutoComplete?: boolean;
 };
 
@@ -44,7 +46,11 @@ const sizeStyles = {
 
 const rowHeights = { small: 32, medium: 40, large: 44, long: 40 } as const;
 
-const textColorClasses = { black: 'text-black', gray: 'text-gray-500' };
+const textColorClasses = {
+  black: 'text-black',
+  gray: 'text-gray-500',
+  foreground: 'text-foreground',
+};
 const bgColorClasses = { white: 'bg-white', gray: 'bg-gray-200' };
 const borderClasses = {
   none: 'border-none',
