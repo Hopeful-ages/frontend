@@ -317,8 +317,8 @@ export default function AdminPlansPage() {
   // --- Renderização do Componente ---
   return (
     <main className="mx-auto mt-20 w-full px-6 py-6">
-      <div className="mb-5 ml-5 flex items-center justify-between">
-        <h1 className="mb-5 text-3xl font-bold">Planos de Contingência</h1>
+      <div className="mb-5 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Planos de Contingência</h1>
       </div>
 
       <FiltersBar

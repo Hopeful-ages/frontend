@@ -1,5 +1,6 @@
 'use client';
 import { Dropdown } from '@/components/Dropdown';
+import { LocateIcon, LocationEdit, MapPin, Search } from 'lucide-react';
 
 type FiltersBarProps = {
   serviceOptions: string[];
@@ -21,53 +22,62 @@ export function FiltersBar({
   onSearch,
 }: FiltersBarProps) {
   return (
-    <div className="mb-6 ml-5 flex flex-wrap items-end gap-4">
-      <div className="w-full sm:w-auto sm:flex-1">
-        <label className="text-sm font-medium text-gray-700">Cidade</label>
+    <div className="mb-4 flex flex-wrap items-end gap-8">
+      <div className="flex w-full flex-col sm:w-auto sm:flex-1">
+        <label className="mb-1 text-sm font-medium text-gray-700">Cidade</label>
         <Dropdown
-          label="Todas as Cidades"
+          label="Buscar por cidade"
           items={['Todos', ...cityOptions]}
           onSelect={(v) => onSelectCity(v === 'Todos' ? null : v)}
-          size="medium"
-          bgColor="gray"
-          border="none"
+          size="small"
+          bgColor="white"
+          border="gray"
+          maxItemsVisible={3}
+          icon={<Search className="h-4 w-4 text-gray-500" />}
           fullWidth
+          useAutoComplete
         />
       </div>
 
-      <div className="w-full sm:w-auto sm:flex-1">
-        <label className="text-sm font-medium text-gray-700">Serviço</label>
+      <div className="flex w-full flex-col sm:w-auto sm:flex-1">
+        <label className="mb-1 text-sm font-medium text-gray-700">
+          Serviço
+        </label>
         <Dropdown
           label="Todos os Serviços"
           items={['Todos', ...serviceOptions]}
           onSelect={(v) => onSelectService(v === 'Todos' ? null : v)}
-          size="medium"
-          bgColor="gray"
-          border="none"
+          size="small"
+          bgColor="white"
+          border="gray"
           fullWidth
+          useAutoComplete
         />
       </div>
 
-      <div className="w-full sm:w-auto sm:flex-1">
-        <label className="text-sm font-medium text-gray-700">Cobrade</label>
+      <div className="flex w-full flex-col sm:w-auto sm:flex-1">
+        <label className="mb-1 text-sm font-medium text-gray-700">
+          Cobrade
+        </label>
         <Dropdown
           label="Todos os Cobrades"
           items={['Todos', ...cobradeOptions]}
           onSelect={(v) => onSelectCobrade(v === 'Todos' ? null : v)}
-          size="medium"
-          bgColor="gray"
-          border="none"
+          size="small"
+          bgColor="white"
+          useAutoComplete
+          border="gray"
           fullWidth
         />
       </div>
 
-      <div className="ml-auto">
+      <div className="ml-auto flex items-end">
         <button
           onClick={onSearch}
           title="Buscar planos"
           className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800"
         >
-          <span>Buscar</span>
+          Buscar
         </button>
       </div>
     </div>
