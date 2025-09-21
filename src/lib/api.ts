@@ -2,6 +2,9 @@ import Cookies from 'js-cookie';
 import { decodeJWT } from './jwt';
 import {
   CityResponseDTO,
+  PlanRequestDTO,
+  PlanResponseDTO,
+  PlanUpdateDTO,
   ServiceResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
@@ -121,4 +124,21 @@ export const api = {
     fetchWithAuthVoid(`/api/users/enable/${id}`, {
       method: 'PATCH',
     }),
+
+  getPlans: () => fetchWithAuth('/api/plans') as Promise<PlanResponseDTO[]>,
+
+  getPlan: (id: string) =>
+    fetchWithAuth(`/api/plans/${id}`) as Promise<PlanResponseDTO>,
+
+  createPlan: (payload: PlanRequestDTO) =>
+    fetchWithAuth('/api/plans', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }) as Promise<PlanResponseDTO>,
+
+  editPlan: (id: string, payload: PlanUpdateDTO) =>
+    fetchWithAuth(`/api/plans/${id}`, {
+      method: 'PATCH', // Usando PATCH para consistência com editUser
+      body: JSON.stringify(payload),
+    }) as Promise<PlanResponseDTO>,
 };
