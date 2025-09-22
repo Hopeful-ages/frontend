@@ -10,7 +10,7 @@ export const StepSelector: React.FC = () => {
     if (steps.includes(step)) {
       setCurrentStep(step);
     } else {
-      //alert("Etapa inválida!");
+      alert("Etapa inválida!");
 
     }
   };
