@@ -2,6 +2,7 @@
 
 import { api } from '@/lib/api';
 import {
+  ApiError,
   CityResponseDTO,
   ServiceResponseDTO,
   UserResponseDTO,
@@ -28,6 +29,75 @@ type Field =
   | 'cityId';
 
 type Errors = Partial<Record<Field, string>>;
+
+export function handleApiErrors(
+  err: unknown,
+  setErrors: React.Dispatch<React.SetStateAction<Errors>>,
+  fallback: (msg: string) => void,
+) {
+  const apiErr = err as ApiError;
+
+  if (!apiErr || !apiErr.data) {
+    fallback(
+      'Ocorreu um erro inesperado. Por favor, tente novamente em alguns instantes.',
+    );
+    return;
+  }
+
+  const backendMsg = apiErr.data.message?.trim();
+  if (!backendMsg) {
+    fallback(
+      apiErr.raw ||
+        'Não foi possível completar a ação. Verifique sua conexão ou tente novamente.',
+    );
+    return;
+  }
+
+  const parts = backendMsg
+    .split(';')
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const next: Errors = {};
+
+  parts.forEach((p) => {
+    const [field, ...rest] = p.split(':');
+    if (field && rest.length) {
+      const f = field.trim() as Field;
+      const msg = rest.join(':').trim();
+      next[f] = msg.charAt(0).toUpperCase() + msg.slice(1);
+    }
+  });
+
+  if (Object.keys(next).length > 0) {
+    setErrors(next);
+    return;
+  }
+
+  const possibleFields: Field[] = [
+    'name',
+    'cpf',
+    'email',
+    'phone',
+    'password',
+    'confirm',
+    'serviceId',
+    'cityId',
+  ];
+
+  const lowerMsg = backendMsg.toLowerCase();
+  const matchedField = possibleFields.find((f) =>
+    lowerMsg.includes(f.toLowerCase()),
+  );
+
+  if (matchedField) {
+    setErrors({
+      [matchedField]: backendMsg.charAt(0).toUpperCase() + backendMsg.slice(1),
+    });
+    return;
+  }
+
+  fallback(backendMsg.charAt(0).toUpperCase() + backendMsg.slice(1));
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CPF_RE = /^[0-9.\-]{11,14}$/;
@@ -313,6 +383,7 @@ export default function AdminUsersPage() {
         success('Usuário atualizado com sucesso');
       } catch (err) {
         console.error(err);
+        handleApiErrors(err as ApiError, setErrors, error);
         error('Não foi possível editar o usuário');
       }
     } else {
@@ -332,6 +403,7 @@ export default function AdminUsersPage() {
         success('Usuário criado com sucesso');
       } catch (err) {
         console.error(err);
+        handleApiErrors(err as ApiError, setErrors, error);
         error('Não foi possível criar o usuário');
       }
     }
