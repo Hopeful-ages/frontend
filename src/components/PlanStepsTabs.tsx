@@ -11,7 +11,7 @@ export const StepSelector: React.FC = () => {
       setCurrentStep(step);
     } else {
       //alert("Etapa inválida!");
-      // add opcao com outra legenda 
+
     }
   };
 
