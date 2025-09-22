@@ -93,7 +93,7 @@ export function UserFormModal({
       isOpen={isOpen}
       onClose={onClose}
       title={isEdit ? titleWhenEdit : 'Cadastro de Usuários'}
-      size="lg"
+      size="auto"
       footer={
         <div className="flex w-full items-center justify-center gap-3">
           <Button

@@ -72,7 +72,7 @@ const buttonClasses = cva(
 );
 
 const menuClasses = cva(
-  'absolute left-0 right-0 z-20 mt-1 w-full overflow-y-auto overscroll-contain rounded-md shadow-lg',
+  'absolute left-0 right-0 z-20 mt-1 w-full overflow-y-auto overscroll-contain rounded-md shadow-lg', // removi border-gray-400
   {
     variants: {
       bgColor: {
@@ -82,7 +82,7 @@ const menuClasses = cva(
       },
       border: {
         none: 'border-0',
-        gray: 'border border-gray-300',
+        gray: 'border border-gray-400',
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
