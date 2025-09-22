@@ -30,7 +30,7 @@ type Field =
 
 type Errors = Partial<Record<Field, string>>;
 
-export function handleApiErrors(
+function handleApiErrors(
   err: unknown,
   setErrors: React.Dispatch<React.SetStateAction<Errors>>,
   fallback: (msg: string) => void,
