@@ -1,29 +1,38 @@
-// planStepsTabs.js
-const readline = require("readline");
+'use client';
+import React, { useState } from 'react';
 
 const steps = ["antes", "durante", "depois"];
-let currentStep = "antes";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+export const StepSelector: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState("antes");
 
-function showMenu() {
-  console.log("\nEtapas do plano:");
-  steps.forEach((s) => {
-    console.log(s === currentStep ? ` [${s}] (ativo)` : `   ${s}`);
-  });
-
-  rl.question("Digite a etapa (antes, durante, depois): ", (answer) => {
-    if (steps.includes(answer)) {
-      currentStep = answer;
-      console.log(`\nVocê mudou para a etapa: ${currentStep}`);
+  const handleChangeStep = (step: string) => {
+    if (steps.includes(step)) {
+      setCurrentStep(step);
     } else {
-      console.log("Etapa inválida!");
+      alert("Etapa inválida!");
     }
-    showMenu();
-  });
-}
+  };
 
-showMenu();
+  return (
+    <div className="p-4">
+      <h2 className="text-lg font-bold mb-2">Etapas do plano:</h2>
+      <ul className="space-y-1">
+        {steps.map((step) => (
+          <li key={step}>
+            <button
+              className={`px-3 py-1 rounded ${
+                step === currentStep
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => handleChangeStep(step)}
+            >
+              {step} {step === currentStep && "(ativo)"}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
