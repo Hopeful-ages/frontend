@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
 import { useLoading } from '@/providers/LoadingProvider';
 import { Lock, Send, User } from 'lucide-react';
+import ProtocolList from '@/components/ProtocolList';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -79,6 +80,30 @@ export default function LoginPage() {
     return null;
   }
 
+  const mockProtocols: Protocol[] = [
+    {
+      id: 1,
+      description: 'Protocolo de Segurança para Acesso à Rede Interna',
+    },
+    {
+      id: 2,
+      description: 'Protocolo de Onboarding para Novos Funcionários',
+    },
+    {
+      id: 'a3f8-b1c9', // Exemplo com ID de string
+      description:
+        'Protocolo de Resposta a Incidentes de Segurança Cibernética',
+    },
+    {
+      id: 4,
+      description: 'Protocolo de Gerenciamento de Ativos de TI',
+    },
+    {
+      id: 5,
+      description: 'Protocolo para Solicitação de Férias e Licenças',
+    },
+  ];
+
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white p-4">
       <div className="w-full max-w-sm">
@@ -136,6 +161,11 @@ export default function LoginPage() {
             >
               Entrar
             </Button>
+            <ProtocolList
+              protocols={mockProtocols}
+              onEdit={() => {}}
+              onRemove={() => {}}
+            />
           </div>
         </form>
       </div>
