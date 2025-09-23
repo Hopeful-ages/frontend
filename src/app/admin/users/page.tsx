@@ -142,7 +142,7 @@ export default function AdminUsersPage() {
   const [errors, setErrors] = useState<Errors>({});
 
   const serviceNames = services.map((s) => s.name);
-  const cityNames = cities.map((c) => c.name);
+  const cityNames = cities.map((c) => `${c.name} - ${c.state}`);
 
   useEffect(() => {
     if (isLoading) {
@@ -160,8 +160,10 @@ export default function AdminUsersPage() {
 
   const serviceNameById = (id: string) =>
     services.find((s) => s.id === id)?.name ?? null;
-  const cityNameById = (id: string) =>
-    cities.find((c) => c.id === id)?.name ?? null;
+  const cityNameById = (id: string) => {
+    const city = cities.find((c) => c.id === id);
+    return city ? `${city.name} - ${city.state}` : null;
+  };
 
   const setServiceByName = (name: string) => {
     const id = services.find((s) => s.name === name)?.id ?? '';
@@ -169,8 +171,9 @@ export default function AdminUsersPage() {
     if (errors.serviceId) setErrors((e) => ({ ...e, serviceId: undefined }));
   };
 
-  const setCityByName = (name: string) => {
-    const id = cities.find((c) => c.name === name)?.id ?? '';
+  const setCityByName = (value: string) => {
+    const cityName = value.split(' - ')[0]; // pega só o nome da cidade
+    const id = cities.find((c) => c.name === cityName)?.id ?? '';
     setForm((f) => ({ ...f, cityId: id }));
     if (errors.cityId) setErrors((e) => ({ ...e, cityId: undefined }));
   };
