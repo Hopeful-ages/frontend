@@ -144,6 +144,7 @@ export function UserFormModal({
             icon={<MapPin className="h-4 w-4" />}
             fullWidth
             value={valueCityName}
+            useAutoComplete={true}
           />
           {errors.cityId && (
             <p className="mt-1.5 text-xs font-medium text-red-600">
