@@ -46,7 +46,7 @@ const buttonClasses = cva(
       },
       border: {
         none: 'border-none',
-        gray: 'border border-gray-300',
+        gray: 'border border-gray-400',
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
@@ -82,7 +82,7 @@ const menuClasses = cva(
       },
       border: {
         none: 'border-0',
-        gray: 'border border-gray-300',
+        gray: 'border border-gray-400',
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
@@ -226,7 +226,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
             }}
             className={cn(
               'min-w-0 flex-1 truncate bg-transparent outline-none',
-              tone,
+              selected ? 'text-black' : tone,
             )}
           />
           <ChevronDown
