@@ -29,7 +29,6 @@ type Field =
   | 'cityId';
 
 type Errors = Partial<Record<Field, string>>;
-
 function handleApiErrors(
   err: unknown,
   setErrors: React.Dispatch<React.SetStateAction<Errors>>,
@@ -52,6 +51,11 @@ function handleApiErrors(
     );
     return;
   }
+  //TRATAMENTO ESPECIAL PARA CPF
+  if (/contribuinte individual brasileiro/i.test(backendMsg)) {
+    setErrors({ cpf: 'CPF inválido' });
+    return;
+  }
 
   const parts = backendMsg
     .split(';')
@@ -63,7 +67,11 @@ function handleApiErrors(
     const [field, ...rest] = p.split(':');
     if (field && rest.length) {
       const f = field.trim() as Field;
-      const msg = rest.join(':').trim();
+      let msg = rest.join(':').trim();
+      //TRATAMENTO ESPECIAL PARA CPF
+      if (/contribuinte individual brasileiro/i.test(msg)) {
+        msg = 'CPF inválido';
+      }
       next[f] = msg.charAt(0).toUpperCase() + msg.slice(1);
     }
   });
