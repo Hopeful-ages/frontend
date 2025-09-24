@@ -9,7 +9,6 @@ function cn(...classes: Array<string | undefined | false | null>) {
 
 export type Step = string;
 
-//ver outra maneira de herdar as VariantProps
 export interface PlanStepsTabsProps extends VariantProps<typeof tabClasses> {
   steps: Step[];
   currentStep: Step;
@@ -17,7 +16,7 @@ export interface PlanStepsTabsProps extends VariantProps<typeof tabClasses> {
 }
 
 const tabClasses = cva(
-  'px-4 py-2 font-medium transition-colors select-none whitespace-nowrap',
+  'px-4 py-3 font-semibold transition-colors select-none whitespace-nowrap', // fonte mais forte + padding maior
   {
     variants: {
       active: {
@@ -46,14 +45,13 @@ export const PlanStepsTabs: React.FC<PlanStepsTabsProps> = ({
 }) => {
   return (
     <div
-      className="flex overflow-hidden rounded-lg border border-gray-300"
+      className="flex overflow-hidden rounded-md border border-gray-300" // rounded-md para ficar mais parecido
       role="tablist"
       aria-label="Etapas do Plano"
     >
       {steps.map((step, index) => {
         const isActive = step === currentStep;
         const isFirst = index === 0;
-        const isLast = index === steps.length - 1;
 
         const borderClass = !isFirst ? 'border-l border-gray-300' : '';
 
