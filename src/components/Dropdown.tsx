@@ -23,6 +23,7 @@ type dropdownProps = {
   fullWidth?: boolean;
   maxItemsVisible?: number;
   value?: string | null;
+  useAutoComplete?: boolean;
 };
 
 const rowHeights = { small: 32, medium: 40, large: 44, long: 40 } as const;
@@ -45,7 +46,7 @@ const buttonClasses = cva(
       },
       border: {
         none: 'border-none',
-        gray: 'border border-gray-300',
+        gray: 'border border-gray-400',
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
@@ -81,7 +82,7 @@ const menuClasses = cva(
       },
       border: {
         none: 'border-0',
-        gray: 'border border-gray-300',
+        gray: 'border border-gray-400',
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
@@ -147,9 +148,11 @@ export const Dropdown: React.FC<dropdownProps> = ({
   fullWidth = false,
   maxItemsVisible = 4,
   value,
+  useAutoComplete = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [filterText, setFilterText] = useState('');
   const ref = useRef<HTMLDivElement>(null);
 
   const triggerId = useId();
@@ -158,8 +161,9 @@ export const Dropdown: React.FC<dropdownProps> = ({
   useEffect(() => {
     if (typeof value !== 'undefined') {
       setSelected(value ?? null);
+      if (useAutoComplete) setFilterText(value ?? '');
     }
-  }, [value]);
+  }, [value, useAutoComplete]);
 
   useEffect(() => {
     const out = (e: MouseEvent) => {
@@ -174,6 +178,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
     setSelected(val || null);
     onSelect(val);
     setOpen(false);
+    if (useAutoComplete) setFilterText(val);
   };
 
   const maxH = `${rowHeights[size] * maxItemsVisible}px`;
@@ -185,47 +190,92 @@ export const Dropdown: React.FC<dropdownProps> = ({
 
   const tone = toneByText[textColor];
 
+  const filteredItems = useAutoComplete
+    ? items.filter((it) => it.toLowerCase().includes(filterText.toLowerCase()))
+    : items;
+
   return (
     <div
       ref={ref}
       className={cn('relative inline-block', fullWidth && 'w-full')}
     >
-      <button
-        id={triggerId}
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={menuId}
-        className={buttonClasses({
-          size,
-          bgColor,
-          border,
-          radius: roundedBorder,
-          width: fullWidth ? 'full' : 'auto',
-          textSize,
-        })}
-      >
-        {icon && <span className={cn('shrink-0', tone)}>{icon}</span>}
-
-        <span
-          className={cn(
-            'min-w-0 flex-1 truncate',
-            selected ? 'text-black' : tone,
-          )}
+      {useAutoComplete ? (
+        <div
+          id={triggerId}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={menuId}
+          className={buttonClasses({
+            size,
+            bgColor,
+            border,
+            radius: roundedBorder,
+            width: fullWidth ? 'full' : 'auto',
+            textSize,
+          })}
+          onClick={() => setOpen((o) => !o)}
         >
-          {selected ?? label}
-        </span>
+          {icon && <span className={cn('shrink-0', tone)}>{icon}</span>}
+          <input
+            type="text"
+            value={filterText}
+            placeholder={selected ?? label}
+            onChange={(e) => {
+              setFilterText(e.target.value);
+              setOpen(true);
+            }}
+            className={cn(
+              'min-w-0 flex-1 truncate bg-transparent outline-none',
+              selected ? 'text-black' : tone,
+            )}
+          />
+          <ChevronDown
+            size={chevronBySize[size]}
+            className={cn(
+              'ml-auto shrink-0 transition-transform duration-200',
+              open ? 'rotate-180' : 'rotate-0',
+              tone,
+            )}
+          />
+        </div>
+      ) : (
+        <button
+          id={triggerId}
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={menuId}
+          className={buttonClasses({
+            size,
+            bgColor,
+            border,
+            radius: roundedBorder,
+            width: fullWidth ? 'full' : 'auto',
+            textSize,
+          })}
+        >
+          {icon && <span className={cn('shrink-0', tone)}>{icon}</span>}
 
-        <ChevronDown
-          size={chevronBySize[size]}
-          className={cn(
-            'ml-auto shrink-0 transition-transform duration-200',
-            open ? 'rotate-180' : 'rotate-0',
-            tone,
-          )}
-        />
-      </button>
+          <span
+            className={cn(
+              'min-w-0 flex-1 truncate',
+              selected ? 'text-black' : tone,
+            )}
+          >
+            {selected ?? label}
+          </span>
+
+          <ChevronDown
+            size={chevronBySize[size]}
+            className={cn(
+              'ml-auto shrink-0 transition-transform duration-200',
+              open ? 'rotate-180' : 'rotate-0',
+              tone,
+            )}
+          />
+        </button>
+      )}
 
       {open && (
         <ul
@@ -235,32 +285,38 @@ export const Dropdown: React.FC<dropdownProps> = ({
           className={menuClasses({ bgColor, border })}
           style={{ maxHeight: `${maxH}` }}
         >
-          {items.map((item, i) => {
-            const isSelected = selected === item;
-            const optionId = `${menuId}-option-${i}`;
-            return (
-              <li
-                key={optionId}
-                role="option"
-                aria-selected={isSelected}
-                id={optionId}
-              >
-                <button
-                  type="button"
-                  onClick={() => pick(item)}
-                  className={itemClasses({
-                    size,
-                    selected: isSelected ? true : false,
-                    tone: bgColor,
-                    ringTone: border,
-                    textSize,
-                  })}
+          {filteredItems.length === 0 ? (
+            <li className="px-4 py-2 text-gray-400 select-none">
+              Sem resultados
+            </li>
+          ) : (
+            filteredItems.map((item, i) => {
+              const isSelected = selected === item;
+              const optionId = `${menuId}-option-${i}`;
+              return (
+                <li
+                  key={optionId}
+                  role="option"
+                  aria-selected={isSelected}
+                  id={optionId}
                 >
-                  {item}
-                </button>
-              </li>
-            );
-          })}
+                  <button
+                    type="button"
+                    onClick={() => pick(item)}
+                    className={itemClasses({
+                      size,
+                      selected: isSelected ? true : false,
+                      tone: bgColor,
+                      ringTone: border,
+                      textSize,
+                    })}
+                  >
+                    {item}
+                  </button>
+                </li>
+              );
+            })
+          )}
         </ul>
       )}
     </div>

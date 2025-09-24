@@ -59,9 +59,10 @@ export function UsersTable({
                 </div>
               </Table.Cell>
               <Table.Cell>{row.service?.name ?? '—'}</Table.Cell>
-              <Table.Cell>{row.city?.name ?? '—'}</Table.Cell>
+              <Table.Cell>
+                {row.city ? `${row.city.name} - ${row.city.state}` : '—'}
+              </Table.Cell>{' '}
               <Table.Cell>{row.accountStatus ? 'Sim' : 'Não'}</Table.Cell>
-
               <Table.Cell align="center">
                 <button
                   type="button"
@@ -72,7 +73,6 @@ export function UsersTable({
                   <Pencil className="h-4 w-4" />
                 </button>
               </Table.Cell>
-
               <Table.Cell align="center">
                 <button
                   type="button"

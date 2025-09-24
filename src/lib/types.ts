@@ -35,3 +35,12 @@ export type UserUpdateDTO = Partial<{
   cityId: string | null;
   accountStatus: boolean;
 }>;
+
+export type ApiError = {
+  status: number;
+  data?: {
+    error?: string;
+    message?: string;
+  };
+  raw?: string;
+};

@@ -2,6 +2,7 @@
 
 import { api } from '@/lib/api';
 import {
+  ApiError,
   CityResponseDTO,
   ServiceResponseDTO,
   UserResponseDTO,
@@ -28,6 +29,83 @@ type Field =
   | 'cityId';
 
 type Errors = Partial<Record<Field, string>>;
+function handleApiErrors(
+  err: unknown,
+  setErrors: React.Dispatch<React.SetStateAction<Errors>>,
+  fallback: (msg: string) => void,
+) {
+  const apiErr = err as ApiError;
+
+  if (!apiErr || !apiErr.data) {
+    fallback(
+      'Ocorreu um erro inesperado. Por favor, tente novamente em alguns instantes.',
+    );
+    return;
+  }
+
+  const backendMsg = apiErr.data.message?.trim();
+  if (!backendMsg) {
+    fallback(
+      apiErr.raw ||
+        'Não foi possível completar a ação. Verifique sua conexão ou tente novamente.',
+    );
+    return;
+  }
+  //TRATAMENTO ESPECIAL PARA CPF
+  if (/contribuinte individual brasileiro/i.test(backendMsg)) {
+    setErrors({ cpf: 'CPF inválido' });
+    return;
+  }
+
+  const parts = backendMsg
+    .split(';')
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const next: Errors = {};
+
+  parts.forEach((p) => {
+    const [field, ...rest] = p.split(':');
+    if (field && rest.length) {
+      const f = field.trim() as Field;
+      let msg = rest.join(':').trim();
+      //TRATAMENTO ESPECIAL PARA CPF
+      if (/contribuinte individual brasileiro/i.test(msg)) {
+        msg = 'CPF inválido';
+      }
+      next[f] = msg.charAt(0).toUpperCase() + msg.slice(1);
+    }
+  });
+
+  if (Object.keys(next).length > 0) {
+    setErrors(next);
+    return;
+  }
+
+  const possibleFields: Field[] = [
+    'name',
+    'cpf',
+    'email',
+    'phone',
+    'password',
+    'confirm',
+    'serviceId',
+    'cityId',
+  ];
+
+  const lowerMsg = backendMsg.toLowerCase();
+  const matchedField = possibleFields.find((f) =>
+    lowerMsg.includes(f.toLowerCase()),
+  );
+
+  if (matchedField) {
+    setErrors({
+      [matchedField]: backendMsg.charAt(0).toUpperCase() + backendMsg.slice(1),
+    });
+    return;
+  }
+
+  fallback(backendMsg.charAt(0).toUpperCase() + backendMsg.slice(1));
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CPF_RE = /^[0-9.\-]{11,14}$/;
@@ -72,7 +150,7 @@ export default function AdminUsersPage() {
   const [errors, setErrors] = useState<Errors>({});
 
   const serviceNames = services.map((s) => s.name);
-  const cityNames = cities.map((c) => c.name);
+  const cityNames = cities.map((c) => `${c.name} - ${c.state}`);
 
   useEffect(() => {
     if (isLoading) {
@@ -90,8 +168,10 @@ export default function AdminUsersPage() {
 
   const serviceNameById = (id: string) =>
     services.find((s) => s.id === id)?.name ?? null;
-  const cityNameById = (id: string) =>
-    cities.find((c) => c.id === id)?.name ?? null;
+  const cityNameById = (id: string) => {
+    const city = cities.find((c) => c.id === id);
+    return city ? `${city.name} - ${city.state}` : null;
+  };
 
   const setServiceByName = (name: string) => {
     const id = services.find((s) => s.name === name)?.id ?? '';
@@ -99,8 +179,9 @@ export default function AdminUsersPage() {
     if (errors.serviceId) setErrors((e) => ({ ...e, serviceId: undefined }));
   };
 
-  const setCityByName = (name: string) => {
-    const id = cities.find((c) => c.name === name)?.id ?? '';
+  const setCityByName = (value: string) => {
+    const cityName = value.split(' - ')[0]; // pega só o nome da cidade
+    const id = cities.find((c) => c.name === cityName)?.id ?? '';
     setForm((f) => ({ ...f, cityId: id }));
     if (errors.cityId) setErrors((e) => ({ ...e, cityId: undefined }));
   };
@@ -313,6 +394,7 @@ export default function AdminUsersPage() {
         success('Usuário atualizado com sucesso');
       } catch (err) {
         console.error(err);
+        handleApiErrors(err as ApiError, setErrors, error);
         error('Não foi possível editar o usuário');
       }
     } else {
@@ -332,6 +414,7 @@ export default function AdminUsersPage() {
         success('Usuário criado com sucesso');
       } catch (err) {
         console.error(err);
+        handleApiErrors(err as ApiError, setErrors, error);
         error('Não foi possível criar o usuário');
       }
     }

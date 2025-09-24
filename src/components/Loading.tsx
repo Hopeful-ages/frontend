@@ -11,7 +11,7 @@ export default function Loading({ text = 'Carregando...' }: LoadingProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white text-black"
+      className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-white text-black"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
