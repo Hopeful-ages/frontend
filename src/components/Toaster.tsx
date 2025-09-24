@@ -7,7 +7,7 @@ export function Toaster() {
   const { toasts, dismiss } = useToast();
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 flex w-full max-w-sm flex-col gap-2">
+    <div className="fixed bottom-4 left-4 z-200 flex w-full max-w-sm flex-col gap-2">
       {toasts.map((toast, index) => (
         <motion.div
           key={toast.id}

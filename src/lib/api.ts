@@ -10,6 +10,21 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+async function handleResponse(res: Response) {
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    let data: unknown = undefined;
+    try {
+      data = txt ? JSON.parse(txt) : undefined;
+    } catch {}
+    throw { status: res.status, data, raw: txt };
+  }
+
+  const ct = res.headers.get('content-type') || '';
+  if (!ct.includes('application/json')) return null as unknown;
+  return res.json();
+}
+
 async function fetchWithAuth(input: string, init?: RequestInit) {
   const token = Cookies.get('token');
   const headers = new Headers(init?.headers || {});
@@ -22,14 +37,8 @@ async function fetchWithAuth(input: string, init?: RequestInit) {
     headers,
     credentials: 'omit',
   });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => '');
-    throw new Error(`Erro ${res.status} – ${txt || 'Falha na requisição'}`);
-  }
 
-  const ct = res.headers.get('content-type') || '';
-  if (!ct.includes('application/json')) return null as unknown;
-  return res.json();
+  return handleResponse(res);
 }
 
 async function fetchWithAuthVoid(
@@ -39,15 +48,14 @@ async function fetchWithAuthVoid(
   const token = Cookies.get('token');
   const headers = new Headers(init?.headers || {});
   if (token) headers.set('Authorization', `Bearer ${token}`);
+
   const res = await fetch(`${BASE_URL}${input}`, {
     ...init,
     headers,
     credentials: 'omit',
   });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => '');
-    throw new Error(`Erro ${res.status} – ${txt || 'Falha na requisição'}`);
-  }
+
+  await handleResponse(res);
 }
 
 export const api = {
@@ -59,9 +67,7 @@ export const api = {
       body: JSON.stringify({ username: email, password }),
     });
 
-    if (!res.ok) throw new Error('Falha no login');
-
-    const data = await res.json();
+    const data = await handleResponse(res);
 
     Cookies.set('token', data.token, { expires: 1, sameSite: 'strict' });
 
@@ -81,6 +87,7 @@ export const api = {
 
     return data;
   },
+
   logout: () => {
     Cookies.remove('token');
     Cookies.remove('user');
@@ -113,12 +120,8 @@ export const api = {
     }) as Promise<UserResponseDTO>,
 
   disableUser: (id: string) =>
-    fetchWithAuthVoid(`/api/users/disable/${id}`, {
-      method: 'PATCH',
-    }),
+    fetchWithAuthVoid(`/api/users/disable/${id}`, { method: 'PATCH' }),
 
   enableUser: (id: string) =>
-    fetchWithAuthVoid(`/api/users/enable/${id}`, {
-      method: 'PATCH',
-    }),
+    fetchWithAuthVoid(`/api/users/enable/${id}`, { method: 'PATCH' }),
 };
