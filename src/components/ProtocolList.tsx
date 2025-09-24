@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowDown } from 'lucide-react';
 
 export interface Protocol {
   id: string | number;
@@ -25,29 +26,40 @@ const ProtocolList: React.FC<ProtocolListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      {protocols.map((protocol) => (
-        <div
-          key={protocol.id}
-          className="flex items-center justify-between border-t border-b border-gray-200 p-4"
-        >
-          <span className="text-gray-800">{protocol.description}</span>
-          <div className="flex space-x-3">
-            <button
-              className="text-gray-300 hover:underline"
-              onClick={() => onEdit(protocol)}
-            >
-              Editar
-            </button>
-            <button
-              className="text-gray-300 hover:underline"
-              onClick={() => onRemove(protocol)}
-            >
-              Remover
-            </button>
+    <div className="mx-auto w-full max-w-lg p-4">
+      <div className="text-gray-450 mb-4 flex items-center gap-x-1 text-sm">
+        <span>Protocolos</span>
+        <ArrowDown size={14} />
+      </div>
+
+      <div className="w-full flex-row space-y-4">
+        {protocols.map((protocol) => (
+          <div
+            key={protocol.id}
+            className="flex items-start justify-between border-t border-b border-gray-200 p-4"
+          >
+            <span className="text-gray-160 flex-grow pr-4 text-sm font-medium">
+              {protocol.description}
+            </span>
+            <div className="mt-auto flex flex-shrink-0 flex-row space-x-3">
+              <button
+                type="button"
+                className="text-xs text-gray-400 hover:underline"
+                onClick={() => onEdit(protocol)}
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                className="text-xs text-gray-400 hover:underline"
+                onClick={() => onRemove(protocol)}
+              >
+                Remover
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
