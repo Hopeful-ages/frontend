@@ -26,7 +26,7 @@ const ProtocolList: React.FC<ProtocolListProps> = ({
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg p-4">
+    <div className="mx-auto w-full p-4">
       <div className="text-gray-450 mb-4 flex items-center gap-x-1 text-sm">
         <span>Protocolos</span>
         <ArrowDown size={14} />
