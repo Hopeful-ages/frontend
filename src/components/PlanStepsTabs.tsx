@@ -1,39 +1,79 @@
 'use client';
-import React, { useState } from 'react';
 
-const steps = ["antes", "durante", "depois"];
+import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-export const StepSelector: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState("antes");
+function cn(...classes: Array<string | undefined | false | null>) {
+  return classes.filter(Boolean).join(' ');
+}
 
-  const handleChangeStep = (step: string) => {
-    if (steps.includes(step)) {
-      setCurrentStep(step);
-    } else {
-      alert("Etapa inválida!");
+export type Step = string;
 
-    }
-  };
+//ver outra maneira de herdar as VariantProps
+export interface PlanStepsTabsProps extends VariantProps<typeof tabClasses> {
+  steps: Step[];
+  currentStep: Step;
+  onChange: (step: Step) => void;
+}
 
+const tabClasses = cva(
+  'px-4 py-2 font-medium transition-colors select-none whitespace-nowrap',
+  {
+    variants: {
+      active: {
+        true: 'bg-black text-white border-black',
+        false: 'bg-white text-black hover:bg-gray-100',
+      },
+      size: {
+        sm: 'text-sm',
+        md: 'text-base',
+        lg: 'text-lg',
+      },
+    },
+    defaultVariants: {
+      active: false,
+      size: 'md',
+    },
+  },
+);
+
+export const PlanStepsTabs: React.FC<PlanStepsTabsProps> = ({
+  steps,
+  currentStep,
+  onChange,
+  size = 'md',
+  ...rest
+}) => {
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-bold mb-2">Etapas do plano:</h2>
-      <ul className="space-y-1">
-        {steps.map((step) => (
-          <li key={step}>
-            <button
-              className={`px-3 py-1 rounded ${
-                step === currentStep
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => handleChangeStep(step)}
-            >
-              {step} {step === currentStep && "(ativo)"}
-            </button>
-          </li>
-        ))}
-      </ul>
+    <div
+      className="flex overflow-hidden rounded-lg border border-gray-300"
+      role="tablist"
+      aria-label="Etapas do Plano"
+    >
+      {steps.map((step, index) => {
+        const isActive = step === currentStep;
+        const isFirst = index === 0;
+        const isLast = index === steps.length - 1;
+
+        const borderClass = !isFirst ? 'border-l border-gray-300' : '';
+
+        return (
+          <button
+            key={step}
+            role="tab"
+            type="button"
+            aria-selected={isActive}
+            aria-controls={`panel-${step.replace(/\s+/g, '-')}`}
+            onClick={() => onChange(step)}
+            className={cn(tabClasses({ active: isActive, size }), borderClass)}
+            {...rest}
+          >
+            {step}
+          </button>
+        );
+      })}
     </div>
   );
 };
+
+PlanStepsTabs.displayName = 'PlanStepsTabs';
