@@ -16,7 +16,7 @@ export interface PlanStepsTabsProps extends VariantProps<typeof tabClasses> {
 }
 
 const tabClasses = cva(
-  'px-4 py-3 font-semibold transition-colors select-none whitespace-nowrap',
+  'px-4 py-3 font-semibold transition-colors select-none text-center rounded-sm flex-1',
   {
     variants: {
       active: {
@@ -45,15 +45,12 @@ export const PlanStepsTabs: React.FC<PlanStepsTabsProps> = ({
 }) => {
   return (
     <div
-      className="flex overflow-hidden rounded-md border border-gray-300" // rounded-md para ficar mais parecido
+      className="flex overflow-hidden rounded-md border border-gray-300"
       role="tablist"
       aria-label="Etapas do Plano"
     >
-      {steps.map((step, index) => {
+      {steps.map((step) => {
         const isActive = step === currentStep;
-        const isFirst = index === 0;
-
-        const borderClass = !isFirst ? 'border-l border-gray-300' : '';
 
         return (
           <button
@@ -63,7 +60,7 @@ export const PlanStepsTabs: React.FC<PlanStepsTabsProps> = ({
             aria-selected={isActive}
             aria-controls={`panel-${step.replace(/\s+/g, '-')}`}
             onClick={() => onChange(step)}
-            className={cn(tabClasses({ active: isActive, size }), borderClass)}
+            className={cn(tabClasses({ active: isActive, size }))}
             {...rest}
           >
             {step}
