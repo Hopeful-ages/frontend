@@ -16,7 +16,7 @@ export interface PlanStepsTabsProps extends VariantProps<typeof tabClasses> {
 }
 
 const tabClasses = cva(
-  'px-4 py-3 font-semibold transition-colors select-none whitespace-nowrap', // fonte mais forte + padding maior
+  'px-4 py-3 font-semibold transition-colors select-none whitespace-nowrap',
   {
     variants: {
       active: {
