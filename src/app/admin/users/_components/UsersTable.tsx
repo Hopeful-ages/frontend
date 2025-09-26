@@ -61,7 +61,7 @@ export function UsersTable({
               <Table.Cell>{row.service?.name ?? '—'}</Table.Cell>
               <Table.Cell>
                 {row.city ? `${row.city.name} - ${row.city.state}` : '—'}
-              </Table.Cell>{' '}
+              </Table.Cell>
               <Table.Cell>{row.accountStatus ? 'Sim' : 'Não'}</Table.Cell>
               <Table.Cell align="center">
                 <button

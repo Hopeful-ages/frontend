@@ -9,6 +9,7 @@ import React, {
   PropsWithChildren,
   useCallback,
   useLayoutEffect,
+  useEffect,
 } from 'react';
 import {
   ChevronUp,
@@ -40,6 +41,8 @@ type TableRootProps<T> = {
   defaultPage?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
+  selectable?: boolean;
+  onSelectionChange?: (rows: T[]) => void;
 };
 
 type TableHeadingProps<T> = PropsWithChildren<{
@@ -108,9 +111,14 @@ type TableCtx<T> = {
   setPage: (p: number) => void;
   setPageSize: (s: number) => void;
   paginatedRows: T[];
+  selectable: boolean;
+  selectedRows: T[];
+  toggleRow: (row: T) => void;
+  toggleAll: () => void;
+  isRowSelected: (row: T) => boolean;
 };
 
-const TableContext = createContext<TableCtx<unknown> | null>(null);
+const TableContext = createContext<null | unknown>(null);
 const RowContext = createContext<{ row: unknown | undefined }>({
   row: undefined,
 });
@@ -136,6 +144,8 @@ function Root<T>({
   defaultPage = 1,
   onPageChange,
   onPageSizeChange,
+  selectable = false,
+  onSelectionChange,
 }: PropsWithChildren<TableRootProps<T>>) {
   const [sort, setSortInner] = useState<SortState>({
     accessor: defaultSort?.accessor ?? null,
@@ -218,6 +228,41 @@ function Root<T>({
     return sortedRows.slice(start, start + pageSizeState);
   }, [sortedRows, page, pageSizeState]);
 
+  const [selectedRows, setSelectedRows] = useState<T[]>([]);
+
+  useEffect(() => {
+    if (onSelectionChange) onSelectionChange(selectedRows);
+  }, [selectedRows, onSelectionChange]);
+
+  const toggleRow = useCallback((row: T) => {
+    setSelectedRows((prev) =>
+      prev.includes(row) ? prev.filter((r) => r !== row) : [...prev, row],
+    );
+  }, []);
+
+  const isRowSelected = useCallback(
+    (row: T) => selectedRows.includes(row),
+    [selectedRows],
+  );
+
+  const toggleAll = useCallback(() => {
+    setSelectedRows((prev) => {
+      const page = paginatedRows as T[];
+      if (page.length === 0) return prev;
+
+      const pageSet = new Set(page);
+      const prevOnPageCount = prev.filter((r) => pageSet.has(r)).length;
+
+      if (prevOnPageCount === page.length) {
+        return prev.filter((r) => !pageSet.has(r));
+      }
+
+      const merged = [...prev];
+      for (const r of page) if (!merged.includes(r)) merged.push(r);
+      return merged;
+    });
+  }, [paginatedRows]);
+
   return (
     <TableContext.Provider
       value={{
@@ -236,6 +281,11 @@ function Root<T>({
         setPage,
         setPageSize,
         paginatedRows,
+        selectable,
+        selectedRows,
+        toggleRow,
+        toggleAll,
+        isRowSelected,
       }}
     >
       <div className={cx('mx-auto w-[98%] overflow-x-auto', className)}>
@@ -272,8 +322,28 @@ function Footer({ children }: { children: React.ReactNode }) {
 }
 
 function Row<T>({ row, className, children }: TableRowProps<T>) {
-  const { divider, size } = useTable<T>();
+  const {
+    divider,
+    size,
+    selectable,
+    toggleRow,
+    isRowSelected,
+    selectedRows,
+    paginatedRows,
+    toggleAll,
+  } = useTable<T>();
+
   const isHeader = row === undefined;
+
+  const headerPad = size === 'sm' ? 'py-2' : size === 'lg' ? 'py-4' : 'py-3';
+  const bodyPad = size === 'sm' ? 'py-2' : size === 'lg' ? 'py-3.5' : 'py-2.5';
+
+  const page = paginatedRows as T[];
+  const pageSet = new Set(page);
+  const selectedOnPage = selectedRows.filter((r) => pageSet.has(r)).length;
+  const allSelectedOnPage = page.length > 0 && selectedOnPage === page.length;
+  const someSelectedOnPage = selectedOnPage > 0 && selectedOnPage < page.length;
+
   return (
     <RowContext.Provider value={{ row }}>
       <tr
@@ -284,6 +354,48 @@ function Row<T>({ row, className, children }: TableRowProps<T>) {
           className,
         )}
       >
+        {selectable &&
+          (isHeader ? (
+            <th
+              className={cx(
+                'border-b border-gray-200 px-4 text-center text-sm font-semibold whitespace-nowrap text-gray-700',
+                headerPad,
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={allSelectedOnPage}
+                ref={(el) => {
+                  if (el) el.indeterminate = someSelectedOnPage;
+                }}
+                onChange={() => {
+                  if (someSelectedOnPage) {
+                    paginatedRows.forEach((r) => {
+                      if (isRowSelected(r)) toggleRow(r);
+                    });
+                  } else {
+                    toggleAll();
+                  }
+                }}
+                className="h-3.5 w-3.5 cursor-pointer accent-black"
+              />
+            </th>
+          ) : (
+            <td
+              className={cx(
+                'px-4 text-center text-sm whitespace-nowrap text-gray-700',
+                bodyPad,
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={row ? isRowSelected(row) : false}
+                onChange={() => row && toggleRow(row)}
+                className="h-3.5 w-3.5 cursor-pointer accent-black"
+              />
+            </td>
+          ))}
+
         {React.Children.toArray(children).map((child, idx) => {
           if (!React.isValidElement(child)) return child;
           return React.cloneElement(
