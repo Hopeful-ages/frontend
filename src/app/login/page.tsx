@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
 import { useLoading } from '@/providers/LoadingProvider';
 import { Lock, Send, User } from 'lucide-react';
-import { Dropdown } from '@/components/Dropdown';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +20,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
 
@@ -34,7 +32,6 @@ export default function LoginPage() {
     if (isCheckingAuth) {
       showLoading('Verificando autenticação...');
       if (!loadingShown.current) {
-        // warning('Atenção!!', 'Verificando autenticação...');
         loadingShown.current = true;
       }
     } else {
