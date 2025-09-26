@@ -51,7 +51,7 @@ function handleApiErrors(
     );
     return;
   }
-  //TRATAMENTO ESPECIAL PARA CPF
+
   if (/contribuinte individual brasileiro/i.test(backendMsg)) {
     setErrors({ cpf: 'CPF inválido' });
     return;
@@ -68,7 +68,7 @@ function handleApiErrors(
     if (field && rest.length) {
       const f = field.trim() as Field;
       let msg = rest.join(':').trim();
-      //TRATAMENTO ESPECIAL PARA CPF
+
       if (/contribuinte individual brasileiro/i.test(msg)) {
         msg = 'CPF inválido';
       }
@@ -156,7 +156,6 @@ export default function AdminUsersPage() {
     if (isLoading) {
       showLoading('Verificando autenticação...');
       if (!loadingShown.current) {
-        // warning('Atenção!!', 'Verificando autenticação...');
         loadingShown.current = true;
       }
     } else {
@@ -180,7 +179,7 @@ export default function AdminUsersPage() {
   };
 
   const setCityByName = (value: string) => {
-    const cityName = value.split(' - ')[0]; // pega só o nome da cidade
+    const cityName = value.split(' - ')[0];
     const id = cities.find((c) => c.name === cityName)?.id ?? '';
     setForm((f) => ({ ...f, cityId: id }));
     if (errors.cityId) setErrors((e) => ({ ...e, cityId: undefined }));
