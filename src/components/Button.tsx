@@ -10,6 +10,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 export type ButtonVariant =
   | 'primary'
   | 'secondary'
+  | 'terciary'
   | 'ghost'
   | 'outline'
   | 'danger'
@@ -31,6 +32,8 @@ const buttonClasses = cva(
           'bg-blue-600 text-white shadow-sm hover:bg-blue-900 active:bg-blue-800 focus-visible:outline-none focus-visible:ring-0',
         secondary:
           'bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:brightness-90 active:brightness-75 focus-visible:outline-none focus-visible:ring-0',
+        terciary:
+          'bg-gray-300 text-black shadow-sm hover:bg-gray-500 active:bg-gray-400 focus-visible:outline-none focus-visible:ring-0',
 
         outline:
           'border border-gray-300 bg-[var(--background)] text-[var(--foreground)]  focus-visible:outline-none focus-visible:ring-0 hover:text-gray-400',

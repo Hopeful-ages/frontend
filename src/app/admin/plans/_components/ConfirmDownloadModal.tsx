@@ -11,7 +11,6 @@ type ConfirmDownloadModalProps = {
   onClose: () => void;
 };
 
-// Retorna o ano da data de atualização mais recente das tarefas de um cenário
 const getLatestUpdateYear = (
   scenario: ScenarioResponseDTO | null
 ): string | number => {
@@ -65,7 +64,7 @@ export function ConfirmDownloadModal({
     >
       <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
         <h2 className="text-2xl font-bold text-black">Confirmar download</h2>
-        <FileText className="my-4 h-16 w-16 text-red-600" />
+        <FileText className="my-4 h-16 w-16 text-black-600" />
         {scenario && (
           <p className="text-gray-600">
             {scenario.city.name ?? ''}, {scenarioYear}

@@ -59,7 +59,7 @@ export default function AdminPlansPage() {
   const [errors, setErrors] = useState<Errors>({});
 
   const cobradeOptions = useMemo(() => {
-    const uniqueCobrades = new Set(scenarios.map((s) => s.cobrade.description));
+    const uniqueCobrades = new Set(scenarios.map((s) => s.cobrade.subgroup));
     return Array.from(uniqueCobrades);
   }, [scenarios]);
 
@@ -95,7 +95,7 @@ export default function AdminPlansPage() {
         ? s.city.name.toLowerCase().includes(appliedCityFilter.toLowerCase())
         : true;
       const byCobrade = appliedCobradeFilter
-        ? s.cobrade.description.toLowerCase() ===
+        ? s.cobrade.subgroup.toLowerCase() ===
           appliedCobradeFilter.toLowerCase()
         : true;
       return byCity && byCobrade;
