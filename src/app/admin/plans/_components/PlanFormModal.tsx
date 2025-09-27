@@ -5,7 +5,6 @@ import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { AlertTriangle, Check, Hammer, MapPin, X } from 'lucide-react';
 
-// Tipos para o estado e erros do formulário, específicos para Planos
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 
 export type PlanFormState = {
@@ -16,7 +15,6 @@ export type PlanFormState = {
 
 type Errors = Partial<Record<Field, string>>;
 
-// Props do componente, espelhando a estrutura do UserFormModal
 type PlanFormModalProps = {
   isOpen: boolean;
   isEdit: boolean;
@@ -77,7 +75,6 @@ export function PlanFormModal({
       }
     >
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Dropdown de Cidade */}
         <div className="w-full">
           <Dropdown
             label="Selecione a Cidade"
@@ -97,7 +94,6 @@ export function PlanFormModal({
           )}
         </div>
 
-        {/* Dropdown de Serviço */}
         <div className="w-full">
           <Dropdown
             label="Selecione o Serviço"
@@ -117,7 +113,6 @@ export function PlanFormModal({
           )}
         </div>
 
-        {/* Input de Cobrade - Ocupa a largura total */}
         <div className="md:col-span-2">
           <Input
             value={form.cobrade}
@@ -127,10 +122,6 @@ export function PlanFormModal({
             error={errors.cobrade}
           />
         </div>
-
-        {/* Futuramente, um campo para upload de arquivo poderia ser adicionado aqui.
-          Ex: <Input type="file" ... /> 
-        */}
       </div>
     </Modal>
   );

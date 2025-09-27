@@ -17,51 +17,34 @@ import { FiltersBar } from './_components/FiltersBar';
 import { PlanFormModal, PlanFormState } from './_components/PlanFormModal';
 import { PlansTable } from './_components/PlansTable';
 
-// Tipos específicos para o formulário de Planos
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
 
 export default function AdminPlansPage() {
-  // --- Estados de Dados e UI ---
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<PlanResponseDTO[]>([]);
-  const [services, setServices] = useState<ServiceResponseDTO[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
 
-  // --- Estados de Filtros ---
-  const [pendingCityFilter, setPendingCityFilter] = useState<string | null>(
-    null,
-  );
-  const [pendingServiceFilter, setPendingServiceFilter] = useState<
-    string | null
-  >(null);
+  const [selectedPlanIds, setSelectedPlanIds] = useState<string[]>([]);
+
+  const [pendingCityFilter, setPendingCityFilter] = useState('');
   const [pendingCobradeFilter, setPendingCobradeFilter] = useState<
     string | null
   >(null);
 
-  // --- Estados para os filtros APLICADOS (após clicar em "Buscar") ---
-  const [appliedCityFilter, setAppliedCityFilter] = useState<string | null>(
-    null,
-  );
-  const [appliedServiceFilter, setAppliedServiceFilter] = useState<
-    string | null
-  >(null);
+  const [appliedCityFilter, setAppliedCityFilter] = useState('');
   const [appliedCobradeFilter, setAppliedCobradeFilter] = useState<
     string | null
   >(null);
 
-  // --- Estados do Modal de Formulário (Criar/Editar) ---
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  // --- Estados do Modal de Confirmação (Download) ---
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [planForDownload, setPlanForDownload] =
     useState<PlanResponseDTO | null>(null);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
-  // --- Hooks Customizados ---
   const { success, error, warning } = useToast();
   const { showLoading, hideLoading } = useLoading();
   const loadingShown = useRef(false);
@@ -69,7 +52,6 @@ export default function AdminPlansPage() {
     requiredRole: 'ROLE_USER',
   });
 
-  // --- Estados do Formulário ---
   const [form, setForm] = useState<PlanFormState>({
     cityId: '',
     serviceId: '',
@@ -77,23 +59,11 @@ export default function AdminPlansPage() {
   });
   const [errors, setErrors] = useState<Errors>({});
 
-  // --- Dados Derivados para UI ---
-  const serviceNames = services.map((s) => s.name);
-  const cityNames = cities.map((c) => c.name);
   const cobradeOptions = useMemo(() => {
-    // Extrai opções únicas de Cobrade a partir dos planos existentes
     const uniqueCobrades = new Set(plans.map((p) => p.cobrade));
     return Array.from(uniqueCobrades);
   }, [plans]);
 
-  // Função para lidar com o clique no botão "Buscar"
-  const handleSearch = () => {
-    setAppliedCityFilter(pendingCityFilter);
-    setAppliedServiceFilter(pendingServiceFilter);
-    setAppliedCobradeFilter(pendingCobradeFilter);
-  };
-
-  // --- Efeito para Loading de Autenticação ---
   useEffect(() => {
     if (isAuthLoading) {
       if (!loadingShown.current) {
@@ -105,68 +75,48 @@ export default function AdminPlansPage() {
     }
   }, [isAuthLoading, showLoading, hideLoading]);
 
-  // --- Funções Auxiliares para o Formulário ---
-  const serviceNameById = (id: string) =>
-    services.find((s) => s.id === id)?.name ?? null;
-  const cityNameById = (id: string) =>
-    cities.find((c) => c.id === id)?.name ?? null;
-
-  const setServiceByName = (name: string) => {
-    const id = services.find((s) => s.name === name)?.id ?? '';
-    onUpdate('serviceId', id);
+  const handleSearch = () => {
+    setAppliedCityFilter(pendingCityFilter);
+    setAppliedCobradeFilter(pendingCobradeFilter);
   };
 
-  const setCityByName = (name: string) => {
-    const id = cities.find((c) => c.name === name)?.id ?? '';
-    onUpdate('cityId', id);
+  const handleClearFilters = () => {
+    setPendingCityFilter('');
+    setPendingCobradeFilter(null);
+    setAppliedCityFilter('');
+    setAppliedCobradeFilter(null);
   };
 
-  // --- Lógica de Validação ---
-  function validateField(field: Field, value: string): string {
-    switch (field) {
-      case 'cityId':
-        return value ? '' : 'Selecione uma cidade';
-      case 'serviceId':
-        return value ? '' : 'Selecione um serviço';
-      case 'cobrade':
-        return value.trim() ? '' : 'O campo Cobrade é obrigatório';
-      default:
-        return '';
+  const filteredPlans = useMemo(() => {
+    if (!appliedCityFilter && !appliedCobradeFilter) {
+      return plans;
     }
-  }
+    return plans.filter((p) => {
+      const byCity = appliedCityFilter
+        ? (p.city?.name ?? '')
+            .toLowerCase()
+            .includes(appliedCityFilter.toLowerCase())
+        : true;
+      const byCobrade = appliedCobradeFilter
+        ? p.cobrade.toLowerCase() === appliedCobradeFilter.toLowerCase()
+        : true;
+      return byCity && byCobrade;
+    });
+  }, [plans, appliedCityFilter, appliedCobradeFilter]);
 
-  function validateOnSubmit(): boolean {
-    const next: Errors = {
-      cityId: validateField('cityId', form.cityId),
-      serviceId: validateField('serviceId', form.serviceId),
-      cobrade: validateField('cobrade', form.cobrade),
-    };
-    setErrors(next);
-    const ok = Object.values(next).every((v) => !v);
-    if (!ok) {
-      warning('Corrija os campos destacados!');
-    }
-    return ok;
-  }
+  const showPagination = filteredPlans.length > 10;
 
-  const canClickSave =
-    !!form.cityId && !!form.serviceId && !!form.cobrade.trim();
-
-  // --- Efeito para Busca Inicial de Dados ---
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        const [fetchedPlans, fetchedServices, fetchedCities] =
-          await Promise.all([
-            api.getPlans(),
-            api.getAllServices(),
-            api.getAllCities(),
-          ]);
+        const [fetchedPlans, fetchedCities] = await Promise.all([
+          api.getPlans(),
+          api.getAllCities(),
+        ]);
         if (!mounted) return;
         setPlans(fetchedPlans);
-        setServices(fetchedServices);
         setCities(fetchedCities);
       } catch (e) {
         console.error(e);
@@ -180,155 +130,45 @@ export default function AdminPlansPage() {
     };
   }, [error]);
 
-  // --- Lógica de Filtragem ---
-  const filteredPlans = useMemo(() => {
-    // Se nenhum filtro foi aplicado ainda, retorna todos os planos
-    if (!appliedCityFilter && !appliedServiceFilter && !appliedCobradeFilter) {
-      return plans;
-    }
-    return plans.filter((p) => {
-      const byCity = appliedCityFilter
-        ? (p.city?.name ?? '').toLowerCase() === appliedCityFilter.toLowerCase()
-        : true;
-      const byService = appliedServiceFilter
-        ? (p.service?.name ?? '').toLowerCase() ===
-          appliedServiceFilter.toLowerCase()
-        : true;
-      const byCobrade = appliedCobradeFilter
-        ? p.cobrade.toLowerCase() === appliedCobradeFilter.toLowerCase()
-        : true;
-      return byCity && byService && byCobrade;
-    });
-  }, [plans, appliedCityFilter, appliedServiceFilter, appliedCobradeFilter]);
-
-  const showPagination = filteredPlans.length > 10;
-
-  // --- Handlers de Ações da UI ---
-  const openCreateForm = () => {
-    setIsEdit(false);
-    setEditingId(null);
-    setForm({ cityId: '', serviceId: '', cobrade: '' });
-    setErrors({});
-    setIsFormOpen(true);
+  const onEdit = (id: string) => {
+    console.log('Editando plano:', id);
   };
 
-  const closeForm = () => {
-    setIsFormOpen(false);
-  };
-
-  const onEdit = async (id: string) => {
-    try {
-      showLoading('Carregando plano...');
-      const plan = await api.getPlan(id);
-      setIsEdit(true);
-      setEditingId(plan.id);
-      setForm({
-        cityId: plan.city?.id ?? '',
-        serviceId: plan.service?.id ?? '',
-        cobrade: plan.cobrade ?? '',
-      });
-      setErrors({});
-      setIsFormOpen(true);
-    } catch (err) {
-      console.error(err);
-      error('Falha ao carregar dados do plano para edição');
-    } finally {
-      hideLoading();
-    }
-  };
-
-  const onSave = async () => {
-    if (!validateOnSubmit()) return;
-
-    showLoading(isEdit ? 'Atualizando plano...' : 'Criando plano...');
-    try {
-      if (isEdit && editingId) {
-        const payload: PlanUpdateDTO = {
-          cityId: form.cityId,
-          serviceId: form.serviceId,
-          cobrade: form.cobrade.trim(),
-        };
-        const updated = await api.editPlan(editingId, payload);
-        setPlans((prev) =>
-          prev.map((p) => (p.id === updated.id ? updated : p)),
-        );
-        success('Plano atualizado com sucesso');
-      } else {
-        const created = await api.createPlan({
-          cityId: form.cityId,
-          serviceId: form.serviceId,
-          cobrade: form.cobrade.trim(),
-        });
-        setPlans((prev) => [created, ...prev]);
-        success('Plano criado com sucesso');
-      }
-      closeForm();
-    } catch (err) {
-      console.error(err);
-      error(
-        isEdit
-          ? 'Não foi possível editar o plano'
-          : 'Não foi possível criar o plano',
-      );
-    } finally {
-      hideLoading();
-    }
-  };
-
-  const onUpdate = (field: Field, value: string) => {
-    setForm((f) => ({ ...f, [field]: value }));
-    if (errors[field]) {
-      const msg = validateField(field, value);
-      setErrors((prev) => ({ ...prev, [field]: msg || undefined }));
-    }
-  };
-
-  // --- Handlers do Modal de Download ---
-  const openDownloadModal = (plan: PlanResponseDTO) => {
+  const onDownload = (plan: PlanResponseDTO) => {
     setPlanForDownload(plan);
     setDownloadModalOpen(true);
   };
 
-  const closeDownloadModal = () => {
-    setDownloadModalOpen(false);
-    setPlanForDownload(null);
-    setDownloadLoading(false);
-  };
-
-  const confirmDownload = async () => {
-    if (!planForDownload) return;
-    setDownloadLoading(true);
-    try {
-      // Simula uma chamada de API e abre o arquivo
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      window.open(planForDownload.fileUrl, '_blank');
-      success('Download iniciado.');
-      closeDownloadModal();
-    } catch (err) {
-      error('Falha ao iniciar o download.');
-      setDownloadLoading(false);
+  const handleBulkDownload = () => {
+    const selectedPlans = plans.filter((p) => selectedPlanIds.includes(p.id));
+    if (selectedPlans.length === 0) {
+      error('Nenhum plano selecionado para download.');
+      return;
     }
+
+    success(`Iniciando download de ${selectedPlans.length} plano(s)...`);
+    selectedPlans.forEach((plan) => {
+      window.open(plan.fileUrl, '_blank');
+    });
   };
 
   if (isAuthLoading) {
-    return null; // O provedor de loading global já está ativo
+    return null;
   }
 
-  // --- Renderização do Componente ---
   return (
     <main className="mx-auto mt-20 w-full px-6 py-6">
-      <div className="mb-5 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Planos de Contingência</h1>
+      <div className="mb-5 ml-5 flex items-center justify-between">
+        <h1 className="mb-5 text-3xl font-bold">Planos de Contingência</h1>
       </div>
 
       <FiltersBar
-        serviceOptions={serviceNames}
         cobradeOptions={cobradeOptions}
-        cityOptions={cityNames}
-        onSelectCity={setPendingCityFilter}
-        onSelectService={setPendingServiceFilter}
+        cityFilter={pendingCityFilter}
+        onCityChange={setPendingCityFilter}
         onSelectCobrade={setPendingCobradeFilter}
         onSearch={handleSearch}
+        onClearFilters={handleClearFilters}
       />
 
       {loading ? (
@@ -339,35 +179,50 @@ export default function AdminPlansPage() {
         <PlansTable
           rows={filteredPlans}
           showPagination={showPagination}
+          selectedPlanIds={selectedPlanIds}
+          onSelectionChange={setSelectedPlanIds}
           onEdit={onEdit}
-          onDownload={openDownloadModal}
+          onDownload={onDownload}
         />
       )}
 
-      {/* Para este modal funcionar, crie o arquivo PlanFormModal.tsx similar ao UserFormModal.tsx */}
+      {selectedPlanIds.length > 0 && (
+        <div className="fixed right-5 bottom-5 z-20">
+          <button
+            onClick={handleBulkDownload}
+            className="flex items-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-105"
+          >
+            Downloads ({selectedPlanIds.length})
+          </button>
+        </div>
+      )}
+
       <PlanFormModal
         isOpen={isFormOpen}
         isEdit={isEdit}
         form={form}
         errors={errors}
-        canClickSave={canClickSave}
-        cityNames={cityNames}
-        serviceNames={serviceNames}
-        valueCityName={cityNameById(form.cityId)}
-        valueServiceName={serviceNameById(form.serviceId)}
-        onClose={closeForm}
-        onSave={onSave}
-        onUpdate={onUpdate}
-        onSelectCityByName={setCityByName}
-        onSelectServiceByName={setServiceByName}
+        canClickSave={true}
+        cityNames={cities.map((c) => c.name)}
+        serviceNames={[]}
+        valueCityName={null}
+        valueServiceName={null}
+        onClose={() => setIsFormOpen(false)}
+        onSave={() => {}}
+        onUpdate={() => {}}
+        onSelectCityByName={() => {}}
+        onSelectServiceByName={() => {}}
       />
 
       <ConfirmDownloadModal
         open={isDownloadModalOpen}
         loading={downloadLoading}
         plan={planForDownload}
-        onConfirm={confirmDownload}
-        onClose={closeDownloadModal}
+        onConfirm={() => {
+          if (planForDownload) window.open(planForDownload.fileUrl, '_blank');
+          setDownloadModalOpen(false);
+        }}
+        onClose={() => setDownloadModalOpen(false)}
       />
     </main>
   );
