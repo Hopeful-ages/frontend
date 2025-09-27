@@ -102,13 +102,23 @@ export default function CreateScenario() {
             >
               Cidade
             </label>
-            <Input
-              id="city"
-              name="city"
-              size="md"
-              placeholder="Cidade"
+            <Dropdown
+              label="Selecione a cidade"
+              items={[
+                'Porto Alegre - RS',
+                'Sao Leopoldo - RS',
+                'Novo Hamburgo - RS',
+                'Caxias do Sul - RS',
+                'Gramado - RS',
+                'Canela - RS',
+                'Bento Gonçalves - RS',
+                'Santa Maria - RS',
+                'Pelotas - RS',
+              ]}
+              size="large"
               value={cidade}
-              onChange={(e) => setCidade(e.target.value)}
+              onSelect={(item) => setCidade(item)}
+              useAutoComplete
             />
           </div>
           <div className="mt-6 ml-4 flex-1">
