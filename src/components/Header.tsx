@@ -124,7 +124,7 @@ export default function Header() {
               size={'sm'}
               className="h-0.5 w-52 p-0.5"
             >
-              <Link href="/criar-cenario">Criar Cenário</Link>
+              <Link href="/admin/createScenario">Criar Cenário</Link>
             </Button>
             <button
               onClick={logout}
