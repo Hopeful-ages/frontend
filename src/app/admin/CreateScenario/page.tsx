@@ -16,27 +16,31 @@ type Protocol = {
   description: string;
 };
 
-const initialProtocols: Protocol[] = [
-  {
-    id: '1',
-    description:
-      'Realizar simulações periódicas de evacuação para trabalhadores e comunidades vizinhas em caso de acidente químico. (Bombeiros, 2025)',
-  },
-  {
-    id: '2',
-    description:
-      'Definir rotas de transporte seguro para resíduos químicos e estabelecer procedimentos para descarte adequado. (Polícia Rodoviária, 2025)',
-  },
-  {
-    id: '3',
-    description:
-      'Estabelecer protocolos para a contenção de vazamentos de produtos químicos em indústrias, com medidas de isolamento da área e neutralização da substância. (Defesa Civil, 2025)',
-  },
-];
+// const initialProtocols: Protocol[] = [
+//   {
+//     id: '1',
+//     description:
+//       'Realizar simulações periódicas de evacuação para trabalhadores e comunidades vizinhas em caso de acidente químico. (Bombeiros, 2025)',
+//   },
+//   {
+//     id: '2',
+//     description:
+//       'Definir rotas de transporte seguro para resíduos químicos e estabelecer procedimentos para descarte adequado. (Polícia Rodoviária, 2025)',
+//   },
+//   {
+//     id: '3',
+//     description:
+//       'Estabelecer protocolos para a contenção de vazamentos de produtos químicos em indústrias, com medidas de isolamento da área e neutralização da substância. (Defesa Civil, 2025)',
+//   },
+// ];
 
 export default function CreateScenario() {
   const [etapaAtual, setEtapaAtual] = useState(ETAPAS_DO_PLANO[0]);
-  const [protocols, setProtocols] = useState<Protocol[]>(initialProtocols);
+  const [protocols, setProtocols] = useState<Protocol[]>([]);
+  const [cidade, setCidade] = useState('Porto Alegre - RS');
+  const [cobrade, setCobrade] = useState<string | null>(null);
+  const [parametro, setParametro] = useState('');
+  const [acao, setAcao] = useState('');
 
   const handleRemoveProtocol = (protocolToRemove: Protocol) => {
     const updatedProtocols = protocols.filter(
@@ -66,6 +70,41 @@ export default function CreateScenario() {
     }
   };
 
+  const handleAddTask = () => {
+    if (parametro.trim() === '' || acao.trim() === '') {
+      alert('Por favor, preencha os campos "Parâmetro" e "Ação".');
+      return;
+    }
+
+    const newProtocol: Protocol = {
+      id: Date.now().toString(),
+      description: `${parametro.trim()} - ${acao.trim()}`,
+    };
+
+    setProtocols([...protocols, newProtocol]);
+    setParametro('');
+    setAcao('');
+  };
+
+  const handleSave = () => {
+    if (!cobrade) {
+      alert('Por favor, selecione um COBRADE.');
+      return;
+    }
+
+    const scenarioData = {
+      cidade,
+      cobrade,
+      etapa: etapaAtual,
+      protocols,
+    };
+
+    console.log('--- DADOS A SEREM SALVOS ---', scenarioData);
+    alert(
+      `Cenário para a cidade de ${cidade} foi salvo com sucesso! (Verifique o console para ver os dados)`,
+    );
+  };
+
   return (
     <div className="b-l b-r min-h-screen">
       <Header />
@@ -86,7 +125,8 @@ export default function CreateScenario() {
               name="city"
               size="md"
               placeholder="Cidade"
-              defaultValue="Porto Alegre - RS"
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
             />
           </div>
           <div className="mt-6 ml-4 flex-1">
@@ -95,7 +135,7 @@ export default function CreateScenario() {
               items={['COBRADE 1', 'COBRADE 2', 'COBRADE 3']}
               size="large"
               border="gray"
-              onSelect={(item) => console.log('Selected item:', item)}
+              onSelect={(item) => setCobrade(item)}
               useAutoComplete
             />
           </div>
@@ -113,6 +153,8 @@ export default function CreateScenario() {
           <Input
             name="task"
             placeholder="Digite aqui o parâmetro"
+            value={parametro}
+            onChange={(e) => setParametro(e.target.value)}
             className="flex-1"
           />
         </div>
@@ -123,6 +165,8 @@ export default function CreateScenario() {
             name="task"
             placeholder="Digite aqui a Ação"
             className="flex-1"
+            value={acao}
+            onChange={(e) => setAcao(e.target.value)}
           />
         </div>
         <ProtocolList
@@ -134,9 +178,7 @@ export default function CreateScenario() {
           <Button
             variant="secondary"
             size="lg"
-            onClick={() => {
-              console.log('Adicionar nova tarefa');
-            }}
+            onClick={handleAddTask}
             leftIcon={<Plus size={16} />}
           >
             Adicionar Tarefa
@@ -145,9 +187,7 @@ export default function CreateScenario() {
           <Button
             variant="secondary"
             size="lg"
-            onClick={() => {
-              console.log('Salvar');
-            }}
+            onClick={handleSave}
             leftIcon={<Save size={16} />}
           >
             Salvar
