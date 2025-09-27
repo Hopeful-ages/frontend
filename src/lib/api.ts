@@ -2,9 +2,9 @@ import Cookies from 'js-cookie';
 import { decodeJWT } from './jwt';
 import {
   CityResponseDTO,
-  ScenarioRequestDTO, // Adicionado
-  ScenarioResponseDTO, // Substituído
-  ScenarioUpdateDTO, // Substituído
+  ScenarioRequestDTO,
+  ScenarioResponseDTO,
+  ScenarioUpdateDTO,
   ServiceResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
@@ -125,7 +125,6 @@ export const api = {
       method: 'PATCH',
     }),
 
-  // Funções de Cenário (antigos Planos)
   getScenarios: () =>
     fetchWithAuth('/api/scenarios') as Promise<ScenarioResponseDTO[]>,
 

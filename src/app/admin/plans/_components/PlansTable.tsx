@@ -12,12 +12,11 @@ type PlansTableProps = {
   onDownload: (scenario: ScenarioResponseDTO) => void;
 };
 
-// Retorna a data de atualização mais recente das tarefas de um cenário
 const getLatestUpdate = (scenario: ScenarioResponseDTO): string | null => {
   if (!scenario.tasks || scenario.tasks.length === 0) {
     return null;
   }
-  // Encontra a tarefa com a data de atualização mais recente
+  
   const latestTask = scenario.tasks.reduce((latest, current) => {
     const latestDate = new Date(latest.lastUpdateDate);
     const currentDate = new Date(current.lastUpdateDate);

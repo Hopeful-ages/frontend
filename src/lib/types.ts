@@ -36,11 +36,6 @@ export type UserUpdateDTO = Partial<{
   accountStatus: boolean;
 }>;
 
-
-
-
-
-
 export type CobradeDTO = {
   id: string;
   code: string;

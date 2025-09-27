@@ -109,7 +109,6 @@ export default function AdminPlansPage() {
     (async () => {
       try {
         setLoading(true);
-        // Supondo que api.getPlans() agora retorna ScenarioResponseDTO[]
         const [fetchedScenarios, fetchedCities] = await Promise.all([
           api.getScenarios(),
           api.getAllCities(),
@@ -149,9 +148,6 @@ export default function AdminPlansPage() {
 
     success(`Iniciando download de ${selectedScenarios.length} plano(s)...`);
     selectedScenarios.forEach((scenario) => {
-      // NOTE: ScenarioResponseDTO não possui fileUrl.
-      // A URL de download deve ser construída ou obtida de outra forma.
-      // Exemplo: chamando um endpoint da API para baixar o arquivo.
       const downloadUrl = `/api/scenarios/${scenario.id}/download`;
       window.open(downloadUrl, '_blank');
     });
@@ -159,7 +155,6 @@ export default function AdminPlansPage() {
 
   const handleConfirmDownload = () => {
     if (scenarioForDownload) {
-      // NOTE: O mesmo que em handleBulkDownload, a URL é construída.
       const downloadUrl = `/api/scenarios/${scenarioForDownload.id}/download`;
       window.open(downloadUrl, '_blank');
       setDownloadModalOpen(false);
