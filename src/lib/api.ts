@@ -9,6 +9,7 @@ import {
   UserRequestDTO,
   UserResponseDTO,
   UserUpdateDTO,
+  CobradeDTO,
 } from './types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -103,6 +104,10 @@ export const api = {
 
   getAllServices: () =>
     fetchWithAuth('/api/services') as Promise<ServiceResponseDTO[]>,
+  getAllCobrades: () =>
+    fetchWithAuth('/api/cobrades') as Promise<CobradeDTO[]>,
+  getCobradeById: (id: string) =>
+    fetchWithAuth(`/api/cobrades/${id}`) as Promise<CobradeDTO>,
 
   getAllCities: () => fetchWithAuth('/api/city') as Promise<CityResponseDTO[]>,
 
