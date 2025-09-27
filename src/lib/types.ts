@@ -36,41 +36,84 @@ export type UserUpdateDTO = Partial<{
   accountStatus: boolean;
 }>;
 
-// ===============================================
-// DTOS PARA PLANOS DE CONTINGÊNCIA
-// ===============================================
 
-/**
- * @description Objeto de resposta da API para um Plano de Contingência.
- * Usado para exibir os planos na tabela e em detalhes.
- */
-export type PlanResponseDTO = {
+
+
+
+
+export type CobradeDTO = {
   id: string;
-  cobrade: string;
-  lastUpdated: string; // Recomenda-se usar o formato ISO 8601 (ex: "2025-08-11T20:55:36Z")
+  code: string;
+  description: string;
+  subgroup: string;
+  type: string | null;
+  subType: string | null;
+};
+
+export type TaskResponseDTO = {
+  id: string;
+  description: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+  lastUpdateDate: string; // ISO 8601
   service: ServiceSummaryDTO | null;
-  city: CitySummaryDTO | null;
-  fileUrl: string; // URL para o download do arquivo do plano
 };
 
-/**
- * @description Objeto enviado para a API para criar um novo Plano de Contingência.
- */
-export type PlanRequestDTO = {
-  cobrade: string;
-  serviceId: string;
-  cityId: string;
-  // O arquivo em si (PDF) geralmente é enviado como FormData, não no JSON do DTO.
-  // Opcionalmente, pode-se incluir metadados do arquivo se necessário.
-  fileName?: string;
+export type TaskRequestDTO = {
+  description: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+  serviceId?: string | null;
 };
-
-/**
- * @description Objeto para atualizar um Plano de Contingência existente.
- * Todos os campos são opcionais, permitindo a atualização parcial.
- */
-export type PlanUpdateDTO = Partial<{
-  cobrade: string;
+  
+export type TaskUpdateDTO = Partial<{
+  description: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+  lastUpdateDate: string;
   serviceId: string | null;
-  cityId: string | null;
+}>;
+  
+export type ParameterResponseDTO = {
+  id: string;
+  description: string;
+  action: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+};
+
+export type ParameterRequestDTO = {
+  description: string;
+  action: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+};
+
+export type ParameterUpdateDTO = Partial<{
+  description: string;
+  action: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+}>;
+
+export type ScenarioResponseDTO = {
+  id: string;
+  description: string | null;
+  origin: string;
+  city: CitySummaryDTO;
+  cobrade: CobradeDTO;
+  tasks: TaskResponseDTO[];
+  parameters: ParameterResponseDTO[];
+};
+
+export type ScenarioRequestDTO = {
+  description?: string | null;
+  origin: string;
+  cityId: string;
+  cobradeId: string;
+  tasks?: TaskRequestDTO[];
+  parameters?: ParameterRequestDTO[];
+};
+
+export type ScenarioUpdateDTO = Partial<{
+  description: string | null;
+  origin: string;
+  cityId: string;
+  cobradeId: string;
+  tasks: TaskUpdateDTO[];
+  parameters: ParameterUpdateDTO[];
 }>;

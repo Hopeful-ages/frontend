@@ -1,24 +1,39 @@
 'use client';
 import { Modal } from '@/components/Modal';
-import { PlanResponseDTO } from '@/lib/types';
+import { ScenarioResponseDTO } from '@/lib/types';
 import { Check, FileText, X } from 'lucide-react';
 
 type ConfirmDownloadModalProps = {
   open: boolean;
   loading: boolean;
-  plan: PlanResponseDTO | null;
+  scenario: ScenarioResponseDTO | null;
   onConfirm: () => void;
   onClose: () => void;
+};
+
+// Retorna o ano da data de atualização mais recente das tarefas de um cenário
+const getLatestUpdateYear = (
+  scenario: ScenarioResponseDTO | null
+): string | number => {
+  if (!scenario || !scenario.tasks || scenario.tasks.length === 0) {
+    return '';
+  }
+  const latestTask = scenario.tasks.reduce((latest, current) => {
+    const latestDate = new Date(latest.lastUpdateDate);
+    const currentDate = new Date(current.lastUpdateDate);
+    return currentDate > latestDate ? current : latest;
+  });
+  return new Date(latestTask.lastUpdateDate).getFullYear();
 };
 
 export function ConfirmDownloadModal({
   open,
   loading,
-  plan,
+  scenario,
   onConfirm,
   onClose,
 }: ConfirmDownloadModalProps) {
-  const planYear = plan ? new Date(plan.lastUpdated).getFullYear() : '';
+  const scenarioYear = getLatestUpdateYear(scenario);
 
   return (
     <Modal
@@ -51,9 +66,9 @@ export function ConfirmDownloadModal({
       <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
         <h2 className="text-2xl font-bold text-black">Confirmar download</h2>
         <FileText className="my-4 h-16 w-16 text-red-600" />
-        {plan && (
+        {scenario && (
           <p className="text-gray-600">
-            {plan.city?.name ?? ''}, {planYear}
+            {scenario.city.name ?? ''}, {scenarioYear}
           </p>
         )}
       </div>

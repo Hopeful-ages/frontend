@@ -1,15 +1,29 @@
 'use client';
 import Table from '@/components/Table';
-import { PlanResponseDTO } from '@/lib/types';
+import { ScenarioResponseDTO } from '@/lib/types';
 import { FileDown, Pencil } from 'lucide-react';
 
 type PlansTableProps = {
-  rows: PlanResponseDTO[];
+  rows: ScenarioResponseDTO[];
   showPagination: boolean;
   selectedPlanIds: string[];
   onSelectionChange: (newSelectedIds: string[]) => void;
   onEdit: (id: string) => void;
-  onDownload: (plan: PlanResponseDTO) => void;
+  onDownload: (scenario: ScenarioResponseDTO) => void;
+};
+
+// Retorna a data de atualização mais recente das tarefas de um cenário
+const getLatestUpdate = (scenario: ScenarioResponseDTO): string | null => {
+  if (!scenario.tasks || scenario.tasks.length === 0) {
+    return null;
+  }
+  // Encontra a tarefa com a data de atualização mais recente
+  const latestTask = scenario.tasks.reduce((latest, current) => {
+    const latestDate = new Date(latest.lastUpdateDate);
+    const currentDate = new Date(current.lastUpdateDate);
+    return currentDate > latestDate ? current : latest;
+  });
+  return latestTask.lastUpdateDate;
 };
 
 export function PlansTable({
@@ -44,7 +58,7 @@ export function PlansTable({
     rows.length > 0 && selectedPlanIds.length === rows.length;
 
   return (
-    <Table<PlanResponseDTO>
+    <Table<ScenarioResponseDTO>
       rows={rows}
       size="md"
       divider
@@ -61,16 +75,16 @@ export function PlansTable({
               onChange={handleSelectAll}
             />
           </Table.Heading>
-          <Table.Heading accessor="cityName" sortable width="80%">
-            Cidade ↓
+          <Table.Heading accessor="cityName" sortable width="30%">
+            Cidade
           </Table.Heading>
-          <Table.Heading accessor="cobrade" width="60%">
+          <Table.Heading accessor="cobrade" width="20%">
             Cobrade
           </Table.Heading>
-          <Table.Heading accessor="lastUpdated" width="40%">
+          <Table.Heading accessor="lastUpdated" width="20%">
             Última Atualização
           </Table.Heading>
-          <Table.Heading width="10%" align="center">
+          <Table.Heading width="5%" align="center">
             Editar
           </Table.Heading>
           <Table.Heading width="5%" align="center">
@@ -80,44 +94,49 @@ export function PlansTable({
       </Table.Header>
 
       <Table.Body>
-        <Table.Rows<PlanResponseDTO>>
-          {(row) => (
-            <Table.Row key={row.id} row={row}>
-              <Table.Cell align="center">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  checked={selectedPlanIds.includes(row.id)}
-                  onChange={() => handleSelectRow(row.id)}
-                />
-              </Table.Cell>
-              <Table.Cell>{row.city?.name ?? '—'}</Table.Cell>
-              <Table.Cell>{row.cobrade ?? '—'}</Table.Cell>
-              <Table.Cell>{formatDate(row.lastUpdated)}</Table.Cell>
+        <Table.Rows<ScenarioResponseDTO>>
+          {(row) => {
+            const lastUpdated = getLatestUpdate(row);
+            return (
+              <Table.Row key={row.id} row={row}>
+                <Table.Cell align="center">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked={selectedPlanIds.includes(row.id)}
+                    onChange={() => handleSelectRow(row.id)}
+                  />
+                </Table.Cell>
+                <Table.Cell>{row.city.name ?? '—'}</Table.Cell>
+                <Table.Cell>{row.cobrade.subgroup ?? '—'}</Table.Cell>
+                <Table.Cell>
+                  {lastUpdated ? formatDate(lastUpdated) : '—'}
+                </Table.Cell>
 
-              <Table.Cell align="center">
-                <button
-                  type="button"
-                  title="Editar Plano"
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md hover:bg-gray-100"
-                  onClick={() => onEdit(row.id)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </button>
-              </Table.Cell>
+                <Table.Cell align="center">
+                  <button
+                    type="button"
+                    title="Editar Plano"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md hover:bg-gray-100"
+                    onClick={() => onEdit(row.id)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                </Table.Cell>
 
-              <Table.Cell align="center">
-                <button
-                  type="button"
-                  title="Download do Plano"
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md hover:bg-gray-100"
-                  onClick={() => onDownload(row)}
-                >
-                  <FileDown className="h-4 w-4" />
-                </button>
-              </Table.Cell>
-            </Table.Row>
-          )}
+                <Table.Cell align="center">
+                  <button
+                    type="button"
+                    title="Download do Plano"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md hover:bg-gray-100"
+                    onClick={() => onDownload(row)}
+                  >
+                    <FileDown className="h-4 w-4" />
+                  </button>
+                </Table.Cell>
+              </Table.Row>
+            );
+          }}
         </Table.Rows>
       </Table.Body>
 

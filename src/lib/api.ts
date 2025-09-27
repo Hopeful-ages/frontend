@@ -2,9 +2,9 @@ import Cookies from 'js-cookie';
 import { decodeJWT } from './jwt';
 import {
   CityResponseDTO,
-  PlanRequestDTO,
-  PlanResponseDTO,
-  PlanUpdateDTO,
+  ScenarioRequestDTO, // Adicionado
+  ScenarioResponseDTO, // Substituído
+  ScenarioUpdateDTO, // Substituído
   ServiceResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
@@ -125,20 +125,22 @@ export const api = {
       method: 'PATCH',
     }),
 
-  getPlans: () => fetchWithAuth('/api/plans') as Promise<PlanResponseDTO[]>,
+  // Funções de Cenário (antigos Planos)
+  getScenarios: () =>
+    fetchWithAuth('/api/scenarios') as Promise<ScenarioResponseDTO[]>,
 
-  getPlan: (id: string) =>
-    fetchWithAuth(`/api/plans/${id}`) as Promise<PlanResponseDTO>,
+  getScenario: (id: string) =>
+    fetchWithAuth(`/api/scenarios/${id}`) as Promise<ScenarioResponseDTO>,
 
-  createPlan: (payload: PlanRequestDTO) =>
-    fetchWithAuth('/api/plans', {
+  createScenario: (payload: ScenarioRequestDTO) =>
+    fetchWithAuth('/api/scenarios', {
       method: 'POST',
       body: JSON.stringify(payload),
-    }) as Promise<PlanResponseDTO>,
+    }) as Promise<ScenarioResponseDTO>,
 
-  editPlan: (id: string, payload: PlanUpdateDTO) =>
-    fetchWithAuth(`/api/plans/${id}`, {
-      method: 'PATCH', // Usando PATCH para consistência com editUser
+  editScenario: (id: string, payload: ScenarioUpdateDTO) =>
+    fetchWithAuth(`/api/scenarios/${id}`, {
+      method: 'PATCH',
       body: JSON.stringify(payload),
-    }) as Promise<PlanResponseDTO>,
+    }) as Promise<ScenarioResponseDTO>,
 };

@@ -3,8 +3,7 @@
 import { api } from '@/lib/api';
 import {
   CityResponseDTO,
-  PlanResponseDTO,
-  PlanUpdateDTO,
+  ScenarioResponseDTO,
   ServiceResponseDTO,
 } from '@/lib/types';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -22,10 +21,10 @@ type Errors = Partial<Record<Field, string>>;
 
 export default function AdminPlansPage() {
   const [loading, setLoading] = useState(true);
-  const [plans, setPlans] = useState<PlanResponseDTO[]>([]);
+  const [scenarios, setScenarios] = useState<ScenarioResponseDTO[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
 
-  const [selectedPlanIds, setSelectedPlanIds] = useState<string[]>([]);
+  const [selectedScenarioIds, setSelectedScenarioIds] = useState<string[]>([]);
 
   const [pendingCityFilter, setPendingCityFilter] = useState('');
   const [pendingCobradeFilter, setPendingCobradeFilter] = useState<
@@ -41,8 +40,8 @@ export default function AdminPlansPage() {
   const [isEdit, setIsEdit] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [planForDownload, setPlanForDownload] =
-    useState<PlanResponseDTO | null>(null);
+  const [scenarioForDownload, setScenarioForDownload] =
+    useState<ScenarioResponseDTO | null>(null);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
   const { success, error, warning } = useToast();
@@ -60,9 +59,9 @@ export default function AdminPlansPage() {
   const [errors, setErrors] = useState<Errors>({});
 
   const cobradeOptions = useMemo(() => {
-    const uniqueCobrades = new Set(plans.map((p) => p.cobrade));
+    const uniqueCobrades = new Set(scenarios.map((s) => s.cobrade.description));
     return Array.from(uniqueCobrades);
-  }, [plans]);
+  }, [scenarios]);
 
   useEffect(() => {
     if (isAuthLoading) {
@@ -87,36 +86,36 @@ export default function AdminPlansPage() {
     setAppliedCobradeFilter(null);
   };
 
-  const filteredPlans = useMemo(() => {
+  const filteredScenarios = useMemo(() => {
     if (!appliedCityFilter && !appliedCobradeFilter) {
-      return plans;
+      return scenarios;
     }
-    return plans.filter((p) => {
+    return scenarios.filter((s) => {
       const byCity = appliedCityFilter
-        ? (p.city?.name ?? '')
-            .toLowerCase()
-            .includes(appliedCityFilter.toLowerCase())
+        ? s.city.name.toLowerCase().includes(appliedCityFilter.toLowerCase())
         : true;
       const byCobrade = appliedCobradeFilter
-        ? p.cobrade.toLowerCase() === appliedCobradeFilter.toLowerCase()
+        ? s.cobrade.description.toLowerCase() ===
+          appliedCobradeFilter.toLowerCase()
         : true;
       return byCity && byCobrade;
     });
-  }, [plans, appliedCityFilter, appliedCobradeFilter]);
+  }, [scenarios, appliedCityFilter, appliedCobradeFilter]);
 
-  const showPagination = filteredPlans.length > 10;
+  const showPagination = filteredScenarios.length > 10;
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        const [fetchedPlans, fetchedCities] = await Promise.all([
-          api.getPlans(),
+        // Supondo que api.getPlans() agora retorna ScenarioResponseDTO[]
+        const [fetchedScenarios, fetchedCities] = await Promise.all([
+          api.getScenarios(),
           api.getAllCities(),
         ]);
         if (!mounted) return;
-        setPlans(fetchedPlans);
+        setScenarios(fetchedScenarios);
         setCities(fetchedCities);
       } catch (e) {
         console.error(e);
@@ -131,25 +130,40 @@ export default function AdminPlansPage() {
   }, [error]);
 
   const onEdit = (id: string) => {
-    console.log('Editando plano:', id);
+    console.log('Editando cenário:', id);
   };
 
-  const onDownload = (plan: PlanResponseDTO) => {
-    setPlanForDownload(plan);
+  const onDownload = (scenario: ScenarioResponseDTO) => {
+    setScenarioForDownload(scenario);
     setDownloadModalOpen(true);
   };
 
   const handleBulkDownload = () => {
-    const selectedPlans = plans.filter((p) => selectedPlanIds.includes(p.id));
-    if (selectedPlans.length === 0) {
+    const selectedScenarios = scenarios.filter((s) =>
+      selectedScenarioIds.includes(s.id)
+    );
+    if (selectedScenarios.length === 0) {
       error('Nenhum plano selecionado para download.');
       return;
     }
 
-    success(`Iniciando download de ${selectedPlans.length} plano(s)...`);
-    selectedPlans.forEach((plan) => {
-      window.open(plan.fileUrl, '_blank');
+    success(`Iniciando download de ${selectedScenarios.length} plano(s)...`);
+    selectedScenarios.forEach((scenario) => {
+      // NOTE: ScenarioResponseDTO não possui fileUrl.
+      // A URL de download deve ser construída ou obtida de outra forma.
+      // Exemplo: chamando um endpoint da API para baixar o arquivo.
+      const downloadUrl = `/api/scenarios/${scenario.id}/download`;
+      window.open(downloadUrl, '_blank');
     });
+  };
+
+  const handleConfirmDownload = () => {
+    if (scenarioForDownload) {
+      // NOTE: O mesmo que em handleBulkDownload, a URL é construída.
+      const downloadUrl = `/api/scenarios/${scenarioForDownload.id}/download`;
+      window.open(downloadUrl, '_blank');
+      setDownloadModalOpen(false);
+    }
   };
 
   if (isAuthLoading) {
@@ -177,22 +191,22 @@ export default function AdminPlansPage() {
         </div>
       ) : (
         <PlansTable
-          rows={filteredPlans}
+          rows={filteredScenarios}
           showPagination={showPagination}
-          selectedPlanIds={selectedPlanIds}
-          onSelectionChange={setSelectedPlanIds}
+          selectedPlanIds={selectedScenarioIds}
+          onSelectionChange={setSelectedScenarioIds}
           onEdit={onEdit}
           onDownload={onDownload}
         />
       )}
 
-      {selectedPlanIds.length > 0 && (
+      {selectedScenarioIds.length > 0 && (
         <div className="fixed right-5 bottom-5 z-20">
           <button
             onClick={handleBulkDownload}
             className="flex items-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-105"
           >
-            Downloads ({selectedPlanIds.length})
+            Downloads ({selectedScenarioIds.length})
           </button>
         </div>
       )}
@@ -217,11 +231,8 @@ export default function AdminPlansPage() {
       <ConfirmDownloadModal
         open={isDownloadModalOpen}
         loading={downloadLoading}
-        plan={planForDownload}
-        onConfirm={() => {
-          if (planForDownload) window.open(planForDownload.fileUrl, '_blank');
-          setDownloadModalOpen(false);
-        }}
+        scenario={scenarioForDownload}
+        onConfirm={handleConfirmDownload}
         onClose={() => setDownloadModalOpen(false)}
       />
     </main>
