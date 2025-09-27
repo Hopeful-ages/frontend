@@ -16,24 +16,6 @@ type Protocol = {
   description: string;
 };
 
-// const initialProtocols: Protocol[] = [
-//   {
-//     id: '1',
-//     description:
-//       'Realizar simulações periódicas de evacuação para trabalhadores e comunidades vizinhas em caso de acidente químico. (Bombeiros, 2025)',
-//   },
-//   {
-//     id: '2',
-//     description:
-//       'Definir rotas de transporte seguro para resíduos químicos e estabelecer procedimentos para descarte adequado. (Polícia Rodoviária, 2025)',
-//   },
-//   {
-//     id: '3',
-//     description:
-//       'Estabelecer protocolos para a contenção de vazamentos de produtos químicos em indústrias, com medidas de isolamento da área e neutralização da substância. (Defesa Civil, 2025)',
-//   },
-// ];
-
 export default function CreateScenario() {
   const [etapaAtual, setEtapaAtual] = useState(ETAPAS_DO_PLANO[0]);
   const [protocols, setProtocols] = useState<Protocol[]>([]);
