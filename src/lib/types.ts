@@ -36,6 +36,15 @@ export type UserUpdateDTO = Partial<{
   accountStatus: boolean;
 }>;
 
+export type CobradeResponseDTO = {
+  id: string;
+  code: string;
+  description: string;
+  subgroup: string;
+  type: string;
+  subType: string | null;
+};
+
 export type ApiError = {
   status: number;
   data?: {

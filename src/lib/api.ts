@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import { decodeJWT } from './jwt';
 import {
   CityResponseDTO,
+  CobradeResponseDTO,
   ServiceResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
@@ -100,6 +101,10 @@ export const api = {
 
   getAllServices: () =>
     fetchWithAuth('/api/services') as Promise<ServiceResponseDTO[]>,
+  getAllCobrades: () =>
+    fetchWithAuth('/api/cobrades') as Promise<CobradeResponseDTO[]>,
+  getCobradeById: (id: string) =>
+    fetchWithAuth(`/api/cobrades/${id}`) as Promise<CobradeResponseDTO>,
 
   getAllCities: () => fetchWithAuth('/api/city') as Promise<CityResponseDTO[]>,
 

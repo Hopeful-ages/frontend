@@ -2,70 +2,86 @@
 
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import ProtocolList from '@/components/ProtocolList';
+import ProtocolList, { Protocol } from '@/components/ProtocolList';
 import Header from '@/components/Header';
 import { PlanStepsTabs } from '@/components/PlanStepsTabs';
 import { Dropdown } from '@/components/Dropdown';
 import { Plus, Save } from 'lucide-react';
-import { useState } from 'react';
+import { api } from '@/lib/api';
+import { useEffect, useState } from 'react';
+import { CobradeResponseDTO } from '@/lib/types';
+import { CityResponseDTO } from '@/lib/types';
 
-const ETAPAS_DO_PLANO = ['Antes', 'Durante', 'Depois'];
-
-type Protocol = {
-  id: string;
-  description: string;
-};
+const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function CreateScenario() {
-  const [etapaAtual, setEtapaAtual] = useState(ETAPAS_DO_PLANO[0]);
+  const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
   const [protocols, setProtocols] = useState<Protocol[]>([]);
-  const [cidade, setCidade] = useState('Porto Alegre - RS');
-  const [cobrade, setCobrade] = useState<string | null>(null);
-  const [parametro, setParametro] = useState('');
-  const [acao, setAcao] = useState('');
+  const [cities, setCities] = useState<CityResponseDTO[]>([]);
+  const [city, setCity] = useState<CityResponseDTO | null>(null);
+  const [cobrades, setCobrades] = useState<CobradeResponseDTO[]>([]);
+  const [cobrade, setCobrade] = useState<CobradeResponseDTO | null>(null);
+  const [parameter, setParameter] = useState('');
+  const [action, setAction] = useState('');
+
+  useEffect(() => {
+    const fetchCobrades = async () => {
+      try {
+        const data = await api.getAllCobrades();
+        setCobrades(data);
+      } catch (err) {
+        console.error('Erro ao buscar COBRADES', err);
+      }
+    };
+    const fetchCities = async () => {
+      try {
+        const data = await api.getAllCities();
+        setCities(data);
+      } catch (err) {
+        console.error('Erro ao buscar citiess', err);
+      }
+    };
+    fetchCities();
+    fetchCobrades();
+  }, []);
 
   const handleRemoveProtocol = (protocolToRemove: Protocol) => {
-    const updatedProtocols = protocols.filter(
-      (protocol) => protocol.id !== protocolToRemove.id,
+    setProtocols(
+      protocols.filter((protocol) => protocol.id !== protocolToRemove.id),
     );
-    setProtocols(updatedProtocols);
   };
 
   const handleEditProtocol = (protocolToEdit: Protocol) => {
-    if (!protocolToEdit) {
-      console.error('Protocolo não encontrado!');
-      return;
-    }
-
     const newDescription = prompt(
       'Edite a descrição do protocolo:',
       protocolToEdit.description,
     );
 
     if (newDescription && newDescription.trim() !== '') {
-      const updatedProtocols = protocols.map((protocol) =>
-        protocol.id === protocolToEdit.id
-          ? { ...protocol, description: newDescription }
-          : protocol,
+      setProtocols(
+        protocols.map((protocol) =>
+          protocol.id === protocolToEdit.id
+            ? { ...protocol, description: newDescription }
+            : protocol,
+        ),
       );
-      setProtocols(updatedProtocols);
     }
   };
 
   const handleAddTask = () => {
-    if (parametro.trim() === '' || acao.trim() === '') {
+    if (parameter.trim() === '' || action.trim() === '') {
       alert('Por favor, preencha os campos "Parâmetro" e "Ação".');
       return;
     }
 
     const newProtocol: Protocol = {
       id: Date.now().toString(),
-      description: `${parametro.trim()} - ${acao.trim()}`,
+      description: `${parameter.trim()} - ${action.trim()}`,
     };
 
     setProtocols([...protocols, newProtocol]);
-    setParametro('');
-    setAcao('');
+    setParameter('');
+    setAction('');
   };
 
   const handleSave = () => {
@@ -74,16 +90,21 @@ export default function CreateScenario() {
       return;
     }
 
+    if (!city) {
+      alert('Por favor, selecione uma cidade.');
+      return;
+    }
+
     const scenarioData = {
-      cidade,
+      city,
       cobrade,
-      etapa: etapaAtual,
+      step: currentStep,
       protocols,
     };
 
     console.log('--- DADOS A SEREM SALVOS ---', scenarioData);
     alert(
-      `Cenário para a cidade de ${cidade} foi salvo com sucesso! (Verifique o console para ver os dados)`,
+      `Cenário para a cidade ${city.name} - ${city.state} foi salvo com sucesso!`,
     );
   };
 
@@ -94,6 +115,7 @@ export default function CreateScenario() {
         <h1 className="text-gray-850 my-1 text-center text-3xl">
           Cadastrar Cenário
         </h1>
+
         <div className="mb-6 ml-4 flex w-full gap-8">
           <div className="flex-1">
             <label
@@ -104,49 +126,52 @@ export default function CreateScenario() {
             </label>
             <Dropdown
               label="Selecione a cidade"
-              items={[
-                'Porto Alegre - RS',
-                'Sao Leopoldo - RS',
-                'Novo Hamburgo - RS',
-                'Caxias do Sul - RS',
-                'Gramado - RS',
-                'Canela - RS',
-                'Bento Gonçalves - RS',
-                'Santa Maria - RS',
-                'Pelotas - RS',
-              ]}
+              items={cities.map((c) => `${c.name} - ${c.state}`)}
               size="large"
-              value={cidade}
-              onSelect={(item) => setCidade(item)}
+              value={city ? `${city.name} - ${city.state}` : ''}
+              onSelect={(cityString) => {
+                const cityName = cityString.split(' - ')[0];
+                const selectedCity =
+                  cities.find((c) => c.name === cityName) || null;
+                setCity(selectedCity);
+              }}
               useAutoComplete
             />
           </div>
+
           <div className="mt-6 ml-4 flex-1">
             <Dropdown
               label="Selecione a COBRADE"
-              items={['COBRADE 1', 'COBRADE 2', 'COBRADE 3']}
+              items={cobrades.map((c) => c.subgroup)}
               size="large"
               border="gray"
-              onSelect={(item) => setCobrade(item)}
+              value={cobrade?.subgroup ?? ''}
+              onSelect={(desc) => {
+                const selected =
+                  cobrades.find((c) => c.description === desc) || null;
+                setCobrade(selected);
+              }}
               useAutoComplete
             />
           </div>
         </div>
 
+        {/* Etapas */}
         <PlanStepsTabs
-          steps={ETAPAS_DO_PLANO}
-          currentStep={etapaAtual}
-          onChange={(novaEtapa) => setEtapaAtual(novaEtapa)}
+          steps={PLAN_STEPS}
+          currentStep={currentStep}
+          onChange={(newStep) => setCurrentStep(newStep)}
           size="md"
         />
 
+        {/* Inputs */}
         <div className="mt-6 mb-4 flex items-center gap-4">
           <label className="w-24 text-lg font-medium">Parâmetro</label>
           <Input
-            name="task"
+            name="parameter"
             placeholder="Digite aqui o parâmetro"
-            value={parametro}
-            onChange={(e) => setParametro(e.target.value)}
+            value={parameter}
+            onChange={(e) => setParameter(e.target.value)}
             className="flex-1"
           />
         </div>
@@ -154,18 +179,22 @@ export default function CreateScenario() {
         <div className="mb-4 flex items-center gap-4">
           <label className="w-24 text-lg font-medium">Ação</label>
           <Input
-            name="task"
-            placeholder="Digite aqui a Ação"
+            name="action"
+            placeholder="Digite aqui a ação"
             className="flex-1"
-            value={acao}
-            onChange={(e) => setAcao(e.target.value)}
+            value={action}
+            onChange={(e) => setAction(e.target.value)}
           />
         </div>
+
+        {/* Lista de protocolos */}
         <ProtocolList
           protocols={protocols}
           onEdit={handleEditProtocol}
           onRemove={handleRemoveProtocol}
         />
+
+        {/* Botões */}
         <div className="mt-8 mr-4 flex items-center justify-end gap-4">
           <Button
             variant="secondary"
