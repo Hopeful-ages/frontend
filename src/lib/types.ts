@@ -25,19 +25,19 @@ export type CitySummaryDTO = { id: string; name: string; state: string };
 export type ServiceResponseDTO = ServiceSummaryDTO;
 export type CityResponseDTO = CitySummaryDTO;
 
-export type TaskSummaryDTO = { 
-  id: string; 
-  description: string; 
-  phase: string; 
-  lastUpdatedDate: Date; 
-  service: ServiceSummaryDTO | null 
+export type TaskSummaryDTO = {
+  id: string;
+  description: string;
+  phase: string;
+  lastUpdatedDate: Date;
+  service: ServiceSummaryDTO | null;
 };
 
 export type TaskResponseDTO = TaskSummaryDTO;
 
-export type ParameterSummaryDTO = { 
-  id: string; 
-  description: string; 
+export type ParameterSummaryDTO = {
+  id: string;
+  description: string;
   action: string;
   phase: string;
 };
@@ -45,13 +45,13 @@ export type ParameterSummaryDTO = {
 export type ParameterResponseDTO = ParameterSummaryDTO;
 
 export type ScenarioResponseDTO = {
-  id: string; 
-  description: string;
+  id: string;
+  description: string | null;
   origin: string;
   city: CityResponseDTO;
   cobrade: CobradeDTO;
-  tasks: TaskSummaryDTO;
-  parameters: ParameterSummaryDTO;
+  tasks: TaskSummaryDTO[];
+  parameters: ParameterSummaryDTO[];
 };
 
 export type UserUpdateDTO = Partial<{
