@@ -58,14 +58,14 @@ export type TaskRequestDTO = {
   phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
   serviceId?: string | null;
 };
-  
+
 export type TaskUpdateDTO = Partial<{
   description: string;
   phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
   lastUpdateDate: string;
   serviceId: string | null;
 }>;
-  
+
 export type ParameterResponseDTO = {
   id: string;
   description: string;
@@ -112,3 +112,11 @@ export type ScenarioUpdateDTO = Partial<{
   tasks: TaskUpdateDTO[];
   parameters: ParameterUpdateDTO[];
 }>;
+export type ApiError = {
+  status: number;
+  data?: {
+    error?: string;
+    message?: string;
+  };
+  raw?: string;
+};

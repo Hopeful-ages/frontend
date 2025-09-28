@@ -31,7 +31,6 @@ export default function LoginPage() {
     if (isCheckingAuth) {
       showLoading('Verificando autenticação...');
       if (!loadingShown.current) {
-        // warning('Atenção!!', 'Verificando autenticação...');
         loadingShown.current = true;
       }
     } else {

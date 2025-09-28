@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@/components/Button';
 import { Dropdown } from '@/components/Dropdown';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
@@ -92,24 +93,21 @@ export function UserFormModal({
       isOpen={isOpen}
       onClose={onClose}
       title={isEdit ? titleWhenEdit : 'Cadastro de Usuários'}
-      size="lg"
+      size="auto"
       footer={
         <div className="flex w-full items-center justify-center gap-3">
-          <button
+          <Button
             onClick={onSave}
             disabled={!canClickSave}
-            className="inline-flex items-center gap-2 rounded-md border border-black bg-black px-5 py-2 text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+            variant="secondary"
+            leftIcon={<Check />}
           >
-            <Check className="h-4 w-4" />
-            <span>Salvar</span>
-          </button>
-          <button
-            onClick={onClose}
-            className="inline-flex items-center gap-2 rounded-md border border-red-600 bg-red-600 px-5 py-2 text-white transition hover:bg-red-700"
-          >
-            <X className="h-4 w-4" />
-            <span>Cancelar</span>
-          </button>
+            Salvar
+          </Button>
+
+          <Button onClick={onClose} variant="danger" leftIcon={<X />}>
+            Cancelar
+          </Button>
         </div>
       }
     >
@@ -146,6 +144,7 @@ export function UserFormModal({
             icon={<MapPin className="h-4 w-4" />}
             fullWidth
             value={valueCityName}
+            useAutoComplete={true}
           />
           {errors.cityId && (
             <p className="mt-1.5 text-xs font-medium text-red-600">

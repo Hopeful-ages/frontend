@@ -1,6 +1,6 @@
 'use client';
-import React, { forwardRef, ReactNode } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import React, { forwardRef, ReactNode } from 'react';
 
 function cn(...classes: Array<string | undefined | false | null>) {
   return classes.filter(Boolean).join(' ');
@@ -11,7 +11,7 @@ const inputClasses = cva(
   {
     variants: {
       variant: {
-        default: 'border-gray-300 focus:border-blue-500',
+        default: 'border-gray-400 focus:border-blue-500',
         error: 'border-red-500 text-red-700 focus:border-red-600',
       },
       size: {

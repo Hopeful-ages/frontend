@@ -74,7 +74,7 @@ export default function Header() {
   const links = role === Role.ADMIN ? ADMIN_LINKS : USER_LINKS;
 
   return (
-    <header className="fixed top-0 left-0 z-50 flex w-full items-center justify-between bg-black px-6 py-2 text-gray-300">
+    <header className="fixed top-0 left-0 z-100 flex w-full items-center justify-between bg-black px-6 py-2 text-gray-300">
       <div className="flex items-center gap-2 md:hidden">
         <Link href="https://www.hopeful.pro/">
           <Image
