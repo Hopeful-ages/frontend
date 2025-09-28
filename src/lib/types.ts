@@ -65,6 +65,15 @@ export type UserUpdateDTO = Partial<{
   accountStatus: boolean;
 }>;
 
+export type CobradeResponseDTO = {
+  id: string;
+  code: string;
+  description: string;
+  subgroup: string;
+  type: string;
+  subType: string | null;
+};
+
 export type CobradeDTO = {
   id: string;
   code: string;
@@ -72,14 +81,6 @@ export type CobradeDTO = {
   subgroup: string;
   type: string | null;
   subType: string | null;
-};
-
-export type TaskResponseDTO = {
-  id: string;
-  description: string;
-  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
-  lastUpdateDate: string; // ISO 8601
-  service: ServiceSummaryDTO | null;
 };
 
 export type TaskRequestDTO = {
@@ -95,13 +96,6 @@ export type TaskUpdateDTO = Partial<{
   serviceId: string | null;
 }>;
 
-export type ParameterResponseDTO = {
-  id: string;
-  description: string;
-  action: string;
-  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
-};
-
 export type ParameterRequestDTO = {
   description: string;
   action: string;
@@ -113,16 +107,6 @@ export type ParameterUpdateDTO = Partial<{
   action: string;
   phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
 }>;
-
-export type ScenarioResponseDTO = {
-  id: string;
-  description: string | null;
-  origin: string;
-  city: CitySummaryDTO;
-  cobrade: CobradeDTO;
-  tasks: TaskResponseDTO[];
-  parameters: ParameterResponseDTO[];
-};
 
 export type ScenarioRequestDTO = {
   description?: string | null;
