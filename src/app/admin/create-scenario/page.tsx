@@ -268,17 +268,11 @@ export default function CreateScenario() {
 
         <div className="mb-6 ml-4 flex w-full gap-8">  
           <div className="flex-1">
-            <label
-              htmlFor="city"
-              className="mb-1 block text-sm font-medium text-gray-850"
-            >
-              Cidade
-            </label>
             <Dropdown
-              label="Selecione a cidade"
+              label="Cidade"
               items={cities.map((c) => `${c.name} - ${c.state}`)}
               size="large"
-              value={city ? `${city.name} - ${city.state}` : ''}
+              value={city ? `${city.name} - ${city.state}` : null}
               onSelect={(cityString) => {
                 const cityName = cityString.split(' - ')[0];
                 const selectedCity =
@@ -291,14 +285,8 @@ export default function CreateScenario() {
 
           <div className="mb-6 ml-4 flex w-full gap-8">
             <div className="flex-1">
-              <label
-                htmlFor="cobrades"
-                className="mb-1 block text-sm font-medium text-gray-850"
-              >
-                COBRADE
-              </label>
               <Dropdown
-                label="Selecione a COBRADE"
+                label="Cobrade"
                 items={cobrades.map(
                   (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
                 )}
@@ -306,7 +294,7 @@ export default function CreateScenario() {
                 value={
                   cobrade
                     ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
-                    : ''
+                    : null
                 }
                 onSelect={(desc) => {
                   const selectedCobrade =
@@ -376,7 +364,7 @@ export default function CreateScenario() {
 
         <div className="mt-8 mr-4 flex items-center justify-end gap-4">
           <Button
-            variant="secondary"
+            variant="outline"
             size="md"
             onClick={() => setIsTaskModalOpen(true)}
             leftIcon={<Plus size={16} />}
