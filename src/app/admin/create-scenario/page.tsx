@@ -22,6 +22,7 @@ const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function CreateScenario() {
   const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
+  // Armazena todas as tarefas (protocols) com sua fase associada
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
   const [city, setCity] = useState<CityResponseDTO | null>(null);
@@ -50,6 +51,7 @@ export default function CreateScenario() {
           const tasksAsProtocols: Protocol[] = scenario.tasks.map((task) => ({
             id: task.id,
             description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${new Date().getFullYear()})`,
+            phase: task.phase, // Mantém a fase original retornada pela API (provavelmente ANTES/DURANTE/DEPOIS)
           }));
 
           setProtocols(tasksAsProtocols);
@@ -112,9 +114,7 @@ export default function CreateScenario() {
   };
 
   const handleRemoveProtocol = (protocolToRemove: Protocol) => {
-    setProtocols(
-      protocols.filter((protocol) => protocol.id !== protocolToRemove.id),
-    );
+    setProtocols((prev) => prev.filter((p) => p.id !== protocolToRemove.id));
   };
 
   const handleSave = async () => {
@@ -128,7 +128,12 @@ export default function CreateScenario() {
       return;
     }
 
-    if (protocols.length === 0) {
+    // Apenas tarefas da fase atual contam para validação mínima
+    const currentPhaseProtocols = protocols.filter(
+      (p) => mapStepToPhase(p.phase) === phaseMap[currentStep],
+    );
+
+    if (currentPhaseProtocols.length === 0) {
       alert('Adicione pelo menos uma tarefa antes de salvar o cenário.');
       return;
     }
@@ -153,13 +158,14 @@ export default function CreateScenario() {
 
         return {
           description,
-          phase: phaseMap[currentStep],
+          // Usa a fase específica da tarefa, se existir; caso contrário, a fase atual
+          phase: mapStepToPhase(protocol.phase) || phaseMap[currentStep],
           serviceId: service?.id || null,
         };
       });
 
       // Preparar parâmetros (se existirem)
-      const parameters = [];
+      const parameters: ScenarioRequestDTO['parameters'] = [];
       if (parameter.trim() && action.trim()) {
         parameters.push({
           description: parameter.trim(),
@@ -196,6 +202,39 @@ export default function CreateScenario() {
       alert('Erro ao salvar o cenário. Tente novamente.');
     }
   };
+
+  // Mapeia label da tab para enum de fase
+  const phaseMap: Record<string, 'ANTES' | 'DURANTE' | 'DEPOIS'> = {
+    Antes: 'ANTES',
+    Durante: 'DURANTE',
+    Depois: 'DEPOIS',
+  };
+
+  const mapStepToPhase = (
+    value?: string,
+  ): 'ANTES' | 'DURANTE' | 'DEPOIS' | undefined => {
+    if (!value) return undefined;
+    const upper = value.toUpperCase();
+    if (upper.includes('ANTES')) return 'ANTES';
+    if (upper.includes('DURANTE')) return 'DURANTE';
+    if (upper.includes('DEPOIS')) return 'DEPOIS';
+    return undefined;
+  };
+
+  // Protocolos filtrados pela fase atual
+  const filteredProtocols = protocols
+    .filter(
+      (p) =>
+        (mapStepToPhase(p.phase) || phaseMap[currentStep]) ===
+        phaseMap[currentStep],
+    )
+    .filter((p) => mapStepToPhase(p.phase) === phaseMap[currentStep]);
+
+  // Caso nenhum protocolo tenha fase (legado), mostra os da fase atual (após criação)
+  const displayProtocols =
+    filteredProtocols.length > 0
+      ? filteredProtocols
+      : protocols.filter((p) => !p.phase); // Exibe antigos sem fase enquanto não editados
 
   return (
     <div className="b-l b-r min-h-screen">
@@ -292,7 +331,7 @@ export default function CreateScenario() {
         </div>
 
         <ProtocolList
-          protocols={protocols}
+          protocols={displayProtocols}
           onEdit={handleEditProtocol}
           onRemove={handleRemoveProtocol}
         />
@@ -333,6 +372,7 @@ export default function CreateScenario() {
                   ? {
                       ...p,
                       description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
+                      phase: phaseMap[currentStep],
                     }
                   : p,
               ),
@@ -342,6 +382,7 @@ export default function CreateScenario() {
             const newProtocol: Protocol = {
               id: Date.now().toString(),
               description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
+              phase: phaseMap[currentStep],
             };
             setProtocols((prev) => [...prev, newProtocol]);
           }
@@ -352,7 +393,7 @@ export default function CreateScenario() {
           editTask
             ? {
                 id: String(editTask.id),
-                description: editTask.description.split(' (')[0], // Remove service e ano da description
+                description: editTask.description.split(' (')[0],
                 service:
                   editTask.description.match(/\(([^,]+),/)?.[1] || undefined,
               }

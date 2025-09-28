@@ -4,6 +4,8 @@ import { ArrowDown } from 'lucide-react';
 export interface Protocol {
   id: string | number;
   description: string;
+  // Fase (Antes/Durante/Depois) opcional para permitir filtragem externa
+  phase?: string;
 }
 
 interface ProtocolListProps {
