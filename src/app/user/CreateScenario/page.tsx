@@ -107,13 +107,12 @@ export default function CreateScenario() {
 
         <div className="mt-6 mb-4 flex items-center gap-2">
           {' '}
-          {/* Borda e padding removidos daqui */}
           <Input
             name="task"
             placeholder="Digite aqui a tarefa..."
             value={parametro}
             onChange={(e) => setParametro(e.target.value)}
-            className="flex-1 rounded-lg border border-gray-300 p-2 focus:ring-0" // Borda e padding adicionados aqui
+            className="flex-1 rounded-lg border border-gray-300 p-2 focus:ring-0"
             size={'lg'}
           />
           <button
