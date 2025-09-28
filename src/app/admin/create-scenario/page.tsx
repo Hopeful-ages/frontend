@@ -38,7 +38,7 @@ export default function CreateScenario() {
         const data = await api.getAllCities();
         setCities(data);
       } catch (err) {
-        console.error('Erro ao buscar citiess', err);
+        console.error('Erro ao buscar CIDADES', err);
       }
     };
     fetchCities();
@@ -112,7 +112,7 @@ export default function CreateScenario() {
     <div className="b-l b-r min-h-screen">
       <Header />
       <main className="mx-auto max-w-4xl border p-4 pt-24">
-        <h1 className="text-gray-850 my-1 text-center text-3xl">
+        <h1 className="text-gray-850 my-1 text-center text-3xl mb-10">
           Cadastrar Cenário
         </h1>
 
@@ -139,20 +139,27 @@ export default function CreateScenario() {
             />
           </div>
 
-          <div className="mt-6 ml-4 flex-1">
-            <Dropdown
-              label="Selecione a COBRADE"
-              items={cobrades.map((c) => c.subgroup)}
-              size="large"
-              border="gray"
-              value={cobrade?.subgroup ?? ''}
-              onSelect={(desc) => {
-                const selected =
-                  cobrades.find((c) => c.description === desc) || null;
-                setCobrade(selected);
-              }}
-              useAutoComplete
-            />
+          <div className="mb-6 ml-4 flex w-full gap-8">
+            <div className="flex-1">
+              <label
+                htmlFor="cobrades"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                COBRADE
+              </label>
+              <Dropdown
+                label="Selecione a COBRADE"
+                items={cobrades.map(c => `${c.code} - ${c.subType || c.type || c.subgroup}`)}
+                size="large"
+                value={cobrade ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}` : ''}
+                onSelect={(desc) => {
+                  const selectedCobrade =
+                    cobrades.find((c) => `${c.code} - ${c.subType || c.type || c.subgroup}` === desc) || null;
+                  setCobrade(selectedCobrade);
+                }}
+                useAutoComplete
+              />
+            </div>
           </div>
         </div>
 

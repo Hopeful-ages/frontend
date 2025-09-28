@@ -7,6 +7,7 @@ import {
   UserRequestDTO,
   UserResponseDTO,
   UserUpdateDTO,
+  ScenarioResponseDTO,
 } from './types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -129,4 +130,11 @@ export const api = {
 
   enableUser: (id: string) =>
     fetchWithAuthVoid(`/api/users/enable/${id}`, { method: 'PATCH' }),
+
+  getAllScenarios: () => fetchWithAuth('/api/scenarios') as Promise<ScenarioResponseDTO[]>,
+
+  getScenarioByIdAndCobrade: (cityId: string, cobradeId: string) =>
+  fetchWithAuth(
+    `/api/scenarios/by-city-cobrade?cityId=${encodeURIComponent(cityId)}&cobradeId=${encodeURIComponent(cobradeId)}`
+  ) as Promise<ScenarioResponseDTO>
 };
