@@ -377,7 +377,7 @@ export default function CreateScenario() {
         <div className="mt-8 mr-4 flex items-center justify-end gap-4">
           <Button
             variant="secondary"
-            size="lg"
+            size="md"
             onClick={() => setIsTaskModalOpen(true)}
             leftIcon={<Plus size={16} />}
           >
@@ -386,7 +386,7 @@ export default function CreateScenario() {
 
           <Button
             variant="secondary"
-            size="lg"
+            size="md"
             onClick={handleSave}
             leftIcon={<Save size={16} />}
           >
