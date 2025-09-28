@@ -148,7 +148,7 @@ export default function CreateScenario() {
               value={cobrade?.subgroup ?? ''}
               onSelect={(desc) => {
                 const selected =
-                  cobrades.find((c) => c.description === desc) || null;
+                  cobrades.find((c) => c.subgroup === desc) || null;
                 setCobrade(selected);
               }}
               useAutoComplete
@@ -156,7 +156,6 @@ export default function CreateScenario() {
           </div>
         </div>
 
-        {/* Etapas */}
         <PlanStepsTabs
           steps={PLAN_STEPS}
           currentStep={currentStep}
@@ -164,7 +163,6 @@ export default function CreateScenario() {
           size="md"
         />
 
-        {/* Inputs */}
         <div className="mt-6 mb-4 flex items-center gap-4">
           <label className="w-24 text-lg font-medium">Parâmetro</label>
           <Input
@@ -187,14 +185,12 @@ export default function CreateScenario() {
           />
         </div>
 
-        {/* Lista de protocolos */}
         <ProtocolList
           protocols={protocols}
           onEdit={handleEditProtocol}
           onRemove={handleRemoveProtocol}
         />
 
-        {/* Botões */}
         <div className="mt-8 mr-4 flex items-center justify-end gap-4">
           <Button
             variant="secondary"
