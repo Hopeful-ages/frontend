@@ -1,11 +1,7 @@
 'use client';
 
 import { api } from '@/lib/api';
-import {
-  CityResponseDTO,
-  ScenarioResponseDTO,
-  ServiceResponseDTO,
-} from '@/lib/types';
+import { CityResponseDTO, ScenarioResponseDTO } from '@/lib/types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useProtectedPage } from '@/hooks/useProtectedPage';
@@ -13,50 +9,45 @@ import { useToast } from '@/hooks/useToast';
 import { useLoading } from '@/providers/LoadingProvider';
 import { ConfirmDownloadModal } from './_components/ConfirmDownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
-import { PlanFormModal, PlanFormState } from './_components/PlanFormModal';
 import { PlansTable } from './_components/PlansTable';
+import { useRouter } from 'next/navigation';
 
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
 
 export default function AdminPlansPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [scenarios, setScenarios] = useState<ScenarioResponseDTO[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
 
   const [selectedScenarioIds, setSelectedScenarioIds] = useState<string[]>([]);
 
-  const [pendingCityFilter, setPendingCityFilter] = useState('');
+  const [pendingCityFilter, setPendingCityFilter] = useState<string | null>(
+    null,
+  );
   const [pendingCobradeFilter, setPendingCobradeFilter] = useState<
     string | null
   >(null);
 
-  const [appliedCityFilter, setAppliedCityFilter] = useState('');
+  const [appliedCityFilter, setAppliedCityFilter] = useState<string | null>(
+    null,
+  );
   const [appliedCobradeFilter, setAppliedCobradeFilter] = useState<
     string | null
   >(null);
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [scenarioForDownload, setScenarioForDownload] =
     useState<ScenarioResponseDTO | null>(null);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
-  const { success, error, warning } = useToast();
+  const { success, error } = useToast();
   const { showLoading, hideLoading } = useLoading();
   const loadingShown = useRef(false);
   const { isLoading: isAuthLoading } = useProtectedPage({
     requiredRole: 'ROLE_USER',
   });
-
-  const [form, setForm] = useState<PlanFormState>({
-    cityId: '',
-    serviceId: '',
-    cobrade: '',
-  });
-  const [errors, setErrors] = useState<Errors>({});
 
   const cobradeOptions = useMemo(() => {
     const uniqueCobrades = new Set(scenarios.map((s) => s.cobrade.subgroup));
@@ -75,14 +66,18 @@ export default function AdminPlansPage() {
   }, [isAuthLoading, showLoading, hideLoading]);
 
   const handleSearch = () => {
-    setAppliedCityFilter(pendingCityFilter);
+    const adjustedCity = pendingCityFilter
+      ? pendingCityFilter.split(' - ')[0]
+      : null;
+
+    setAppliedCityFilter(adjustedCity);
     setAppliedCobradeFilter(pendingCobradeFilter);
   };
 
   const handleClearFilters = () => {
-    setPendingCityFilter('');
+    setPendingCityFilter(null);
     setPendingCobradeFilter(null);
-    setAppliedCityFilter('');
+    setAppliedCityFilter(null);
     setAppliedCobradeFilter(null);
   };
 
@@ -103,6 +98,8 @@ export default function AdminPlansPage() {
   }, [scenarios, appliedCityFilter, appliedCobradeFilter]);
 
   const showPagination = filteredScenarios.length > 10;
+
+  const cityNames = cities.map((c) => `${c.name} - ${c.state}`);
 
   useEffect(() => {
     let mounted = true;
@@ -129,7 +126,7 @@ export default function AdminPlansPage() {
   }, [error]);
 
   const onEdit = (id: string) => {
-    console.log('Editando cenário:', id);
+    router.push(`/scenary/${id}`);
   };
 
   const onDownload = (scenario: ScenarioResponseDTO) => {
@@ -139,7 +136,7 @@ export default function AdminPlansPage() {
 
   const handleBulkDownload = () => {
     const selectedScenarios = scenarios.filter((s) =>
-      selectedScenarioIds.includes(s.id)
+      selectedScenarioIds.includes(s.id),
     );
     if (selectedScenarios.length === 0) {
       error('Nenhum plano selecionado para download.');
@@ -173,9 +170,11 @@ export default function AdminPlansPage() {
 
       <FiltersBar
         cobradeOptions={cobradeOptions}
-        cityFilter={pendingCityFilter}
-        onCityChange={setPendingCityFilter}
+        cityOptions={cityNames}
+        cityValue={pendingCityFilter}
+        onSelectCity={setPendingCityFilter}
         onSelectCobrade={setPendingCobradeFilter}
+        cobradeValue={pendingCobradeFilter}
         onSearch={handleSearch}
         onClearFilters={handleClearFilters}
       />
@@ -196,32 +195,15 @@ export default function AdminPlansPage() {
       )}
 
       {selectedScenarioIds.length > 0 && (
-        <div className="fixed right-5 bottom-5 z-20">
+        <div className="mt-6 flex justify-end">
           <button
             onClick={handleBulkDownload}
             className="flex items-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-105"
           >
-            Downloads ({selectedScenarioIds.length})
+            Download ({selectedScenarioIds.length})
           </button>
         </div>
       )}
-
-      <PlanFormModal
-        isOpen={isFormOpen}
-        isEdit={isEdit}
-        form={form}
-        errors={errors}
-        canClickSave={true}
-        cityNames={cities.map((c) => c.name)}
-        serviceNames={[]}
-        valueCityName={null}
-        valueServiceName={null}
-        onClose={() => setIsFormOpen(false)}
-        onSave={() => {}}
-        onUpdate={() => {}}
-        onSelectCityByName={() => {}}
-        onSelectServiceByName={() => {}}
-      />
 
       <ConfirmDownloadModal
         open={isDownloadModalOpen}

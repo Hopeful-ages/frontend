@@ -187,6 +187,13 @@ export const Dropdown: React.FC<dropdownProps> = ({
     gray: 'text-gray-400',
     foreground: 'text-foreground',
   } as const;
+  const placeholderByText = {
+    black: 'placeholder:text-black',
+    gray: 'placeholder:text-gray-400',
+    foreground: 'placeholder:text-foreground',
+  } as const;
+
+  const placeholderTone = placeholderByText[textColor];
 
   const tone = toneByText[textColor];
 
@@ -226,7 +233,8 @@ export const Dropdown: React.FC<dropdownProps> = ({
             }}
             className={cn(
               'min-w-0 flex-1 truncate bg-transparent outline-none',
-              selected ? 'text-black' : tone,
+              'text-black',
+              placeholderTone,
             )}
           />
         </div>

@@ -2,22 +2,24 @@
 
 import { Button } from '@/components/Button';
 import { Dropdown } from '@/components/Dropdown';
-import { Input } from '@/components/Input';
-import { Search } from 'lucide-react';
 
 type FiltersBarProps = {
-  cityFilter: string;
-  onCityChange: (value: string) => void;
+  cityOptions: string[];
+  cityValue: string | null;
+  onSelectCity: (value: string | null) => void;
   cobradeOptions: string[];
+  cobradeValue: string | null;
   onSelectCobrade: (value: string | null) => void;
   onSearch: () => void;
   onClearFilters: () => void;
 };
 
 export function FiltersBar({
-  cityFilter,
-  onCityChange,
+  cityOptions,
+  cityValue,
+  onSelectCity,
   cobradeOptions,
+  cobradeValue,
   onSelectCobrade,
   onSearch,
   onClearFilters,
@@ -32,19 +34,27 @@ export function FiltersBar({
       onSubmit={handleSubmit}
       className="mb-6 flex flex-col gap-4 md:flex-row md:items-end"
     >
-      <div className="flex w-full px-8 flex-col items-start gap-30 md:flex-row md:items-end md:justify-between">
+      <div className="flex w-full flex-col items-start gap-30 px-8 md:flex-row md:items-end md:justify-between">
         <div className="flex w-full max-w-lg gap-4">
           <div className="flex-1">
-            <label htmlFor="city-search" className="mb-1 block text-sm font-medium">
+            <label
+              htmlFor="city-search"
+              className="mb-1 block text-sm font-medium"
+            >
               Cidade:
             </label>
-            <Input
-              id="city-search"
-              type="text"
-              placeholder="Buscar cidade..."
-              value={cityFilter}
-              onChange={(e) => onCityChange(e.target.value)}
-              icon={<Search className="h-4 w-4 text-gray-400" />}
+            <Dropdown
+              label="Buscar cidade"
+              items={cityOptions}
+              value={cityValue}
+              onSelect={(v) => onSelectCity(v)}
+              fullWidth
+              textSize="sm"
+              border="none"
+              bgColor="gray"
+              textColor="gray"
+              size="small"
+              useAutoComplete
             />
           </div>
           <div className="flex-1">
@@ -58,10 +68,13 @@ export function FiltersBar({
               label="Selecionar Cobrade"
               items={cobradeOptions}
               onSelect={(value) => onSelectCobrade(value)}
+              value={cobradeValue}
               fullWidth
-              border = 'none'
-              bgColor = 'gray'
-              textColor = 'gray'
+              textSize="sm"
+              border="none"
+              bgColor="gray"
+              textColor="gray"
+              size="small"
             />
           </div>
         </div>
@@ -74,7 +87,6 @@ export function FiltersBar({
             Buscar
           </Button>
         </div>
-
       </div>
     </form>
   );
