@@ -6,7 +6,7 @@ import ProtocolList from '@/components/ProtocolList';
 import Header from '@/components/Header';
 import { PlanStepsTabs } from '@/components/PlanStepsTabs';
 import { Dropdown } from '@/components/Dropdown';
-import { Plus, Save } from 'lucide-react';
+import { Save, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const ETAPAS_DO_PLANO = ['Antes', 'Durante', 'Depois'];
@@ -22,7 +22,6 @@ export default function CreateScenario() {
   const [cidade, setCidade] = useState('Porto Alegre - RS');
   const [cobrade, setCobrade] = useState<string | null>(null);
   const [parametro, setParametro] = useState('');
-  const [acao, setAcao] = useState('');
   const [servico, setServico] = useState('Bombeiro');
 
   const handleRemoveProtocol = (protocolToRemove: Protocol) => {
@@ -53,22 +52,6 @@ export default function CreateScenario() {
     }
   };
 
-  const handleAddTask = () => {
-    if (parametro.trim() === '' || acao.trim() === '') {
-      alert('Por favor, preencha os campos "Parâmetro" e "Ação".');
-      return;
-    }
-
-    const newProtocol: Protocol = {
-      id: Date.now().toString(),
-      description: `${parametro.trim()} - ${acao.trim()}`,
-    };
-
-    setProtocols([...protocols, newProtocol]);
-    setParametro('');
-    setAcao('');
-  };
-
   const handleSave = () => {
     if (!cobrade) {
       alert('Por favor, selecione um COBRADE.');
@@ -92,21 +75,23 @@ export default function CreateScenario() {
     <div className="b-l b-r min-h-screen">
       <Header />
       <main className="mx-auto max-w-4xl border p-4 pt-24">
-        <h1 className="text-gray-850 my-1 text-center text-3xl">
+        <h1 className="text-gray-850 mt-1 mb-4 text-center text-3xl">
           Cadastrar Cenário
         </h1>
-        <div className="mb-6 ml-4 flex w-full gap-8">
-          <div className="flex justify-between text-sm text-gray-700">
+
+        <div className="mt-4 mb-6 ml-4 w-full">
+          <div className="mb-2 flex items-center justify-between pr-20 text-sm text-gray-400">
             <span>Cidade: {cidade}</span>
             <span>Serviço: {servico}</span>
           </div>
 
-          <div className="max-width mt-6 ml-4 flex-1">
+          <div className="mt-4 flex w-full gap-4 pr-4">
             <Dropdown
               label="Selecione a COBRADE"
               items={['COBRADE 1', 'COBRADE 2', 'COBRADE 3']}
               size="long"
               border="gray"
+              fullWidth={true}
               onSelect={(item) => setCobrade(item)}
               useAutoComplete
             />
@@ -117,29 +102,36 @@ export default function CreateScenario() {
           steps={ETAPAS_DO_PLANO}
           currentStep={etapaAtual}
           onChange={(novaEtapa) => setEtapaAtual(novaEtapa)}
-          size="md"
+          size="sm"
         />
 
-        <div className="mt-6 mb-4 flex items-center gap-4">
+        <div className="mt-6 mb-4 flex items-center gap-2">
+          {' '}
+          {/* Borda e padding removidos daqui */}
           <Input
             name="task"
             placeholder="Digite aqui a tarefa..."
             value={parametro}
             onChange={(e) => setParametro(e.target.value)}
-            className="flex-1"
+            className="flex-1 rounded-lg border border-gray-300 p-2 focus:ring-0" // Borda e padding adicionados aqui
             size={'lg'}
           />
+          <button
+            type="button"
+            className="rounded-md bg-gray-800 p-2 text-white transition-colors hover:bg-gray-700"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
-
         <ProtocolList
           protocols={protocols}
           onEdit={handleEditProtocol}
           onRemove={handleRemoveProtocol}
         />
-        <div className="mt-8 mr-4 flex items-center gap-4">
+        <div className="mt-8 flex justify-center">
           <Button
             variant="secondary"
-            size="lg"
+            size="md"
             onClick={handleSave}
             leftIcon={<Save size={16} />}
           >

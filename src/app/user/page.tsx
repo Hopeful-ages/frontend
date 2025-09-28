@@ -63,6 +63,12 @@ export default function UserPage() {
             <p className="mt-2 text-gray-600">
               Esta é a área para usuários autenticados.
             </p>
+            <button
+              onClick={() => router.push('/user/createScenario')}
+              className="mt-4 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            >
+              Ir para Criar Cenário
+            </button>
 
             {userInfo.roles.includes('ROLE_ADMIN') && (
               <div className="mt-4 rounded-lg bg-yellow-50 p-4">
