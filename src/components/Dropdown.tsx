@@ -102,8 +102,8 @@ const itemClasses = cva(
         long: 'py-2.5',
       },
       selected: {
-        true: 'text-gray-400',
-        false: 'text-gray-400',
+        true: 'text-black',
+        false: 'text-black',
       },
       tone: {
         white: 'bg-white hover:bg-gray-100',
