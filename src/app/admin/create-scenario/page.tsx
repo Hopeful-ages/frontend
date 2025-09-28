@@ -9,7 +9,7 @@ import { Dropdown } from '@/components/Dropdown';
 import { Plus, Save } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useEffect, useState } from 'react';
-import { CobradeResponseDTO } from '@/lib/types';
+import { CobradeDTO } from '@/lib/types';
 import { CityResponseDTO } from '@/lib/types';
 
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
@@ -19,8 +19,8 @@ export default function CreateScenario() {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
   const [city, setCity] = useState<CityResponseDTO | null>(null);
-  const [cobrades, setCobrades] = useState<CobradeResponseDTO[]>([]);
-  const [cobrade, setCobrade] = useState<CobradeResponseDTO | null>(null);
+  const [cobrades, setCobrades] = useState<CobradeDTO[]>([]);
+  const [cobrade, setCobrade] = useState<CobradeDTO | null>(null);
   const [parameter, setParameter] = useState('');
   const [action, setAction] = useState('');
 
@@ -112,15 +112,15 @@ export default function CreateScenario() {
     <div className="b-l b-r min-h-screen">
       <Header />
       <main className="mx-auto max-w-4xl border p-4 pt-24">
-        <h1 className="text-gray-850 my-1 text-center text-3xl mb-10">
+        <h1 className="text-gray-850 my-1 text-center text-3xl mb-6">
           Cadastrar Cenário
         </h1>
 
-        <div className="mb-6 ml-4 flex w-full gap-8">
+        <div className="mb-6 ml-4 flex w-full gap-8">  
           <div className="flex-1">
             <label
               htmlFor="city"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-medium text-gray-850"
             >
               Cidade
             </label>
@@ -143,7 +143,7 @@ export default function CreateScenario() {
             <div className="flex-1">
               <label
                 htmlFor="cobrades"
-                className="mb-1 block text-sm font-medium text-gray-700"
+                className="mb-1 block text-sm font-medium text-gray-850"
               >
                 COBRADE
               </label>
@@ -167,10 +167,10 @@ export default function CreateScenario() {
           steps={PLAN_STEPS}
           currentStep={currentStep}
           onChange={(newStep) => setCurrentStep(newStep)}
-          size="md"
+          size="md"         
         />
 
-        <div className="mt-6 mb-4 flex items-center gap-4">
+        <div className="mt-6 mb-4 ml-4 mr-4 flex items-center gap-4">
           <label className="w-24 text-lg font-medium">Parâmetro</label>
           <Input
             name="parameter"
@@ -181,7 +181,7 @@ export default function CreateScenario() {
           />
         </div>
 
-        <div className="mb-4 flex items-center gap-4">
+        <div className="mb-4 ml-4 mr-4 flex items-center gap-4">
           <label className="w-24 text-lg font-medium">Ação</label>
           <Input
             name="action"
