@@ -49,7 +49,7 @@ export type ScenarioResponseDTO = {
   description: string;
   origin: string;
   city: CityResponseDTO;
-  cobrade: CobradeResponseDTO;
+  cobrade: CobradeDTO;
   tasks: TaskSummaryDTO;
   parameters: ParameterSummaryDTO;
 };
@@ -64,15 +64,6 @@ export type UserUpdateDTO = Partial<{
   cityId: string | null;
   accountStatus: boolean;
 }>;
-
-export type CobradeResponseDTO = {
-  id: string;
-  code: string;
-  description: string;
-  subgroup: string;
-  type: string;
-  subType: string | null;
-};
 
 export type CobradeDTO = {
   id: string;
