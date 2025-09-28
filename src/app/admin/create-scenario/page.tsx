@@ -28,8 +28,17 @@ export default function CreateScenario() {
   const [city, setCity] = useState<CityResponseDTO | null>(null);
   const [cobrades, setCobrades] = useState<CobradeDTO[]>([]);
   const [cobrade, setCobrade] = useState<CobradeDTO | null>(null);
-  const [parameter, setParameter] = useState('');
-  const [action, setAction] = useState('');
+  // Parâmetros por fase (cada fase pode ter 1 par descrição/ação por enquanto)
+  const [paramByPhase, setParamByPhase] = useState<
+    Record<
+      'ANTES' | 'DURANTE' | 'DEPOIS',
+      { description: string; action: string }
+    >
+  >({
+    ANTES: { description: '', action: '' },
+    DURANTE: { description: '', action: '' },
+    DEPOIS: { description: '', action: '' },
+  });
   const [services, setServices] = useState<ServiceSummaryDTO[]>([]);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editTask, setEditTask] = useState<Protocol | null>(null);
@@ -56,11 +65,23 @@ export default function CreateScenario() {
 
           setProtocols(tasksAsProtocols);
 
-          // Preencher parâmetros se existirem
+          // Preencher parâmetros por fase
           if (scenario.parameters.length > 0) {
-            const firstParam = scenario.parameters[0];
-            setParameter(firstParam.description);
-            setAction(firstParam.action);
+            setParamByPhase((prev) => {
+              const clone = { ...prev };
+              scenario.parameters.forEach((p) => {
+                const phase = p.phase as 'ANTES' | 'DURANTE' | 'DEPOIS';
+                clone[phase] = { description: p.description, action: p.action };
+              });
+              return clone;
+            });
+          } else {
+            // Zera se não houver
+            setParamByPhase({
+              ANTES: { description: '', action: '' },
+              DURANTE: { description: '', action: '' },
+              DEPOIS: { description: '', action: '' },
+            });
           }
         } catch {
           console.log(
@@ -69,8 +90,11 @@ export default function CreateScenario() {
           // Limpar dados se não encontrar cenário
           setExistingScenario(null);
           setProtocols([]);
-          setParameter('');
-          setAction('');
+          setParamByPhase({
+            ANTES: { description: '', action: '' },
+            DURANTE: { description: '', action: '' },
+            DEPOIS: { description: '', action: '' },
+          });
         }
       }
     };
@@ -139,13 +163,6 @@ export default function CreateScenario() {
     }
 
     try {
-      // Mapear fases do português para inglês
-      const phaseMap: Record<string, 'ANTES' | 'DURANTE' | 'DEPOIS'> = {
-        Antes: 'ANTES',
-        Durante: 'DURANTE',
-        Depois: 'DEPOIS',
-      };
-
       // Preparar dados das tasks
       const tasks = protocols.map((protocol) => {
         // Extrair descrição sem o serviço e ano
@@ -164,15 +181,20 @@ export default function CreateScenario() {
         };
       });
 
-      // Preparar parâmetros (se existirem)
-      const parameters: ScenarioRequestDTO['parameters'] = [];
-      if (parameter.trim() && action.trim()) {
-        parameters.push({
-          description: parameter.trim(),
-          action: action.trim(),
-          phase: phaseMap[currentStep],
-        });
-      }
+      // Preparar parâmetros de TODAS as fases (se existirem)
+      const parameters: ScenarioRequestDTO['parameters'] = Object.entries(
+        paramByPhase,
+      ).flatMap(([phase, value]) =>
+        value.description.trim() && value.action.trim()
+          ? [
+              {
+                description: value.description.trim(),
+                action: value.action.trim(),
+                phase: phase as 'ANTES' | 'DURANTE' | 'DEPOIS',
+              },
+            ]
+          : [],
+      );
 
       const scenarioData: ScenarioRequestDTO = {
         description: existingScenario?.description || null,
@@ -308,25 +330,41 @@ export default function CreateScenario() {
           size="md"
         />
 
-        <div className="mt-6 mb-4 flex items-center gap-4">
-          <label className="w-24 text-lg font-medium">Parâmetro</label>
+        <div className="mt-6 mb-4 flex items-start gap-4">
+          <label className="w-24 pt-2 text-lg font-medium">Parâmetro</label>
           <Input
             name="parameter"
-            placeholder="Digite aqui o parâmetro"
-            value={parameter}
-            onChange={(e) => setParameter(e.target.value)}
+            placeholder={`Parâmetro - ${currentStep}`}
+            value={paramByPhase[phaseMap[currentStep]].description}
+            onChange={(e) =>
+              setParamByPhase((prev) => ({
+                ...prev,
+                [phaseMap[currentStep]]: {
+                  ...prev[phaseMap[currentStep]],
+                  description: e.target.value,
+                },
+              }))
+            }
             className="flex-1"
           />
         </div>
 
-        <div className="mb-4 flex items-center gap-4">
-          <label className="w-24 text-lg font-medium">Ação</label>
+        <div className="mb-4 flex items-start gap-4">
+          <label className="w-24 pt-2 text-lg font-medium">Ação</label>
           <Input
             name="action"
-            placeholder="Digite aqui a ação"
+            placeholder={`Ação - ${currentStep}`}
             className="flex-1"
-            value={action}
-            onChange={(e) => setAction(e.target.value)}
+            value={paramByPhase[phaseMap[currentStep]].action}
+            onChange={(e) =>
+              setParamByPhase((prev) => ({
+                ...prev,
+                [phaseMap[currentStep]]: {
+                  ...prev[phaseMap[currentStep]],
+                  action: e.target.value,
+                },
+              }))
+            }
           />
         </div>
 
