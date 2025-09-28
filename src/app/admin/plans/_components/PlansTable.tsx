@@ -13,14 +13,14 @@ type PlansTableProps = {
   onDownload: (scenario: ScenarioResponseDTO) => void;
 };
 
-const getLatestUpdate = (scenario: ScenarioResponseDTO): string | null => {
+const getLatestUpdate = (scenario: ScenarioResponseDTO): Date | null => {
   if (!scenario.tasks || scenario.tasks.length === 0) return null;
   const latestTask = scenario.tasks.reduce((latest, current) => {
-    const latestDate = new Date(latest.lastUpdateDate);
-    const currentDate = new Date(current.lastUpdateDate);
+    const latestDate = new Date(latest.lastUpdatedDate);
+    const currentDate = new Date(current.lastUpdatedDate);
     return currentDate > latestDate ? current : latest;
   });
-  return latestTask.lastUpdateDate;
+  return latestTask.lastUpdatedDate;
 };
 
 export function PlansTable({
@@ -77,7 +77,7 @@ export function PlansTable({
                 <Table.Cell>{row.city.name ?? '—'}</Table.Cell>
                 <Table.Cell>{row.cobrade.subgroup ?? '—'}</Table.Cell>
                 <Table.Cell>
-                  {lastUpdated ? formatDate(lastUpdated) : '—'}
+                  {lastUpdated ? formatDate(lastUpdated.toISOString()) : '—'}
                 </Table.Cell>
                 <Table.Cell align="center">
                   <button
