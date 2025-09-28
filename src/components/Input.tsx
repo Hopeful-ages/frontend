@@ -15,6 +15,7 @@ const inputClasses = cva(
         error: 'border-red-500 text-red-700 focus:border-red-600',
       },
       size: {
+        sm: 'h-8 px-3',
         md: 'h-10 px-4',
         lg: 'h-12 px-4',
       },

@@ -36,6 +36,82 @@ export type UserUpdateDTO = Partial<{
   accountStatus: boolean;
 }>;
 
+export type CobradeDTO = {
+  id: string;
+  code: string;
+  description: string;
+  subgroup: string;
+  type: string | null;
+  subType: string | null;
+};
+
+export type TaskResponseDTO = {
+  id: string;
+  description: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+  lastUpdateDate: string; // ISO 8601
+  service: ServiceSummaryDTO | null;
+};
+
+export type TaskRequestDTO = {
+  description: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+  serviceId?: string | null;
+};
+
+export type TaskUpdateDTO = Partial<{
+  description: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+  lastUpdateDate: string;
+  serviceId: string | null;
+}>;
+
+export type ParameterResponseDTO = {
+  id: string;
+  description: string;
+  action: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+};
+
+export type ParameterRequestDTO = {
+  description: string;
+  action: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+};
+
+export type ParameterUpdateDTO = Partial<{
+  description: string;
+  action: string;
+  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
+}>;
+
+export type ScenarioResponseDTO = {
+  id: string;
+  description: string | null;
+  origin: string;
+  city: CitySummaryDTO;
+  cobrade: CobradeDTO;
+  tasks: TaskResponseDTO[];
+  parameters: ParameterResponseDTO[];
+};
+
+export type ScenarioRequestDTO = {
+  description?: string | null;
+  origin: string;
+  cityId: string;
+  cobradeId: string;
+  tasks?: TaskRequestDTO[];
+  parameters?: ParameterRequestDTO[];
+};
+
+export type ScenarioUpdateDTO = Partial<{
+  description: string | null;
+  origin: string;
+  cityId: string;
+  cobradeId: string;
+  tasks: TaskUpdateDTO[];
+  parameters: ParameterUpdateDTO[];
+}>;
 export type ApiError = {
   status: number;
   data?: {

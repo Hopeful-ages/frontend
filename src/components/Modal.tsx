@@ -40,8 +40,8 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'w-[500px] h-[250px]',
-    md: 'w-[583px] h-[342px]',
+    sm: 'w-[500px] h-[300px]',
+    md: 'w-[583px] h-[380px]',
     lg: 'w-[700px] h-[500px]',
     xl: 'w-[813px] h-[547px]',
     auto: 'max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl',

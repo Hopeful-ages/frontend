@@ -2,6 +2,9 @@ import Cookies from 'js-cookie';
 import { decodeJWT } from './jwt';
 import {
   CityResponseDTO,
+  ScenarioRequestDTO,
+  ScenarioResponseDTO,
+  ScenarioUpdateDTO,
   ServiceResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
@@ -123,5 +126,25 @@ export const api = {
     fetchWithAuthVoid(`/api/users/disable/${id}`, { method: 'PATCH' }),
 
   enableUser: (id: string) =>
-    fetchWithAuthVoid(`/api/users/enable/${id}`, { method: 'PATCH' }),
+    fetchWithAuthVoid(`/api/users/enable/${id}`, {
+      method: 'PATCH',
+    }),
+
+  getScenarios: () =>
+    fetchWithAuth('/api/scenarios') as Promise<ScenarioResponseDTO[]>,
+
+  getScenario: (id: string) =>
+    fetchWithAuth(`/api/scenarios/${id}`) as Promise<ScenarioResponseDTO>,
+
+  createScenario: (payload: ScenarioRequestDTO) =>
+    fetchWithAuth('/api/scenarios', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }) as Promise<ScenarioResponseDTO>,
+
+  editScenario: (id: string, payload: ScenarioUpdateDTO) =>
+    fetchWithAuth(`/api/scenarios/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }) as Promise<ScenarioResponseDTO>,
 };

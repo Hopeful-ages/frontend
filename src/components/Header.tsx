@@ -18,6 +18,7 @@ export enum Role {
 const ADMIN_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/admin/users', label: 'Usuários' },
+  { href: '/admin/plans', label: 'Planos' },
   { href: '/pesquisa', label: 'Pesquisa' },
 ];
 
