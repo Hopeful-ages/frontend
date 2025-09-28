@@ -18,11 +18,11 @@ const getLatestUpdateYear = (
     return '';
   }
   const latestTask = scenario.tasks.reduce((latest, current) => {
-    const latestDate = new Date(latest.lastUpdateDate);
-    const currentDate = new Date(current.lastUpdateDate);
+    const latestDate = new Date(latest.lastUpdatedDate);
+    const currentDate = new Date(current.lastUpdatedDate);
     return currentDate > latestDate ? current : latest;
   });
-  return new Date(latestTask.lastUpdateDate).getFullYear();
+  return new Date(latestTask.lastUpdatedDate).getFullYear();
 };
 
 export function ConfirmDownloadModal({
