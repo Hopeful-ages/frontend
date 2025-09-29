@@ -56,8 +56,8 @@ export default function CreateScenario() {
           setExistingScenario(scenario);
 
           const tasksAsProtocols: Protocol[] = scenario.tasks.map((task) => {
-            const lastUpdateYear = task.lastUpdatedDate
-              ? new Date(task.lastUpdatedDate).getFullYear()
+            const lastUpdateYear = task.lastUpdateDate
+              ? new Date(task.lastUpdateDate).getFullYear()
               : new Date().getFullYear();
 
             return {

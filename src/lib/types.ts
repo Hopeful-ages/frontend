@@ -29,7 +29,7 @@ export type TaskSummaryDTO = {
   id: string;
   description: string;
   phase: string;
-  lastUpdatedDate: Date;
+  lastUpdateDate: string;
   service: ServiceSummaryDTO | null;
 };
 
