@@ -13,21 +13,19 @@ import {
   ScenarioRequestDTO,
   UserResponseDTO,
   ApiError,
-  TaskSummaryDTO,
 } from '@/lib/types';
-import { CreateUserTask } from './create-scenario/_components/CreateUserTask';
+import { CreateUserTask } from './_components/CreateUserTask';
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
-export default function UserPage() {
+export default function CreateUserScenario() {
   const { userInfo, hasAccess } = useProtectedPage({
     requiredRole: 'ROLE_USER',
   });
 
   const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
   const [protocols, setProtocols] = useState<Protocol[]>([]);
-  const [existingTasks, setExistingTasks] = useState<TaskSummaryDTO[]>([]);
   const [cobrades, setCobrades] = useState<CobradeDTO[]>([]);
   const [cobrade, setCobrade] = useState<CobradeDTO | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -48,7 +46,28 @@ export default function UserPage() {
       setUserLoadingError(null);
 
       try {
+        console.log('Buscando dados do usuário com ID do JWT:', userInfo.sub);
+
         const userData = await api.getUser(userInfo.sub);
+
+        console.log(
+          '✅ Dados do usuário obtidos com sucesso via /api/users/{id}:',
+          {
+            id: userData.id,
+            email: userData.email,
+            hasService: !!userData.service,
+            hasCity: !!userData.city,
+            accountStatus: userData.accountStatus,
+          },
+        );
+
+        console.log('Dados do usuário recebidos com sucesso:', {
+          id: userData.id,
+          email: userData.email,
+          hasService: !!userData.service,
+          hasCity: !!userData.city,
+          accountStatus: userData.accountStatus,
+        });
 
         if (!userData.accountStatus) {
           setUserLoadingError(
@@ -58,6 +77,7 @@ export default function UserPage() {
           return;
         }
 
+        // Validar se o usuário tem cidade e serviço configurados
         if (!userData.city) {
           setUserLoadingError(
             'Sua conta não tem uma cidade associada. Entre em contato com o administrador para configurar sua cidade.',
@@ -83,6 +103,18 @@ export default function UserPage() {
         const apiError = error as ApiError;
         setHasUserDataAccess(false);
 
+        // Log detalhado do erro para debug
+        console.error('Detalhes do erro:', {
+          status: apiError?.status,
+          message: apiError?.data,
+          userJWT: {
+            sub: userInfo.sub,
+            email: userInfo.email,
+            roles: userInfo.roles,
+          },
+        });
+
+        // Tratar diferentes tipos de erro com mensagens específicas
         if (apiError?.status === 404) {
           setUserLoadingError(
             `Usuário com ID "${userInfo.sub}" não foi encontrado no sistema. Verifique se sua conta foi criada pelo administrador.`,
@@ -128,62 +160,13 @@ export default function UserPage() {
     fetchCobrades();
   }, []);
 
-  // Buscar tasks existentes quando COBRADE é selecionado
-  useEffect(() => {
-    const fetchExistingTasks = async () => {
-      if (!cobrade || !userDetails?.city) {
-        setExistingTasks([]);
-        return;
-      }
-
-      try {
-        const scenario = await api.getScenarioByIdAndCobrade(
-          userDetails.city.id,
-          cobrade.id,
-        );
-        if (scenario && scenario.tasks) {
-          setExistingTasks(scenario.tasks);
-        } else {
-          setExistingTasks([]);
-        }
-      } catch {
-        console.log('Nenhum cenário existente encontrado para esta COBRADE');
-        setExistingTasks([]);
-      }
-    };
-
-    if (userDetails && cobrade) {
-      fetchExistingTasks();
-    }
-  }, [cobrade, userDetails]);
-
   const handleEditProtocol = (protocolToEdit: Protocol) => {
-    // Verificar se pode editar (apenas tasks do próprio serviço ou criadas localmente)
-    if (protocolToEdit.isExisting && !protocolToEdit.canEdit) {
-      alert('Você só pode editar tasks criadas pelo seu serviço.');
-      return;
-    }
-
     setEditTask(protocolToEdit);
     setIsTaskModalOpen(true);
   };
 
   const handleRemoveProtocol = (protocolToRemove: Protocol) => {
-    // Verificar se pode remover (apenas tasks do próprio serviço ou criadas localmente)
-    if (protocolToRemove.isExisting && !protocolToRemove.canEdit) {
-      alert('Você só pode remover tasks criadas pelo seu serviço.');
-      return;
-    }
-
-    if (protocolToRemove.isExisting) {
-      // Para tasks existentes do servidor, remover da lista de existentes
-      setExistingTasks((prev) =>
-        prev.filter((t) => t.id !== protocolToRemove.id),
-      );
-    } else {
-      // Para tasks criadas localmente, remover da lista de protocolos
-      setProtocols((prev) => prev.filter((p) => p.id !== protocolToRemove.id));
-    }
+    setProtocols((prev) => prev.filter((p) => p.id !== protocolToRemove.id));
   };
 
   const handleSave = async () => {
@@ -204,23 +187,21 @@ export default function UserPage() {
       return;
     }
 
-    // Verificar se há pelo menos uma task (local ou existente)
-    const localTasks = protocols.filter((p) => !p.isExisting);
-
-    if (localTasks.length === 0 && existingTasks.length === 0) {
+    // Validar se há pelo menos uma tarefa em alguma fase
+    if (protocols.length === 0) {
       alert('Adicione pelo menos uma tarefa antes de salvar o cenário.');
       return;
     }
 
     try {
-      // Apenas salvar as tasks criadas localmente (novas)
-      const tasks = localTasks.map((protocol) => {
+      // Preparar dados das tasks - todas com o serviço do usuário
+      const tasks = protocols.map((protocol) => {
         const description = protocol.description.split(' (')[0];
 
         return {
           description,
           phase: mapStepToPhase(protocol.phase) || phaseMap[currentStep],
-          serviceId: userDetails.service!.id,
+          serviceId: userDetails.service!.id, // Sempre o serviço do usuário
         };
       });
 
@@ -230,42 +211,25 @@ export default function UserPage() {
         cityId: userDetails.city.id,
         cobradeId: cobrade.id,
         tasks,
-        parameters: [],
+        parameters: [], // Usuários não podem definir parâmetros
       };
 
-      if (tasks.length > 0) {
-        await api.createScenario(scenarioData);
-        alert(
-          `${tasks.length} nova(s) tarefa(s) adicionada(s) ao cenário para ${cobrade.subType || cobrade.type} em ${userDetails.city.name}!`,
-        );
-      } else {
-        alert(
-          'Nenhuma nova tarefa para adicionar. O cenário já contém todas as tarefas existentes.',
-        );
-      }
+      await api.createScenario(scenarioData);
+      alert(
+        `Cenário criado com sucesso para ${cobrade.subType || cobrade.type} em ${userDetails.city.name}!`,
+      );
 
-      // Limpar apenas as tasks locais, manter COBRADE selecionado para ver tasks existentes
+      // Limpar formulário após sucesso
       setProtocols([]);
-      // Recarregar tasks existentes
-      if (cobrade && userDetails?.city) {
-        try {
-          const scenario = await api.getScenarioByIdAndCobrade(
-            userDetails.city.id,
-            cobrade.id,
-          );
-          if (scenario && scenario.tasks) {
-            setExistingTasks(scenario.tasks);
-          }
-        } catch {
-          // Ignorar erro se não encontrar cenário
-        }
-      }
+      setCobrade(null);
+      setCurrentStep(PLAN_STEPS[0]);
     } catch (error) {
       console.error('Erro ao salvar cenário:', error);
       alert('Erro ao salvar o cenário. Tente novamente.');
     }
   };
 
+  // Mapeia label da tab para enum de fase
   const phaseMap: Record<string, 'ANTES' | 'DURANTE' | 'DEPOIS'> = {
     Antes: 'ANTES',
     Durante: 'DURANTE',
@@ -283,36 +247,22 @@ export default function UserPage() {
     return undefined;
   };
 
-  const allTasks = [
-    ...existingTasks.map((task): Protocol => {
-      const lastUpdateYear = task.lastUpdatedDate
-        ? new Date(task.lastUpdatedDate).getFullYear()
-        : new Date().getFullYear();
+  // Protocolos filtrados pela fase atual
+  const filteredProtocols = protocols
+    .filter(
+      (p) =>
+        (mapStepToPhase(p.phase) || phaseMap[currentStep]) ===
+        phaseMap[currentStep],
+    )
+    .filter((p) => mapStepToPhase(p.phase) === phaseMap[currentStep]);
 
-      return {
-        id: task.id,
-        description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${lastUpdateYear})`,
-        phase: task.phase,
-        isExisting: true,
-        canEdit: task.service?.id === userDetails?.service?.id,
-      };
-    }),
-    ...protocols.map(
-      (p): Protocol => ({ ...p, isExisting: false, canEdit: true }),
-    ),
-  ];
-
-  const filteredProtocols = allTasks.filter(
-    (p) =>
-      (mapStepToPhase(p.phase) || phaseMap[currentStep]) ===
-      phaseMap[currentStep],
-  );
-
+  // Caso nenhum protocolo tenha fase (legado), mostra os da fase atual (após criação)
   const displayProtocols =
     filteredProtocols.length > 0
       ? filteredProtocols
-      : allTasks.filter((p) => !p.phase);
+      : protocols.filter((p) => !p.phase);
 
+  // Verificação de acesso à página
   if (!hasAccess) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -321,6 +271,7 @@ export default function UserPage() {
     );
   }
 
+  // Carregamento dos dados do usuário
   if (isLoadingUserData) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -336,6 +287,7 @@ export default function UserPage() {
     );
   }
 
+  // Erro ao validar acesso aos dados do usuário
   if (userLoadingError || !hasUserDataAccess) {
     return (
       <div className="b-l b-r min-h-screen">
@@ -343,7 +295,7 @@ export default function UserPage() {
         <main className="mx-auto max-w-4xl border p-4 pt-24">
           <div className="text-center">
             <h1 className="text-gray-850 my-1 mb-10 text-3xl">
-              Criar Cenário de Contingência
+              Cadastrar Cenário
             </h1>
             <div className="rounded-lg bg-red-50 p-6">
               <div className="mb-4">
@@ -372,6 +324,12 @@ export default function UserPage() {
                 >
                   Tentar Novamente
                 </button>
+                <button
+                  onClick={() => (window.location.href = '/user')}
+                  className="rounded bg-gray-600 px-4 py-2 text-white transition-colors hover:bg-gray-700"
+                >
+                  Voltar ao Início
+                </button>
               </div>
             </div>
           </div>
@@ -380,7 +338,8 @@ export default function UserPage() {
     );
   }
 
-  if (!userDetails || !userDetails.city || !userDetails.service) {
+  // Validação final - dados do usuário devem estar disponíveis
+  if (!userDetails) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -393,6 +352,50 @@ export default function UserPage() {
     );
   }
 
+  // Se usuário não tem serviço associado
+  if (!userDetails.service) {
+    return (
+      <div className="b-l b-r min-h-screen">
+        <Header />
+        <main className="mx-auto max-w-4xl border p-4 pt-24">
+          <div className="text-center">
+            <h1 className="text-gray-850 my-1 mb-10 text-3xl">
+              Cadastrar Cenário
+            </h1>
+            <div className="rounded-lg bg-yellow-50 p-6">
+              <p className="text-yellow-800">
+                Para criar cenários, você precisa estar associado a um serviço.
+                Entre em contato com o administrador.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Se usuário não tem cidade associada
+  if (!userDetails.city) {
+    return (
+      <div className="b-l b-r min-h-screen">
+        <Header />
+        <main className="mx-auto max-w-4xl border p-4 pt-24">
+          <div className="text-center">
+            <h1 className="text-gray-850 my-1 mb-10 text-3xl">
+              Cadastrar Cenário
+            </h1>
+            <div className="rounded-lg bg-yellow-50 p-6">
+              <p className="text-yellow-800">
+                Para criar cenários, você precisa estar associado a uma cidade.
+                Entre em contato com o administrador.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="b-l b-r min-h-screen">
       <Header />
@@ -401,8 +404,36 @@ export default function UserPage() {
           Criar Cenário de Contingência
         </h1>
 
-        {/* Informações do usuário */}
-        <div className="mr-4 mb-4 ml-4 grid gap-6 md:grid-cols-2">
+        <div className="mr-4 mb-6 ml-4 rounded-lg bg-blue-50 p-4">
+          <div className="flex items-center">
+            <svg
+              className="mr-2 h-5 w-5 text-blue-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-blue-800">
+                <strong>Como criar seu cenário:</strong> Selecione o tipo de
+                emergência e organize as tarefas
+              </p>
+              <p className="mt-1 text-xs text-blue-700">
+                1. Escolha o tipo de emergência (COBRADE) • 2. Organize tarefas
+                por fases (Antes/Durante/Depois) • 3. Salve seu plano
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Informações do usuário e seleção de emergência */}
+        <div className="mr-4 mb-6 ml-4 grid gap-6 md:grid-cols-3">
           <div>
             <div className="mb-2">
               <label className="block text-sm font-medium text-gray-700">
@@ -428,39 +459,38 @@ export default function UserPage() {
               </p>
             </div>
           </div>
-        </div>
 
-        <div className="mr-4 mb-6 ml-4">
-          <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700">
-              COBRADE *
-            </label>
-            <Dropdown
-              label="Selecione o tipo de Cenário (COBRADE)"
-              items={cobrades.map(
-                (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
-              )}
-              size="large"
-              fullWidth={true}
-              value={
-                cobrade
-                  ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
-                  : null
-              }
-              onSelect={(desc) => {
-                const selectedCobrade =
-                  cobrades.find(
-                    (c) =>
-                      `${c.code} - ${c.subType || c.type || c.subgroup}` ===
-                      desc,
-                  ) || null;
-                setCobrade(selectedCobrade);
-              }}
-              useAutoComplete
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Obrigatório para adicionar tarefas ao cenário
-            </p>
+          <div>
+            <div className="mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Tipo de Emergência *
+              </label>
+              <Dropdown
+                label="Selecione o tipo de emergência"
+                items={cobrades.map(
+                  (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
+                )}
+                size="large"
+                value={
+                  cobrade
+                    ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
+                    : null
+                }
+                onSelect={(desc) => {
+                  const selectedCobrade =
+                    cobrades.find(
+                      (c) =>
+                        `${c.code} - ${c.subType || c.type || c.subgroup}` ===
+                        desc,
+                    ) || null;
+                  setCobrade(selectedCobrade);
+                }}
+                useAutoComplete
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Obrigatório para classificar a emergência
+              </p>
+            </div>
           </div>
         </div>
 
@@ -506,6 +536,7 @@ export default function UserPage() {
         }}
         onSave={(taskData) => {
           if (taskData.id) {
+            // Editando tarefa existente
             setProtocols((prev) =>
               prev.map((p) =>
                 p.id === taskData.id
@@ -518,6 +549,7 @@ export default function UserPage() {
               ),
             );
           } else {
+            // Criando nova tarefa
             const newProtocol: Protocol = {
               id: Date.now().toString(),
               description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,

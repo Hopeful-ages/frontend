@@ -56,12 +56,19 @@ export default function CreateScenario() {
           );
           setExistingScenario(scenario);
 
-          // Converter tasks do cenário para protocols
-          const tasksAsProtocols: Protocol[] = scenario.tasks.map((task) => ({
-            id: task.id,
-            description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${new Date().getFullYear()})`,
-            phase: task.phase, // Mantém a fase original retornada pela API (provavelmente ANTES/DURANTE/DEPOIS)
-          }));
+          const tasksAsProtocols: Protocol[] = scenario.tasks.map((task) => {
+            const lastUpdateYear = task.lastUpdatedDate
+              ? new Date(task.lastUpdatedDate).getFullYear()
+              : new Date().getFullYear();
+
+            return {
+              id: task.id,
+              description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${lastUpdateYear})`,
+              phase: task.phase,
+              isExisting: true,
+              canEdit: true,
+            };
+          });
 
           setProtocols(tasksAsProtocols);
 
@@ -266,7 +273,7 @@ export default function CreateScenario() {
           {'Cadastrar Cenário'}
         </h1>
 
-        <div className="mb-6 ml-4 flex w-full gap-8">  
+        <div className="mb-6 ml-4 flex w-full gap-8">
           <div className="flex-1">
             <Dropdown
               label="Cidade"
@@ -315,10 +322,10 @@ export default function CreateScenario() {
           steps={PLAN_STEPS}
           currentStep={currentStep}
           onChange={(newStep) => setCurrentStep(newStep)}
-          size="md"         
+          size="md"
         />
 
-        <div className="mt-6 mb-4 ml-4 mr-4 flex items-start gap-4">
+        <div className="mt-6 mr-4 mb-4 ml-4 flex items-start gap-4">
           <label className="w-24 pt-2 text-lg font-medium">Parâmetro</label>
           <Input
             name="parameter"
@@ -337,7 +344,7 @@ export default function CreateScenario() {
           />
         </div>
 
-        <div className="mb-4 ml-4 mr-4 flex items-start gap-4">
+        <div className="mr-4 mb-4 ml-4 flex items-start gap-4">
           <label className="w-24 pt-2 text-lg font-medium">Ação</label>
           <Input
             name="action"
@@ -399,6 +406,9 @@ export default function CreateScenario() {
                       ...p,
                       description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
                       phase: phaseMap[currentStep],
+                      // Preservar as propriedades existentes
+                      isExisting: p.isExisting,
+                      canEdit: p.canEdit,
                     }
                   : p,
               ),
@@ -409,6 +419,8 @@ export default function CreateScenario() {
               id: Date.now().toString(),
               description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
               phase: phaseMap[currentStep],
+              isExisting: false, // Tasks criadas localmente não são existentes
+              canEdit: true, // Admin pode editar todas as tasks
             };
             setProtocols((prev) => [...prev, newProtocol]);
           }
