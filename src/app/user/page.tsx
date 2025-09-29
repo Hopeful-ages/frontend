@@ -285,8 +285,8 @@ export default function UserPage() {
 
   const allTasks = [
     ...existingTasks.map((task): Protocol => {
-      const lastUpdateYear = task.lastUpdatedDate
-        ? new Date(task.lastUpdatedDate).getFullYear()
+      const lastUpdateYear = task.lastUpdateDate
+        ? new Date(task.lastUpdateDate).getFullYear()
         : new Date().getFullYear();
 
       return {
