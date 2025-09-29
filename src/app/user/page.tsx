@@ -5,7 +5,7 @@ import ProtocolList, { Protocol } from '@/components/ProtocolList';
 import Header from '@/components/Header';
 import { PlanStepsTabs } from '@/components/PlanStepsTabs';
 import { Dropdown } from '@/components/Dropdown';
-import { Plus, Save } from 'lucide-react';
+import { Plus, Save, ChevronDown } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useEffect, useState } from 'react';
 import {
@@ -15,7 +15,7 @@ import {
   ApiError,
   TaskSummaryDTO,
 } from '@/lib/types';
-import { CreateUserTask } from './create-scenario/_components/CreateUserTask';
+import { CreateUserTask } from './_components/CreateUserTask';
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
@@ -435,29 +435,32 @@ export default function UserPage() {
             <label className="block text-sm font-medium text-gray-700">
               COBRADE *
             </label>
-            <Dropdown
-              label="Selecione o tipo de Cenário (COBRADE)"
-              items={cobrades.map(
-                (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
-              )}
-              size="large"
-              fullWidth={true}
-              value={
-                cobrade
-                  ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
-                  : null
-              }
-              onSelect={(desc) => {
-                const selectedCobrade =
-                  cobrades.find(
-                    (c) =>
-                      `${c.code} - ${c.subType || c.type || c.subgroup}` ===
-                      desc,
-                  ) || null;
-                setCobrade(selectedCobrade);
-              }}
-              useAutoComplete
-            />
+            <div className="relative">
+              <Dropdown
+                label="Selecione o tipo de Cenário (COBRADE)"
+                items={cobrades.map(
+                  (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
+                )}
+                size="large"
+                fullWidth={true}
+                value={
+                  cobrade
+                    ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
+                    : null
+                }
+                onSelect={(desc) => {
+                  const selectedCobrade =
+                    cobrades.find(
+                      (c) =>
+                        `${c.code} - ${c.subType || c.type || c.subgroup}` ===
+                        desc,
+                    ) || null;
+                  setCobrade(selectedCobrade);
+                }}
+                useAutoComplete
+              />
+              <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+            </div>
             <p className="mt-1 text-xs text-gray-500">
               Obrigatório para adicionar tarefas ao cenário
             </p>

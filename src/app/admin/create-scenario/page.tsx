@@ -22,13 +22,13 @@ const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function CreateScenario() {
   const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
-  // Armazena todas as tarefas (protocols) com sua fase associada
+
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
   const [city, setCity] = useState<CityResponseDTO | null>(null);
   const [cobrades, setCobrades] = useState<CobradeDTO[]>([]);
   const [cobrade, setCobrade] = useState<CobradeDTO | null>(null);
-  // Parâmetros por fase (cada fase pode ter 1 par descrição/ação por enquanto)
+
   const [paramByPhase, setParamByPhase] = useState<
     Record<
       'ANTES' | 'DURANTE' | 'DEPOIS',
@@ -45,7 +45,6 @@ export default function CreateScenario() {
   const [existingScenario, setExistingScenario] =
     useState<ScenarioResponseDTO | null>(null);
 
-  // Buscar cenário existente quando cidade e COBRADE são selecionados
   useEffect(() => {
     const fetchExistingScenario = async () => {
       if (city && cobrade) {
@@ -72,7 +71,6 @@ export default function CreateScenario() {
 
           setProtocols(tasksAsProtocols);
 
-          // Preencher parâmetros por fase
           if (scenario.parameters.length > 0) {
             setParamByPhase((prev) => {
               const clone = { ...prev };
@@ -83,7 +81,6 @@ export default function CreateScenario() {
               return clone;
             });
           } else {
-            // Zera se não houver
             setParamByPhase({
               ANTES: { description: '', action: '' },
               DURANTE: { description: '', action: '' },
@@ -94,7 +91,7 @@ export default function CreateScenario() {
           console.log(
             'Nenhum cenário encontrado para esta combinação cidade/COBRADE',
           );
-          // Limpar dados se não encontrar cenário
+
           setExistingScenario(null);
           setProtocols([]);
           setParamByPhase({
@@ -159,7 +156,6 @@ export default function CreateScenario() {
       return;
     }
 
-    // Apenas tarefas da fase atual contam para validação mínima
     const currentPhaseProtocols = protocols.filter(
       (p) => mapStepToPhase(p.phase) === phaseMap[currentStep],
     );
@@ -170,25 +166,21 @@ export default function CreateScenario() {
     }
 
     try {
-      // Preparar dados das tasks
       const tasks = protocols.map((protocol) => {
-        // Extrair descrição sem o serviço e ano
         const description = protocol.description.split(' (')[0];
 
-        // Extrair serviceId se possível (você pode implementar uma lógica mais robusta)
         const serviceMatch = protocol.description.match(/\(([^,]+),/);
         const serviceName = serviceMatch?.[1];
         const service = services.find((s) => s.name === serviceName);
 
         return {
           description,
-          // Usa a fase específica da tarefa, se existir; caso contrário, a fase atual
+
           phase: mapStepToPhase(protocol.phase) || phaseMap[currentStep],
           serviceId: service?.id || null,
         };
       });
 
-      // Preparar parâmetros de TODAS as fases (se existirem)
       const parameters: ScenarioRequestDTO['parameters'] = Object.entries(
         paramByPhase,
       ).flatMap(([phase, value]) =>
@@ -215,13 +207,11 @@ export default function CreateScenario() {
       };
 
       if (existingScenario) {
-        // Atualizar cenário existente
         await api.editScenario(existingScenario.id, scenarioData);
         alert(
           `Cenário atualizado com sucesso para ${city.name} - ${city.state}!`,
         );
       } else {
-        // Criar novo cenário
         const newScenario = await api.createScenario(scenarioData);
         alert(`Cenário criado com sucesso para ${city.name} - ${city.state}!`);
         setExistingScenario(newScenario);
@@ -232,7 +222,6 @@ export default function CreateScenario() {
     }
   };
 
-  // Mapeia label da tab para enum de fase
   const phaseMap: Record<string, 'ANTES' | 'DURANTE' | 'DEPOIS'> = {
     Antes: 'ANTES',
     Durante: 'DURANTE',
@@ -250,7 +239,6 @@ export default function CreateScenario() {
     return undefined;
   };
 
-  // Protocolos filtrados pela fase atual
   const filteredProtocols = protocols
     .filter(
       (p) =>
@@ -259,11 +247,10 @@ export default function CreateScenario() {
     )
     .filter((p) => mapStepToPhase(p.phase) === phaseMap[currentStep]);
 
-  // Caso nenhum protocolo tenha fase (legado), mostra os da fase atual (após criação)
   const displayProtocols =
     filteredProtocols.length > 0
       ? filteredProtocols
-      : protocols.filter((p) => !p.phase); // Exibe antigos sem fase enquanto não editados
+      : protocols.filter((p) => !p.phase);
 
   return (
     <div className="b-l b-r min-h-screen">
@@ -398,7 +385,6 @@ export default function CreateScenario() {
         }}
         onSave={(taskData) => {
           if (taskData.id) {
-            // Editando tarefa existente
             setProtocols((prev) =>
               prev.map((p) =>
                 p.id === taskData.id
@@ -406,7 +392,7 @@ export default function CreateScenario() {
                       ...p,
                       description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
                       phase: phaseMap[currentStep],
-                      // Preservar as propriedades existentes
+
                       isExisting: p.isExisting,
                       canEdit: p.canEdit,
                     }
@@ -414,13 +400,12 @@ export default function CreateScenario() {
               ),
             );
           } else {
-            // Criando nova tarefa
             const newProtocol: Protocol = {
               id: Date.now().toString(),
               description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
               phase: phaseMap[currentStep],
-              isExisting: false, // Tasks criadas localmente não são existentes
-              canEdit: true, // Admin pode editar todas as tasks
+              isExisting: false,
+              canEdit: true,
             };
             setProtocols((prev) => [...prev, newProtocol]);
           }

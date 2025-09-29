@@ -49,7 +49,7 @@ const ProtocolList: React.FC<ProtocolListProps> = ({
             </span>
             <div className="mt-auto flex flex-shrink-0 flex-row items-center space-x-3">
               {protocol.isExisting && protocol.canEdit === false && (
-                <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-600">
+                <span className="rounded border border-gray-500 px-2 py-1 text-xs text-gray-500">
                   Somente leitura
                 </span>
               )}
