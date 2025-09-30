@@ -6,6 +6,7 @@ import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { Save, Hammer, X } from 'lucide-react';
 import { Dropdown } from '@/components/Dropdown';
+import { useToast } from '@/hooks/useToast';
 
 type CreateTaskProps = {
   isOpen: boolean;
@@ -33,16 +34,9 @@ export function CreateTask({
   currentPhase,
   editingTask = null,
 }: CreateTaskProps) {
+  const { warning } = useToast();
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [task, setTask] = useState('');
-
-  // Debug para verificar os dados recebidos
-  console.log('CreateTask props:', {
-    isOpen,
-    serviceNames,
-    currentPhase,
-    editingTask,
-  });
 
   // Atualiza os campos quando editingTask muda
   useEffect(() => {
@@ -62,7 +56,7 @@ export function CreateTask({
     console.log('currentPhase:', currentPhase);
 
     if (!selectedService || !task.trim()) {
-      alert('Selecione um serviço e digite a tarefa!');
+      warning('Selecione um serviço e digite a tarefa!');
       return;
     }
 
@@ -117,7 +111,6 @@ export function CreateTask({
             label="Selecione o Serviço"
             items={serviceNames}
             onSelect={(v) => {
-              console.log('Serviço selecionado:', v);
               setSelectedService(v);
             }}
             size="medium"

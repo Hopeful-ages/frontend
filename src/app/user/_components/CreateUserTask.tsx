@@ -5,6 +5,7 @@ import { Modal } from '@/components/Modal';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { Save, X } from 'lucide-react';
+import { useToast } from '@/hooks/useToast';
 
 type CreateUserTaskProps = {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export function CreateUserTask({
   editingTask = null,
 }: CreateUserTaskProps) {
   const [task, setTask] = useState('');
+  const { warning } = useToast();
 
   // Atualiza os campos quando editingTask muda
   useEffect(() => {
@@ -44,7 +46,7 @@ export function CreateUserTask({
 
   const handleSave = () => {
     if (!task.trim()) {
-      alert('Digite a descrição da tarefa!');
+      warning('Digite a descrição da tarefa!');
       return;
     }
 
