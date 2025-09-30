@@ -31,6 +31,9 @@ export default function UserPage() {
   const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [existingTasks, setExistingTasks] = useState<TaskSummaryDTO[]>([]);
+  const [currentScenarioId, setCurrentScenarioId] = useState<string | null>(
+    null,
+  );
   const [cobrades, setCobrades] = useState<CobradeDTO[]>([]);
   const [cobrade, setCobrade] = useState<CobradeDTO | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -144,13 +147,20 @@ export default function UserPage() {
           userDetails.city.id,
           cobrade.id,
         );
-        if (scenario && scenario.tasks) {
-          setExistingTasks(scenario.tasks);
+        if (scenario) {
+          setCurrentScenarioId(scenario.id);
+          if (scenario.tasks) {
+            setExistingTasks(scenario.tasks);
+          } else {
+            setExistingTasks([]);
+          }
         } else {
+          setCurrentScenarioId(null);
           setExistingTasks([]);
         }
       } catch {
         console.log('Nenhum cenário existente encontrado para esta COBRADE');
+        setCurrentScenarioId(null);
         setExistingTasks([]);
       }
     };
@@ -217,8 +227,8 @@ export default function UserPage() {
     }
 
     try {
-      // Apenas salvar as tasks criadas localmente (novas)
-      const tasks = localTasks.map((protocol) => {
+      // Converter tasks locais (novas)
+      const newTasks = localTasks.map((protocol) => {
         const description = protocol.description.split(' (')[0];
 
         return {
@@ -228,43 +238,62 @@ export default function UserPage() {
         };
       });
 
-      const scenarioData: ScenarioRequestDTO = {
+      // Preservar tasks existentes (somente leitura para backend: enviamos novamente para não perder)
+      const existingTasksPayload = existingTasks
+        .filter((t) => t.id) // garantir
+        .map((t) => ({
+          description: t.description,
+          phase: mapStepToPhase(t.phase) || phaseMap[currentStep],
+          serviceId: t.service?.id || userDetails.service!.id,
+        }));
+
+      const baseScenarioData: ScenarioRequestDTO = {
         description: `Plano de contingência para ${cobrade.subgroup || cobrade.type || 'emergências'}`,
         origin: `Plano criado por ${userDetails.service.name} para ${cobrade.subType || cobrade.type || 'emergências'} em ${userDetails.city.name}`,
         cityId: userDetails.city.id,
         cobradeId: cobrade.id,
-        tasks,
+        tasks:
+          newTasks.length > 0 || existingTasksPayload.length > 0
+            ? [...existingTasksPayload, ...newTasks]
+            : undefined,
         parameters: [],
       };
 
-      if (tasks.length > 0) {
-        await api.createScenario(scenarioData);
-        success(
-          'Tarefas adicionadas',
-          `${tasks.length} nova(s) tarefa(s) para ${cobrade.subType || cobrade.type} em ${userDetails.city.name}`,
-        );
+      if (currentScenarioId) {
+        // UPDATE (user scope) - enviar conjunto completo (existentes + novas) para não sobrescrever
+        if (newTasks.length === 0) {
+          await api.updateScenario(currentScenarioId, baseScenarioData);
+          info('Nenhuma nova tarefa', 'Cenário mantido sem adições.');
+        } else {
+          await api.updateScenario(currentScenarioId, baseScenarioData);
+          success(
+            'Cenário atualizado',
+            `${newTasks.length} nova(s) tarefa(s).`,
+          );
+        }
       } else {
-        info(
-          'Sem novas tarefas',
-          'O cenário já contém todas as tarefas existentes.',
+        // CREATE
+        await api.createScenario({ ...baseScenarioData, tasks: [...newTasks] });
+        success(
+          'Cenário criado',
+          `${newTasks.length} tarefa(s) adicionada(s) para ${cobrade.subType || cobrade.type} em ${userDetails.city.name}`,
         );
       }
 
       // Limpar apenas as tasks locais, manter COBRADE selecionado para ver tasks existentes
       setProtocols([]);
-      // Recarregar tasks existentes
+      // Recarregar tasks existentes e cenário
       if (cobrade && userDetails?.city) {
         try {
           const scenario = await api.getScenarioByIdAndCobrade(
             userDetails.city.id,
             cobrade.id,
           );
-          if (scenario && scenario.tasks) {
-            setExistingTasks(scenario.tasks);
+          if (scenario) {
+            setCurrentScenarioId(scenario.id);
+            if (scenario.tasks) setExistingTasks(scenario.tasks);
           }
-        } catch {
-          // Ignorar erro se não encontrar cenário
-        }
+        } catch {}
       }
     } catch (error) {
       console.error('Erro ao salvar cenário:', error);
@@ -523,17 +552,38 @@ export default function UserPage() {
         }}
         onSave={(taskData) => {
           if (taskData.id) {
-            setProtocols((prev) =>
-              prev.map((p) =>
-                p.id === taskData.id
-                  ? {
-                      ...p,
-                      description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
-                      phase: phaseMap[currentStep],
-                    }
-                  : p,
-              ),
+            // Se a edição é de uma task existente do servidor, refletir apenas visualmente (não perdemos o id)
+            const isExistingTask = existingTasks.some(
+              (t) => t.id === taskData.id,
             );
+            if (isExistingTask) {
+              // Atualiza em existingTasks para que próxima montagem do payload inclua descrição atualizada
+              setExistingTasks((prev) =>
+                prev.map((t) =>
+                  t.id === taskData.id
+                    ? {
+                        ...t,
+                        description: taskData.description,
+                        phase: phaseMap[currentStep],
+                        service: t.service, // mantém service original
+                      }
+                    : t,
+                ),
+              );
+            } else {
+              // Task local
+              setProtocols((prev) =>
+                prev.map((p) =>
+                  p.id === taskData.id
+                    ? {
+                        ...p,
+                        description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
+                        phase: phaseMap[currentStep],
+                      }
+                    : p,
+                ),
+              );
+            }
           } else {
             const newProtocol: Protocol = {
               id: Date.now().toString(),
