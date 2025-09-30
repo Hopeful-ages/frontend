@@ -65,7 +65,7 @@ export default function CreateScenario() {
               : new Date().getFullYear();
 
             return {
-              id: task.id,
+              id: String(task.id), // normaliza para string
               description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${lastUpdateYear})`,
               phase: task.phase,
               isExisting: true,
@@ -141,7 +141,10 @@ export default function CreateScenario() {
   }, []);
 
   const handleEditProtocol = (protocolToEdit: Protocol) => {
-    setEditTask(protocolToEdit);
+    // Logs de depuração para garantir que o clique está chegando
+    // (remover depois se desejar)
+    console.log('[EDIT] Clicou em editar protocolo', protocolToEdit);
+    setEditTask({ ...protocolToEdit, id: String(protocolToEdit.id) });
     setIsTaskModalOpen(true);
   };
 
@@ -398,12 +401,12 @@ export default function CreateScenario() {
           if (taskData.id) {
             setProtocols((prev) =>
               prev.map((p) =>
-                p.id === taskData.id
+                String(p.id) === String(taskData.id)
                   ? {
                       ...p,
                       description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
-                      phase: phaseMap[currentStep],
-
+                      // mantém fase anterior se existir
+                      phase: p.phase || phaseMap[currentStep],
                       isExisting: p.isExisting,
                       canEdit: p.canEdit,
                     }

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Modal } from '@/components/Modal';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
-import { Save, Hammer, X } from 'lucide-react';
+import { Hammer, Save, X } from 'lucide-react';
 import { Dropdown } from '@/components/Dropdown';
 import { useToast } from '@/hooks/useToast';
 
@@ -120,9 +120,10 @@ export function CreateTask({
             textSize="sm"
             roundedBorder="lg"
             maxItemsVisible={3}
-            icon={<Hammer className="h-4 w-4" />}
             fullWidth
-            value={selectedService || ''}
+            // IMPORTANTE: não passar string vazia, senão o componente entende que já existe valor
+            value={selectedService ?? null}
+            icon={<Hammer className="h-4 w-4" />}
             useAutoComplete
           />
         </div>

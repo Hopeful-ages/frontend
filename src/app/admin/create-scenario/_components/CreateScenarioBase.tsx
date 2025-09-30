@@ -38,7 +38,7 @@ const DEFAULT_PARAMS: Record<
 
 export function CreateScenarioBase({ scenarioId }: Props) {
   const router = useRouter();
-  const { success, error: toastError, warning, info } = useToast();
+  const { success, error: toastError, warning } = useToast();
 
   const [currentStep, setCurrentStep] = useState<(typeof PLAN_STEPS)[number]>(
     PLAN_STEPS[0],
@@ -110,7 +110,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
             : new Date().getFullYear();
 
           return {
-            id: task.id,
+            id: String(task.id), // normaliza ID para string
             description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${lastUpdateYear})`,
             phase: task.phase,
             isExisting: true,
@@ -387,7 +387,11 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
             <ProtocolList
               protocols={displayProtocols}
-              onEdit={setEditTask}
+              onEdit={(p) => {
+                // garante string e abre modal
+                setEditTask({ ...p, id: String(p.id) });
+                setIsTaskModalOpen(true);
+              }}
               onRemove={(p) =>
                 setProtocols((prev) => prev.filter((x) => x.id !== p.id))
               }
@@ -432,11 +436,11 @@ export function CreateScenarioBase({ scenarioId }: Props) {
           if (taskData.id) {
             setProtocols((prev) =>
               prev.map((p) =>
-                p.id === taskData.id
+                String(p.id) === String(taskData.id)
                   ? {
                       ...p,
                       description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
-                      phase: phaseMap[currentStep],
+                      phase: p.phase || phaseMap[currentStep],
                       isExisting: p.isExisting,
                       canEdit: p.canEdit,
                     }
