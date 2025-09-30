@@ -15,6 +15,7 @@ import {
   ServiceSummaryDTO,
 } from '@/lib/types';
 import { Plus, Save } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CreateTask } from './_components/CreateTask';
 import { useToast } from '@/hooks/useToast';
@@ -22,6 +23,7 @@ import { useToast } from '@/hooks/useToast';
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function CreateScenario() {
+  const router = useRouter();
   const { success, error: toastError, warning } = useToast();
   const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
 
@@ -216,6 +218,9 @@ export default function CreateScenario() {
         success('Cenário criado', `${city.name} - ${city.state}`);
         setExistingScenario(newScenario);
       }
+
+      // Redirect para a listagem de planos após salvar com sucesso
+      router.push('/admin/plans');
     } catch (error) {
       console.error('Erro ao salvar cenário:', error);
       toastError('Erro ao salvar', 'Tente novamente em instantes.');
