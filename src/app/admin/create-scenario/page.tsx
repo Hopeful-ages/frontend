@@ -11,6 +11,7 @@ import { api } from '@/lib/api';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { Toaster } from '@/components/Toaster';
+import { useRouter } from 'next/navigation';
 import {
   CobradeDTO,
   ServiceSummaryDTO,
@@ -24,6 +25,7 @@ const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function CreateScenario() {
   const { success, error: toastError, warning } = useToast();
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
 
   const [protocols, setProtocols] = useState<Protocol[]>([]);
@@ -215,10 +217,12 @@ export default function CreateScenario() {
           'Cenário atualizado com sucesso',
           `${city.name} - ${city.state}`,
         );
+        router.push('/admin/plans');
       } else {
         const newScenario = await api.createScenario(scenarioData);
         success('Cenário criado com sucesso', `${city.name} - ${city.state}`);
         setExistingScenario(newScenario);
+        router.push('/admin/plans');
       }
     } catch (error) {
       console.error('Erro ao salvar cenário:', error);
