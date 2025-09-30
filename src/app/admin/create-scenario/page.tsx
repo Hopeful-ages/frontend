@@ -9,6 +9,8 @@ import { Dropdown } from '@/components/Dropdown';
 import { Plus, Save } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/useToast';
+import { Toaster } from '@/components/Toaster';
 import {
   CobradeDTO,
   ServiceSummaryDTO,
@@ -21,6 +23,7 @@ import { CreateTask } from './_components/CreateTask';
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function CreateScenario() {
+  const { success, error: toastError, warning } = useToast();
   const [currentStep, setCurrentStep] = useState(PLAN_STEPS[0]);
 
   const [protocols, setProtocols] = useState<Protocol[]>([]);
@@ -147,12 +150,12 @@ export default function CreateScenario() {
 
   const handleSave = async () => {
     if (!cobrade) {
-      alert('Por favor, selecione um COBRADE.');
+      warning('Por favor, selecione um COBRADE.');
       return;
     }
 
     if (!city) {
-      alert('Por favor, selecione uma cidade.');
+      warning('Por favor, selecione uma cidade.');
       return;
     }
 
@@ -161,7 +164,7 @@ export default function CreateScenario() {
     );
 
     if (currentPhaseProtocols.length === 0) {
-      alert('Adicione pelo menos uma tarefa antes de salvar o cenário.');
+      warning('Adicione pelo menos uma tarefa antes de salvar o cenário.');
       return;
     }
 
@@ -208,17 +211,18 @@ export default function CreateScenario() {
 
       if (existingScenario) {
         await api.editScenario(existingScenario.id, scenarioData);
-        alert(
-          `Cenário atualizado com sucesso para ${city.name} - ${city.state}!`,
+        success(
+          'Cenário atualizado com sucesso',
+          `${city.name} - ${city.state}`,
         );
       } else {
         const newScenario = await api.createScenario(scenarioData);
-        alert(`Cenário criado com sucesso para ${city.name} - ${city.state}!`);
+        success('Cenário criado com sucesso', `${city.name} - ${city.state}`);
         setExistingScenario(newScenario);
       }
     } catch (error) {
       console.error('Erro ao salvar cenário:', error);
-      alert('Erro ao salvar o cenário. Tente novamente.');
+      toastError('Erro ao salvar o cenário', 'Tente novamente.');
     }
   };
 
@@ -362,6 +366,12 @@ export default function CreateScenario() {
             size="md"
             onClick={() => setIsTaskModalOpen(true)}
             leftIcon={<Plus size={16} />}
+            disabled={!city || !cobrade}
+            title={
+              !city || !cobrade
+                ? 'Selecione Cidade e COBRADE primeiro'
+                : undefined
+            }
           >
             Adicionar Tarefa
           </Button>
@@ -423,6 +433,7 @@ export default function CreateScenario() {
             : null
         }
       />
+      <Toaster />
     </div>
   );
 }

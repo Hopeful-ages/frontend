@@ -8,6 +8,8 @@ import { Dropdown } from '@/components/Dropdown';
 import { Plus, Save, ChevronDown } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/useToast';
+import { Toaster } from '@/components/Toaster';
 import {
   CobradeDTO,
   ScenarioRequestDTO,
@@ -21,6 +23,7 @@ import { useProtectedPage } from '@/hooks/useProtectedPage';
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function UserPage() {
+  const { success, error: toastError, warning, info } = useToast();
   const { userInfo, hasAccess } = useProtectedPage({
     requiredRole: 'ROLE_USER',
   });
@@ -160,7 +163,7 @@ export default function UserPage() {
   const handleEditProtocol = (protocolToEdit: Protocol) => {
     // Verificar se pode editar (apenas tasks do próprio serviço ou criadas localmente)
     if (protocolToEdit.isExisting && !protocolToEdit.canEdit) {
-      alert('Você só pode editar tasks criadas pelo seu serviço.');
+      warning('Você só pode editar tasks criadas pelo seu serviço.');
       return;
     }
 
@@ -171,7 +174,7 @@ export default function UserPage() {
   const handleRemoveProtocol = (protocolToRemove: Protocol) => {
     // Verificar se pode remover (apenas tasks do próprio serviço ou criadas localmente)
     if (protocolToRemove.isExisting && !protocolToRemove.canEdit) {
-      alert('Você só pode remover tasks criadas pelo seu serviço.');
+      warning('Você só pode remover tasks criadas pelo seu serviço.');
       return;
     }
 
@@ -188,18 +191,19 @@ export default function UserPage() {
 
   const handleSave = async () => {
     if (!cobrade) {
-      alert('Por favor, selecione um tipo de emergência (COBRADE).');
+      warning('Por favor, selecione um tipo de emergência (COBRADE).');
       return;
     }
 
     if (!userDetails?.city) {
-      alert('Erro: cidade do usuário não encontrada.');
+      toastError('Erro ao salvar', 'Cidade do usuário não encontrada.');
       return;
     }
 
     if (!userDetails?.service) {
-      alert(
-        'Erro: você deve estar associado a um serviço para criar cenários.',
+      toastError(
+        'Erro: Serviço não associado',
+        'Associe-se a um serviço para criar cenários.',
       );
       return;
     }
@@ -208,7 +212,7 @@ export default function UserPage() {
     const localTasks = protocols.filter((p) => !p.isExisting);
 
     if (localTasks.length === 0 && existingTasks.length === 0) {
-      alert('Adicione pelo menos uma tarefa antes de salvar o cenário.');
+      warning('Adicione pelo menos uma tarefa antes de salvar o cenário.');
       return;
     }
 
@@ -235,12 +239,14 @@ export default function UserPage() {
 
       if (tasks.length > 0) {
         await api.createScenario(scenarioData);
-        alert(
-          `${tasks.length} nova(s) tarefa(s) adicionada(s) ao cenário para ${cobrade.subType || cobrade.type} em ${userDetails.city.name}!`,
+        success(
+          'Tarefas adicionadas',
+          `${tasks.length} nova(s) tarefa(s) para ${cobrade.subType || cobrade.type} em ${userDetails.city.name}`,
         );
       } else {
-        alert(
-          'Nenhuma nova tarefa para adicionar. O cenário já contém todas as tarefas existentes.',
+        info(
+          'Sem novas tarefas',
+          'O cenário já contém todas as tarefas existentes.',
         );
       }
 
@@ -262,7 +268,7 @@ export default function UserPage() {
       }
     } catch (error) {
       console.error('Erro ao salvar cenário:', error);
-      alert('Erro ao salvar o cenário. Tente novamente.');
+      toastError('Erro ao salvar o cenário', 'Tente novamente.');
     }
   };
 
@@ -500,6 +506,7 @@ export default function UserPage() {
           </Button>
         </div>
       </main>
+      <Toaster />
 
       <CreateUserTask
         isOpen={isTaskModalOpen}
