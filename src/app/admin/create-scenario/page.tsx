@@ -287,6 +287,9 @@ export default function CreateScenario() {
               }}
               useAutoComplete
             />
+            <p className="mt-1 text-xs text-gray-500">
+              Obrigatório selecionar uma cidade
+            </p>
           </div>
 
           <div className="flex-1">
@@ -316,6 +319,9 @@ export default function CreateScenario() {
               }}
               useAutoComplete
             />
+            <p className="mt-1 text-xs text-gray-500">
+              Obrigatório selecionar um COBRADE
+            </p>
           </div>
         </div>
 
@@ -376,6 +382,12 @@ export default function CreateScenario() {
             size="md"
             onClick={() => setIsTaskModalOpen(true)}
             leftIcon={<Plus size={16} />}
+            disabled={!city || !cobrade}
+            title={
+              !city || !cobrade
+                ? 'Selecione Cidade e Cobrade primeiro'
+                : undefined
+            }
           >
             Adicionar Tarefa
           </Button>
