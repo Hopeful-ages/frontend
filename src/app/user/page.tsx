@@ -1,22 +1,22 @@
 'use client';
 
 import { Button } from '@/components/Button';
-import ProtocolList, { Protocol } from '@/components/ProtocolList';
+import { Dropdown } from '@/components/Dropdown';
 import Header from '@/components/Header';
 import { PlanStepsTabs } from '@/components/PlanStepsTabs';
-import { Dropdown } from '@/components/Dropdown';
-import { Plus, Save, ChevronDown } from 'lucide-react';
+import ProtocolList, { Protocol } from '@/components/ProtocolList';
+import { useProtectedPage } from '@/hooks/useProtectedPage';
 import { api } from '@/lib/api';
-import { useEffect, useState } from 'react';
 import {
+  ApiError,
   CobradeDTO,
   ScenarioRequestDTO,
-  UserResponseDTO,
-  ApiError,
   TaskSummaryDTO,
+  UserResponseDTO,
 } from '@/lib/types';
+import { Plus, Save } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { CreateUserTask } from './_components/CreateUserTask';
-import { useProtectedPage } from '@/hooks/useProtectedPage';
 
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
@@ -459,7 +459,6 @@ export default function UserPage() {
                 }}
                 useAutoComplete
               />
-              <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
             </div>
             <p className="mt-1 text-xs text-gray-500">
               Obrigatório para adicionar tarefas ao cenário

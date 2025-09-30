@@ -237,6 +237,14 @@ export const Dropdown: React.FC<dropdownProps> = ({
               placeholderTone,
             )}
           />
+          <ChevronDown
+            size={chevronBySize[size]}
+            className={cn(
+              'ml-auto shrink-0 transition-transform duration-200',
+              open ? 'rotate-180' : 'rotate-0',
+              tone,
+            )}
+          />
         </div>
       ) : (
         <button

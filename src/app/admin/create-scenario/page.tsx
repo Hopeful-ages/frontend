@@ -1,21 +1,21 @@
 'use client';
 
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
-import ProtocolList, { Protocol } from '@/components/ProtocolList';
-import Header from '@/components/Header';
-import { PlanStepsTabs } from '@/components/PlanStepsTabs';
 import { Dropdown } from '@/components/Dropdown';
-import { Plus, Save } from 'lucide-react';
+import Header from '@/components/Header';
+import { Input } from '@/components/Input';
+import { PlanStepsTabs } from '@/components/PlanStepsTabs';
+import ProtocolList, { Protocol } from '@/components/ProtocolList';
 import { api } from '@/lib/api';
-import { useEffect, useState } from 'react';
 import {
+  CityResponseDTO,
   CobradeDTO,
-  ServiceSummaryDTO,
-  ScenarioResponseDTO,
   ScenarioRequestDTO,
+  ScenarioResponseDTO,
+  ServiceSummaryDTO,
 } from '@/lib/types';
-import { CityResponseDTO } from '@/lib/types';
+import { Plus, Save } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { CreateTask } from './_components/CreateTask';
 
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
@@ -260,12 +260,16 @@ export default function CreateScenario() {
           {'Cadastrar Cenário'}
         </h1>
 
-        <div className="mb-6 ml-4 flex w-full gap-8">
+        <div className="flex w-full gap-8 p-6">
           <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Cidade
+            </label>
             <Dropdown
-              label="Cidade"
+              label="Selecione uma cidade"
               items={cities.map((c) => `${c.name} - ${c.state}`)}
               size="large"
+              fullWidth
               value={city ? `${city.name} - ${city.state}` : null}
               onSelect={(cityString) => {
                 const cityName = cityString.split(' - ')[0];
@@ -277,31 +281,33 @@ export default function CreateScenario() {
             />
           </div>
 
-          <div className="mb-6 ml-4 flex w-full gap-8">
-            <div className="flex-1">
-              <Dropdown
-                label="Cobrade"
-                items={cobrades.map(
-                  (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
-                )}
-                size="large"
-                value={
-                  cobrade
-                    ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
-                    : null
-                }
-                onSelect={(desc) => {
-                  const selectedCobrade =
-                    cobrades.find(
-                      (c) =>
-                        `${c.code} - ${c.subType || c.type || c.subgroup}` ===
-                        desc,
-                    ) || null;
-                  setCobrade(selectedCobrade);
-                }}
-                useAutoComplete
-              />
-            </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Cobrade
+            </label>
+            <Dropdown
+              label="Selecione um cobrade"
+              items={cobrades.map(
+                (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
+              )}
+              size="large"
+              fullWidth
+              value={
+                cobrade
+                  ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
+                  : null
+              }
+              onSelect={(desc) => {
+                const selectedCobrade =
+                  cobrades.find(
+                    (c) =>
+                      `${c.code} - ${c.subType || c.type || c.subgroup}` ===
+                      desc,
+                  ) || null;
+                setCobrade(selectedCobrade);
+              }}
+              useAutoComplete
+            />
           </div>
         </div>
 

@@ -1,5 +1,5 @@
-import React from 'react';
 import { ArrowDown } from 'lucide-react';
+import React from 'react';
 
 export interface Protocol {
   id: string | number;
@@ -44,7 +44,7 @@ const ProtocolList: React.FC<ProtocolListProps> = ({
             key={protocol.id}
             className="flex items-start justify-between border-t border-b border-gray-200 p-4"
           >
-            <span className="text-gray-160 flex-grow pr-4 text-sm font-medium">
+            <span className="text-gray-160 flex-grow overflow-hidden pr-4 text-sm font-medium break-words text-ellipsis">
               {protocol.description}
             </span>
             <div className="mt-auto flex flex-shrink-0 flex-row items-center space-x-3">
