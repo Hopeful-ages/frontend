@@ -38,14 +38,6 @@ export function CreateTask({
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [task, setTask] = useState('');
 
-  // Debug para verificar os dados recebidos
-  console.log('CreateTask props:', {
-    isOpen,
-    serviceNames,
-    currentPhase,
-    editingTask,
-  });
-
   // Atualiza os campos quando editingTask muda
   useEffect(() => {
     if (editingTask) {

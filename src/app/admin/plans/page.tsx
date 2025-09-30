@@ -126,7 +126,7 @@ export default function AdminPlansPage() {
   }, [error]);
 
   const onEdit = (id: string) => {
-    router.push(`/scenary/${id}`);
+    router.push(`/admin/create-scenario/${id}`);
   };
 
   const onDownload = (scenario: ScenarioResponseDTO) => {
