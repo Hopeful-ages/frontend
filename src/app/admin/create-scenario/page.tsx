@@ -297,7 +297,7 @@ export default function CreateScenario() {
               Cobrade
             </label>
             <Dropdown
-              label="Selecione um cobrade"
+              label="Selecione o tipo de Cenário (COBRADE)"
               items={cobrades.map(
                 (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
               )}
@@ -320,7 +320,7 @@ export default function CreateScenario() {
               useAutoComplete
             />
             <p className="mt-1 text-xs text-gray-500">
-              Obrigatório selecionar um COBRADE
+              Obrigatório para visualizar ou adicionar tarefas ao cenário
             </p>
           </div>
         </div>
