@@ -77,7 +77,6 @@ export function CreateScenarioBase({ scenarioId }: Props) {
     [],
   );
 
-  // carregar listas iniciais
   useEffect(() => {
     (async () => {
       try {
@@ -95,7 +94,6 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       }
     })();
   }, [toastError]);
-
   const prefillFromScenario = useCallback(
     (scenario: ScenarioResponseDTO) => {
       setExistingScenario(scenario);
@@ -287,7 +285,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       <Header />
 
       <main className="mx-auto max-w-4xl border p-4 pt-24">
-        <h1 className="text-gray-850 my-1 mb-10 text-center text-3xl">
+        <h1 className="text-gray-850 my-1 mb-6 text-center text-3xl">
           {scenarioId ? 'Editar Cenário' : 'Cadastrar Cenário'}
         </h1>
 
@@ -295,36 +293,65 @@ export function CreateScenarioBase({ scenarioId }: Props) {
           <div className="text-center text-gray-600">Carregando cenário…</div>
         ) : (
           <>
-            <div className="mb-6 ml-4 flex w-full gap-8">
+            <div className="flex w-full gap-8 p-4">
               <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Cidade
+                </label>
                 <Dropdown
-                  label="Cidade"
+                  label="Selecione uma Cidade"
                   items={cities.map((c) => `${c.name} - ${c.state}`)}
                   size="large"
+                  fullWidth
                   value={city ? `${city.name} - ${city.state}` : null}
-                  onSelect={(cityString) => {
+                  onSelect={async (cityString) => {
                     const cityName = cityString.split(' - ')[0];
                     const selectedCity =
                       cities.find((c) => c.name === cityName) || null;
                     setCity(selectedCity);
+                    // Buscar tarefas do cenário se cobrade também estiver selecionada
+                    if (selectedCity && cobrade) {
+                      try {
+                        const scenario = await api.getScenarioByIdAndCobrade(
+                          selectedCity.id,
+                          cobrade.id,
+                        );
+                        prefillFromScenario(scenario);
+                      } catch {
+                        setExistingScenario(null);
+                        setProtocols([]);
+                        setParamByPhase(DEFAULT_PARAMS);
+                      }
+                    } else {
+                      setExistingScenario(null);
+                      setProtocols([]);
+                      setParamByPhase(DEFAULT_PARAMS);
+                    }
                   }}
                   useAutoComplete
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  Obrigatório selecionar uma cidade
+                </p>
               </div>
 
               <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  COBRADE
+                </label>
                 <Dropdown
-                  label="Cobrade"
+                  label="Selecione o tipo de Cenário (COBRADE)"
                   items={cobrades.map(
                     (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
                   )}
                   size="large"
+                  fullWidth
                   value={
                     cobrade
                       ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
                       : null
                   }
-                  onSelect={(desc) => {
+                  onSelect={async (desc) => {
                     const selectedCobrade =
                       cobrades.find(
                         (c) =>
@@ -332,9 +359,30 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                           desc,
                       ) || null;
                     setCobrade(selectedCobrade);
+                    // Buscar tarefas do cenário se cidade também estiver selecionada
+                    if (city && selectedCobrade) {
+                      try {
+                        const scenario = await api.getScenarioByIdAndCobrade(
+                          city.id,
+                          selectedCobrade.id,
+                        );
+                        prefillFromScenario(scenario);
+                      } catch {
+                        setExistingScenario(null);
+                        setProtocols([]);
+                        setParamByPhase(DEFAULT_PARAMS);
+                      }
+                    } else {
+                      setExistingScenario(null);
+                      setProtocols([]);
+                      setParamByPhase(DEFAULT_PARAMS);
+                    }
                   }}
                   useAutoComplete
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  Obrigatório para visualizar ou adicionar tarefas ao cenário
+                </p>
               </div>
             </div>
 
