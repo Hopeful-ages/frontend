@@ -104,8 +104,7 @@ export const api = {
 
   getAllServices: () =>
     fetchWithAuth('/api/services') as Promise<ServiceResponseDTO[]>,
-  getAllCobrades: () =>
-    fetchWithAuth('/api/cobrades') as Promise<CobradeDTO[]>,
+  getAllCobrades: () => fetchWithAuth('/api/cobrades') as Promise<CobradeDTO[]>,
   getCobradeById: (id: string) =>
     fetchWithAuth(`/api/cobrades/${id}`) as Promise<CobradeDTO>,
 
@@ -147,16 +146,18 @@ export const api = {
       body: JSON.stringify(payload),
     }) as Promise<ScenarioResponseDTO>,
 
-  editScenario: (id: string, payload: ScenarioUpdateDTO) =>
+  // Atualização de cenário (USER ou ADMIN) - backend decide permissões
+  updateScenario: (id: string, payload: ScenarioRequestDTO) =>
     fetchWithAuth(`/api/scenarios/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(payload),
     }) as Promise<ScenarioResponseDTO>,
 
-  getAllScenarios: () => fetchWithAuth('/api/scenarios') as Promise<ScenarioResponseDTO[]>,
+  getAllScenarios: () =>
+    fetchWithAuth('/api/scenarios') as Promise<ScenarioResponseDTO[]>,
 
   getScenarioByIdAndCobrade: (cityId: string, cobradeId: string) =>
-  fetchWithAuth(
-    `/api/scenarios/by-city-cobrade?cityId=${encodeURIComponent(cityId)}&cobradeId=${encodeURIComponent(cobradeId)}`
-  ) as Promise<ScenarioResponseDTO>
+    fetchWithAuth(
+      `/api/scenarios/by-city-cobrade?cityId=${encodeURIComponent(cityId)}&cobradeId=${encodeURIComponent(cobradeId)}`,
+    ) as Promise<ScenarioResponseDTO>,
 };

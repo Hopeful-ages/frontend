@@ -38,7 +38,7 @@ const DEFAULT_PARAMS: Record<
 
 export function CreateScenarioBase({ scenarioId }: Props) {
   const router = useRouter();
-  const { success, error: toastError, warning } = useToast();
+  const { success, error: toastError, warning, info } = useToast();
 
   const [currentStep, setCurrentStep] = useState<(typeof PLAN_STEPS)[number]>(
     PLAN_STEPS[0],
@@ -251,7 +251,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       };
 
       if (existingScenario) {
-        await api.editScenario(existingScenario.id, scenarioData);
+        await api.updateScenario(existingScenario.id, scenarioData);
         success(
           'Cenário atualizado com sucesso',
           `${city.name} - ${city.state}`,
