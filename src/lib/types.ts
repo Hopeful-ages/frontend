@@ -25,6 +25,35 @@ export type CitySummaryDTO = { id: string; name: string; state: string };
 export type ServiceResponseDTO = ServiceSummaryDTO;
 export type CityResponseDTO = CitySummaryDTO;
 
+export type TaskSummaryDTO = {
+  id: string;
+  description: string;
+  phase: string;
+  lastUpdateDate: string;
+  service: ServiceSummaryDTO | null;
+};
+
+export type TaskResponseDTO = TaskSummaryDTO;
+
+export type ParameterSummaryDTO = {
+  id: string;
+  description: string;
+  action: string;
+  phase: string;
+};
+
+export type ParameterResponseDTO = ParameterSummaryDTO;
+
+export type ScenarioResponseDTO = {
+  id: string;
+  description: string | null;
+  origin: string;
+  city: CityResponseDTO;
+  cobrade: CobradeDTO;
+  tasks: TaskSummaryDTO[];
+  parameters: ParameterSummaryDTO[];
+};
+
 export type UserUpdateDTO = Partial<{
   name: string;
   cpf: string;
@@ -45,14 +74,6 @@ export type CobradeDTO = {
   subType: string | null;
 };
 
-export type TaskResponseDTO = {
-  id: string;
-  description: string;
-  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
-  lastUpdateDate: string; // ISO 8601
-  service: ServiceSummaryDTO | null;
-};
-
 export type TaskRequestDTO = {
   description: string;
   phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
@@ -66,13 +87,6 @@ export type TaskUpdateDTO = Partial<{
   serviceId: string | null;
 }>;
 
-export type ParameterResponseDTO = {
-  id: string;
-  description: string;
-  action: string;
-  phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
-};
-
 export type ParameterRequestDTO = {
   description: string;
   action: string;
@@ -84,16 +98,6 @@ export type ParameterUpdateDTO = Partial<{
   action: string;
   phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
 }>;
-
-export type ScenarioResponseDTO = {
-  id: string;
-  description: string | null;
-  origin: string;
-  city: CitySummaryDTO;
-  cobrade: CobradeDTO;
-  tasks: TaskResponseDTO[];
-  parameters: ParameterResponseDTO[];
-};
 
 export type ScenarioRequestDTO = {
   description?: string | null;

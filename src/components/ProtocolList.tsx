@@ -1,9 +1,15 @@
-import React from 'react';
 import { ArrowDown } from 'lucide-react';
+import React from 'react';
 
 export interface Protocol {
   id: string | number;
   description: string;
+  // Fase (Antes/Durante/Depois) opcional para permitir filtragem externa
+  phase?: string;
+  // Indica se é uma task existente do servidor ou criada localmente
+  isExisting?: boolean;
+  // Indica se o usuário pode editar/remover esta task
+  canEdit?: boolean;
 }
 
 interface ProtocolListProps {
@@ -38,24 +44,33 @@ const ProtocolList: React.FC<ProtocolListProps> = ({
             key={protocol.id}
             className="flex items-start justify-between border-t border-b border-gray-200 p-4"
           >
-            <span className="text-gray-160 flex-grow pr-4 text-sm font-medium">
+            <span className="text-gray-160 flex-grow overflow-hidden pr-4 text-sm font-medium break-words text-ellipsis">
               {protocol.description}
             </span>
-            <div className="mt-auto flex flex-shrink-0 flex-row space-x-3">
-              <button
-                type="button"
-                className="text-xs text-gray-400 hover:underline"
-                onClick={() => onEdit(protocol)}
-              >
-                Editar
-              </button>
-              <button
-                type="button"
-                className="text-xs text-gray-400 hover:underline"
-                onClick={() => onRemove(protocol)}
-              >
-                Remover
-              </button>
+            <div className="mt-auto flex flex-shrink-0 flex-row items-center space-x-3">
+              {protocol.isExisting && protocol.canEdit === false && (
+                <span className="rounded border border-gray-500 px-2 py-1 text-xs text-gray-500">
+                  Somente leitura
+                </span>
+              )}
+              {protocol.canEdit !== false && (
+                <>
+                  <button
+                    type="button"
+                    className="text-xs text-gray-400 hover:underline"
+                    onClick={() => onEdit(protocol)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    className="text-xs text-gray-400 hover:underline"
+                    onClick={() => onRemove(protocol)}
+                  >
+                    Remover
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ))}

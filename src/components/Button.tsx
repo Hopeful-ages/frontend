@@ -92,7 +92,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       className,
       variant = 'primary',
-      size = 'md',
+      size = 'sm',
       loading = false,
       leftIcon,
       onClick,

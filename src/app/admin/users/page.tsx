@@ -116,8 +116,21 @@ export default function AdminUsersPage() {
   const [services, setServices] = useState<ServiceResponseDTO[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
 
-  const [serviceFilter, setServiceFilter] = useState<string | null>(null);
-  const [cityFilter, setCityFilter] = useState<string | null>(null);
+  const [pendingCityFilter, setPendingCityFilter] = useState<string | null>(
+    null,
+  );
+
+  const [appliedCityFilter, setAppliedCityFilter] = useState<string | null>(
+    null,
+  );
+
+  const [pendingServiceFilter, setPendingServiceFilter] = useState<string | null>(
+    null,
+  );
+
+  const [appliedServiceFilter, setAppliedServiceFilter] = useState<string | null>(
+    null,
+  );
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -278,15 +291,15 @@ export default function AdminUsersPage() {
 
   const filtered = useMemo(() => {
     return users.filter((u) => {
-      const byService = serviceFilter
-        ? (u.service?.name ?? '').toLowerCase() === serviceFilter.toLowerCase()
+      const byService = appliedServiceFilter
+        ? (u.service?.name ?? '').toLowerCase() === appliedServiceFilter.toLowerCase()
         : true;
-      const byCity = cityFilter
-        ? (u.city?.name ?? '').toLowerCase() === cityFilter.toLowerCase()
+      const byCity = appliedCityFilter
+        ? (u.city?.name ?? '').toLowerCase() === appliedCityFilter.toLowerCase()
         : true;
       return byService && byCity;
     });
-  }, [users, serviceFilter, cityFilter]);
+  }, [users, appliedServiceFilter, appliedCityFilter]);
 
   const showPagination = filtered.length > 10;
 
@@ -294,6 +307,22 @@ export default function AdminUsersPage() {
     setIsEdit(false);
     setEditingId(null);
     setIsCreateOpen(true);
+  };
+
+  const handleSearch = () => {
+    const adjustedCity = pendingCityFilter
+      ? pendingCityFilter.split(' - ')[0]
+      : null;
+
+    setAppliedCityFilter(adjustedCity);
+    setAppliedServiceFilter(pendingServiceFilter);
+  };
+
+  const handleClearFilters = () => {
+    setPendingCityFilter(null);
+    setPendingServiceFilter(null);
+    setAppliedCityFilter(null);
+    setAppliedServiceFilter(null);
   };
 
   const closeCreate = () => {
@@ -446,10 +475,14 @@ export default function AdminUsersPage() {
       </div>
 
       <FiltersBar
-        serviceNames={serviceNames}
-        cityNames={cityNames}
-        onSelectService={(v) => setServiceFilter(v)}
-        onSelectCity={(v) => setCityFilter(v)}
+        cityOptions={cityNames}
+        cityValue={pendingCityFilter}
+        serviceOptions={serviceNames}
+        serviceValue={pendingServiceFilter}
+        onSelectCity={setPendingCityFilter}
+        onSelectService={setPendingServiceFilter}
+        onSearch={handleSearch}
+        onClearFilters={handleClearFilters}
         onCreate={openCreate}
       />
 

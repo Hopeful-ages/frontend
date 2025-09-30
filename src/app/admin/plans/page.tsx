@@ -7,10 +7,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 import { useToast } from '@/hooks/useToast';
 import { useLoading } from '@/providers/LoadingProvider';
+import { useRouter } from 'next/navigation';
 import { ConfirmDownloadModal } from './_components/ConfirmDownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
-import { useRouter } from 'next/navigation';
 
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
@@ -126,7 +126,7 @@ export default function AdminPlansPage() {
   }, [error]);
 
   const onEdit = (id: string) => {
-    router.push(`/scenary/${id}`);
+    router.push(`/admin/create-scenario/${id}`);
   };
 
   const onDownload = (scenario: ScenarioResponseDTO) => {

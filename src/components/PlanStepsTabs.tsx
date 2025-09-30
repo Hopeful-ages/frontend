@@ -45,7 +45,7 @@ export const PlanStepsTabs: React.FC<PlanStepsTabsProps> = ({
 }) => {
   return (
     <div
-      className="flex overflow-hidden rounded-md border border-gray-300"
+      className="flex ml-4 mr-4 overflow-hidden rounded-md border border-gray-300"
       role="tablist"
       aria-label="Etapas do Plano"
     >

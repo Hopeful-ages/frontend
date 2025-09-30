@@ -102,8 +102,8 @@ const itemClasses = cva(
         long: 'py-2.5',
       },
       selected: {
-        true: 'text-gray-400',
-        false: 'text-gray-400',
+        true: 'text-black',
+        false: 'text-black',
       },
       tone: {
         white: 'bg-white hover:bg-gray-100',
@@ -235,6 +235,14 @@ export const Dropdown: React.FC<dropdownProps> = ({
               'min-w-0 flex-1 truncate bg-transparent outline-none',
               'text-black',
               placeholderTone,
+            )}
+          />
+          <ChevronDown
+            size={chevronBySize[size]}
+            className={cn(
+              'ml-auto shrink-0 transition-transform duration-200',
+              open ? 'rotate-180' : 'rotate-0',
+              tone,
             )}
           />
         </div>
