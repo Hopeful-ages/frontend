@@ -492,6 +492,14 @@ export default function UserPage() {
             size="md"
             onClick={() => setIsTaskModalOpen(true)}
             leftIcon={<Plus size={16} />}
+            disabled={!cobrade || !userDetails?.city || !userDetails?.service}
+            title={
+              !cobrade
+                ? 'Selecione um COBRADE primeiro'
+                : !userDetails?.city || !userDetails?.service
+                  ? 'Dados de cidade/serviço indisponíveis'
+                  : undefined
+            }
           >
             Adicionar Tarefa
           </Button>
