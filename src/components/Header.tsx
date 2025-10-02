@@ -36,10 +36,7 @@ export default function Header() {
   const successShown = useRef(false);
 
   useEffect(() => {
-    if (isCheckingAuth) {
-      showLoading('Verificando autenticação...');
-      warning('Atenção!!', 'Verificando autenticação...');
-    } else {
+    if (!isCheckingAuth) {
       setTimeout(() => {
         hideLoading();
       }, 1000);
@@ -54,7 +51,6 @@ export default function Header() {
     }
 
     if (!isCheckingAuth && isAuthenticated && role && !successShown.current) {
-      success('Autenticação verificada com sucesso!');
       successShown.current = true;
     }
   }, [
