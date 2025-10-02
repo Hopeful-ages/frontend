@@ -74,7 +74,11 @@ export function PlansTable({
             const lastUpdated = getLatestUpdate(row);
             return (
               <Table.Row key={row.id} row={row}>
-                <Table.Cell>{row.city.name ?? '—'}</Table.Cell>
+                <Table.Cell>
+                  {row.city 
+                    ? `${row.city.name} - ${row.city.state}` 
+                    : '—'}
+                </Table.Cell>
                 <Table.Cell>{row.cobrade.subgroup ?? '—'}</Table.Cell>
                 <Table.Cell>
                   {lastUpdated ? formatDate(lastUpdated) : '—'}
