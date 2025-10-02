@@ -34,6 +34,7 @@ export type UserFormState = {
   confirm: string;
   serviceId: string;
   cityId: string;
+  role: string;
 };
 
 type Errors = Partial<Record<Field, string>>;

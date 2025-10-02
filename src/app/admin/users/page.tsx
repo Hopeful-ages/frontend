@@ -17,6 +17,7 @@ import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { UsersTable } from './_components/UsersTable';
+import { debug } from 'console';
 
 type Field =
   | 'name'
@@ -124,13 +125,13 @@ export default function AdminUsersPage() {
     null,
   );
 
-  const [pendingServiceFilter, setPendingServiceFilter] = useState<string | null>(
-    null,
-  );
+  const [pendingServiceFilter, setPendingServiceFilter] = useState<
+    string | null
+  >(null);
 
-  const [appliedServiceFilter, setAppliedServiceFilter] = useState<string | null>(
-    null,
-  );
+  const [appliedServiceFilter, setAppliedServiceFilter] = useState<
+    string | null
+  >(null);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -159,6 +160,7 @@ export default function AdminUsersPage() {
     confirm: '',
     serviceId: '',
     cityId: '',
+    role: '',
   });
   const [errors, setErrors] = useState<Errors>({});
 
@@ -292,7 +294,8 @@ export default function AdminUsersPage() {
   const filtered = useMemo(() => {
     return users.filter((u) => {
       const byService = appliedServiceFilter
-        ? (u.service?.name ?? '').toLowerCase() === appliedServiceFilter.toLowerCase()
+        ? (u.service?.name ?? '').toLowerCase() ===
+          appliedServiceFilter.toLowerCase()
         : true;
       const byCity = appliedCityFilter
         ? (u.city?.name ?? '').toLowerCase() === appliedCityFilter.toLowerCase()
@@ -338,6 +341,7 @@ export default function AdminUsersPage() {
       confirm: '',
       serviceId: '',
       cityId: '',
+      role: '',
     });
     setErrors({});
   };
@@ -356,6 +360,7 @@ export default function AdminUsersPage() {
         confirm: '',
         serviceId: u.service?.id ?? '',
         cityId: u.city?.id ?? '',
+        role: u.role?.id ?? '',
       });
       setErrors({});
       setIsCreateOpen(true);
@@ -366,8 +371,13 @@ export default function AdminUsersPage() {
   };
 
   const askToggleStatus = (u: UserResponseDTO) => {
-    setConfirmTarget(u);
-    setConfirmOpen(true);
+    if (u.role?.name === 'ADMIN') {
+      warning('Usuários administradores não podem ser desativados');
+      return;
+    } else {
+      setConfirmTarget(u);
+      setConfirmOpen(true);
+    }
   };
   const closeConfirm = () => {
     setConfirmOpen(false);
