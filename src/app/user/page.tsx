@@ -529,7 +529,7 @@ export default function UserPage() {
                   : undefined
             }
           >
-            Adicionar Tarefa
+            Adicionar Ação
           </Button>
 
           <Button
