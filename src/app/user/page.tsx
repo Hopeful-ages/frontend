@@ -23,7 +23,7 @@ import { CreateUserTask } from './_components/CreateUserTask';
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
 export default function UserPage() {
-  const { success, error: toastError, warning, info } = useToast();
+  const { error: toastError, info, warning } = useToast();
   const { userInfo, hasAccess } = useProtectedPage({
     requiredRole: 'ROLE_USER',
   });
@@ -266,18 +266,10 @@ export default function UserPage() {
           info('Nenhuma nova tarefa', 'Cenário mantido sem adições.');
         } else {
           await api.updateScenario(currentScenarioId, baseScenarioData);
-          success(
-            'Cenário atualizado',
-            `${newTasks.length} nova(s) tarefa(s).`,
-          );
         }
       } else {
         // CREATE
         await api.createScenario({ ...baseScenarioData, tasks: [...newTasks] });
-        success(
-          'Cenário criado',
-          `${newTasks.length} tarefa(s) adicionada(s) para ${cobrade.subType || cobrade.type} em ${userDetails.city.name}`,
-        );
       }
 
       // Limpar apenas as tasks locais, manter COBRADE selecionado para ver tasks existentes

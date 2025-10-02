@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-export type ToastType = 'error' | 'info' | 'default';
+export type ToastType = 'error' | 'warning' | 'info' | 'default';
 
 export interface ToastProps {
   id: string;
@@ -187,6 +187,15 @@ function error(message: string, description?: string, duration?: number) {
   });
 }
 
+function warning(message: string, description?: string, duration?: number) {
+  return toast({
+    type: 'warning',
+    title: message,
+    description,
+    duration,
+  });
+}
+
 function info(message: string, description?: string, duration?: number) {
   return toast({
     type: 'info',
@@ -213,6 +222,7 @@ function useToast() {
     ...state,
     toast,
     error,
+    warning,
     info,
     dismiss: (toastId?: string) =>
       dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),

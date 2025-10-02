@@ -25,6 +25,8 @@ export default function LoginPage() {
 
   const { showLoading, hideLoading } = useLoading();
 
+  const { warning } = useToast();
+
   const loadingShown = useRef(false);
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export default function LoginPage() {
     isCheckingAuth,
     isAuthenticated,
     showLoading,
+    warning,
     hideLoading,
     router,
   ]);
@@ -59,7 +62,6 @@ export default function LoginPage() {
 
       if (result.redirectTo) {
         router.push(result.redirectTo);
-
       } else {
         router.push('/');
       }
