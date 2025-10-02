@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'default';
+export type ToastType = 'error' | 'info' | 'default';
 
 export interface ToastProps {
   id: string;
@@ -178,27 +178,9 @@ function toast({ duration = TOAST_REMOVE_DELAY, ...props }: Toast) {
   };
 }
 
-function success(message: string, description?: string, duration?: number) {
-  return toast({
-    type: 'success',
-    title: message,
-    description,
-    duration,
-  });
-}
-
 function error(message: string, description?: string, duration?: number) {
   return toast({
     type: 'error',
-    title: message,
-    description,
-    duration,
-  });
-}
-
-function warning(message: string, description?: string, duration?: number) {
-  return toast({
-    type: 'warning',
     title: message,
     description,
     duration,
@@ -230,9 +212,7 @@ function useToast() {
   return {
     ...state,
     toast,
-    success,
     error,
-    warning,
     info,
     dismiss: (toastId?: string) =>
       dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),

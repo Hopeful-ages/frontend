@@ -31,20 +31,19 @@ export default function Header() {
   const router = useRouter();
   const { isCheckingAuth, isAuthenticated, role, logout } = useAuthRedirect();
   const { showLoading, hideLoading } = useLoading();
-  const { success, error, warning } = useToast();
+  const { error } = useToast();
 
   const successShown = useRef(false);
 
   useEffect(() => {
     if (isCheckingAuth) {
       showLoading('Verificando autenticação...');
-      warning('Atenção!!', 'Verificando autenticação...');
     } else {
       setTimeout(() => {
         hideLoading();
       }, 1000);
     }
-  }, [isCheckingAuth, showLoading, hideLoading, warning]);
+  }, [isCheckingAuth, showLoading, hideLoading]);
 
   useEffect(() => {
     if (!isCheckingAuth && (!isAuthenticated || !role)) {
@@ -54,7 +53,6 @@ export default function Header() {
     }
 
     if (!isCheckingAuth && isAuthenticated && role && !successShown.current) {
-      success('Autenticação verificada com sucesso!');
       successShown.current = true;
     }
   }, [
@@ -63,8 +61,7 @@ export default function Header() {
     role,
     router,
     showLoading,
-    error,
-    success,
+    error
   ]);
 
   if (isCheckingAuth) {

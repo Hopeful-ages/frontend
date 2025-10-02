@@ -24,7 +24,6 @@ export default function LoginPage() {
   const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
 
   const { showLoading, hideLoading } = useLoading();
-  const { success, warning } = useToast();
 
   const loadingShown = useRef(false);
 
@@ -46,7 +45,6 @@ export default function LoginPage() {
     isAuthenticated,
     showLoading,
     hideLoading,
-    warning,
     router,
   ]);
 
@@ -61,10 +59,9 @@ export default function LoginPage() {
 
       if (result.redirectTo) {
         router.push(result.redirectTo);
-        success('Autenticado com sucesso!');
+
       } else {
         router.push('/');
-        success('Autenticado com sucesso!');
       }
     } catch {
       setError('Usuário ou senha inválidos. Tente novamente.');
