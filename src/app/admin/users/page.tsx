@@ -17,7 +17,6 @@ import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { UsersTable } from './_components/UsersTable';
-import { debug } from 'console';
 
 type Field =
   | 'name'
@@ -160,7 +159,7 @@ export default function AdminUsersPage() {
     confirm: '',
     serviceId: '',
     cityId: '',
-    role: '',
+    roleId: '',
   });
   const [errors, setErrors] = useState<Errors>({});
 
@@ -341,7 +340,7 @@ export default function AdminUsersPage() {
       confirm: '',
       serviceId: '',
       cityId: '',
-      role: '',
+      roleId: '',
     });
     setErrors({});
   };
@@ -360,7 +359,7 @@ export default function AdminUsersPage() {
         confirm: '',
         serviceId: u.service?.id ?? '',
         cityId: u.city?.id ?? '',
-        role: u.role?.id ?? '',
+        roleId: u.role?.id ?? '',
       });
       setErrors({});
       setIsCreateOpen(true);
@@ -374,7 +373,7 @@ export default function AdminUsersPage() {
     if (u.role?.name === 'ADMIN') {
       warning('Usuários administradores não podem ser desativados');
       return;
-    } else {
+    } else { 
       setConfirmTarget(u);
       setConfirmOpen(true);
     }
