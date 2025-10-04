@@ -8,7 +8,7 @@ export const Footer: React.FC = () => {
         TECNOPUC|Prédio 96A| Sala 215|Av. Ipiranga, 6681 - Partenon, Porto
         Alegre - RS, 90619-900
       </p>
-      <p>&copy; C Copyright 2025 Hopeful.</p>
+      <p>&copy; Copyright 2025 Hopeful.</p>
     </footer>
   );
 };
