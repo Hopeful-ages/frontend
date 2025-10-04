@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
 import { useLoading } from '@/providers/LoadingProvider';
 import { Lock, Send, User } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -137,6 +138,9 @@ export default function LoginPage() {
             </Button>
           </div>
         </form>
+      </div>
+      <div className="absolute bottom-0 w-full">
+        <Footer />
       </div>
     </main>
   );
