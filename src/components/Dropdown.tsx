@@ -13,6 +13,7 @@ type dropdownProps = {
   label: string;
   items: string[];
   onSelect: (item: string) => void;
+  onInputChange?: (value: string) => void;
   size?: 'small' | 'medium' | 'large' | 'long';
   icon?: React.ReactNode;
   textColor?: 'black' | 'gray' | 'foreground';
@@ -138,6 +139,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
   label,
   items,
   onSelect,
+  onInputChange,
   size = 'medium',
   icon,
   textColor = 'black',
@@ -230,6 +232,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
             onChange={(e) => {
               setFilterText(e.target.value);
               setOpen(true);
+              if (onInputChange) onInputChange(e.target.value);
             }}
             className={cn(
               'min-w-0 flex-1 truncate bg-transparent outline-none',
