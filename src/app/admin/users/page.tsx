@@ -17,6 +17,7 @@ import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { UsersTable } from './_components/UsersTable';
+import { Footer } from '@/components/Footer';
 
 type Field =
   | 'name'
@@ -124,13 +125,13 @@ export default function AdminUsersPage() {
     null,
   );
 
-  const [pendingServiceFilter, setPendingServiceFilter] = useState<string | null>(
-    null,
-  );
+  const [pendingServiceFilter, setPendingServiceFilter] = useState<
+    string | null
+  >(null);
 
-  const [appliedServiceFilter, setAppliedServiceFilter] = useState<string | null>(
-    null,
-  );
+  const [appliedServiceFilter, setAppliedServiceFilter] = useState<
+    string | null
+  >(null);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -292,7 +293,8 @@ export default function AdminUsersPage() {
   const filtered = useMemo(() => {
     return users.filter((u) => {
       const byService = appliedServiceFilter
-        ? (u.service?.name ?? '').toLowerCase() === appliedServiceFilter.toLowerCase()
+        ? (u.service?.name ?? '').toLowerCase() ===
+          appliedServiceFilter.toLowerCase()
         : true;
       const byCity = appliedCityFilter
         ? (u.city?.name ?? '').toLowerCase() === appliedCityFilter.toLowerCase()
@@ -469,60 +471,65 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <main className="mx-auto mt-20 w-full px-6 py-6">
-      <div className="mb-5 ml-5 flex items-center justify-between">
-        <h1 className="mb-5 text-3xl font-bold">Usuários</h1>
-      </div>
-
-      <FiltersBar
-        cityOptions={cityNames}
-        cityValue={pendingCityFilter}
-        serviceOptions={serviceNames}
-        serviceValue={pendingServiceFilter}
-        onSelectCity={setPendingCityFilter}
-        onSelectService={setPendingServiceFilter}
-        onSearch={handleSearch}
-        onClearFilters={handleClearFilters}
-        onCreate={openCreate}
-      />
-
-      {loading ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 text-gray-700">
-          Carregando...
+    <>
+      <main className="mx-auto mt-20 min-h-screen w-full px-6 py-6">
+        <div className="mb-5 ml-5 flex items-center justify-between">
+          <h1 className="mb-5 text-3xl font-bold">Usuários</h1>
         </div>
-      ) : (
-        <UsersTable
-          rows={filtered}
-          showPagination={showPagination}
-          onEdit={onEdit}
-          onToggleAsk={askToggleStatus}
+
+        <FiltersBar
+          cityOptions={cityNames}
+          cityValue={pendingCityFilter}
+          serviceOptions={serviceNames}
+          serviceValue={pendingServiceFilter}
+          onSelectCity={setPendingCityFilter}
+          onSelectService={setPendingServiceFilter}
+          onSearch={handleSearch}
+          onClearFilters={handleClearFilters}
+          onCreate={openCreate}
         />
-      )}
 
-      <UserFormModal
-        isOpen={isCreateOpen}
-        isEdit={isEdit}
-        form={form}
-        errors={errors}
-        canClickSave={canClickSave}
-        serviceNames={serviceNames}
-        cityNames={cityNames}
-        valueServiceName={serviceNameById(form.serviceId)}
-        valueCityName={cityNameById(form.cityId)}
-        onClose={closeCreate}
-        onSave={onSave}
-        onUpdate={onUpdate}
-        onSelectServiceByName={setServiceByName}
-        onSelectCityByName={setCityByName}
-      />
+        {loading ? (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 text-gray-700">
+            Carregando...
+          </div>
+        ) : (
+          <UsersTable
+            rows={filtered}
+            showPagination={showPagination}
+            onEdit={onEdit}
+            onToggleAsk={askToggleStatus}
+          />
+        )}
 
-      <ConfirmToggleModal
-        open={confirmOpen}
-        loading={confirmLoading}
-        isActive={confirmTarget?.accountStatus}
-        onConfirm={confirmToggle}
-        onClose={closeConfirm}
-      />
-    </main>
+        <UserFormModal
+          isOpen={isCreateOpen}
+          isEdit={isEdit}
+          form={form}
+          errors={errors}
+          canClickSave={canClickSave}
+          serviceNames={serviceNames}
+          cityNames={cityNames}
+          valueServiceName={serviceNameById(form.serviceId)}
+          valueCityName={cityNameById(form.cityId)}
+          onClose={closeCreate}
+          onSave={onSave}
+          onUpdate={onUpdate}
+          onSelectServiceByName={setServiceByName}
+          onSelectCityByName={setCityByName}
+        />
+
+        <ConfirmToggleModal
+          open={confirmOpen}
+          loading={confirmLoading}
+          isActive={confirmTarget?.accountStatus}
+          onConfirm={confirmToggle}
+          onClose={closeConfirm}
+        />
+      </main>
+      <div className="m-0 w-full">
+        <Footer />
+      </div>
+    </>
   );
 }

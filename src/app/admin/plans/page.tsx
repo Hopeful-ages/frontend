@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { ConfirmDownloadModal } from './_components/ConfirmDownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
+import { Footer } from '@/components/Footer';
 
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
@@ -163,55 +164,58 @@ export default function AdminPlansPage() {
   }
 
   return (
-    <main className="mx-auto mt-20 w-full px-6 py-6">
-      <div className="mb-5 ml-5 flex items-center justify-between">
-        <h1 className="mb-5 text-3xl font-bold">Planos de Contingência</h1>
-      </div>
-
-      <FiltersBar
-        cobradeOptions={cobradeOptions}
-        cityOptions={cityNames}
-        cityValue={pendingCityFilter}
-        onSelectCity={setPendingCityFilter}
-        onSelectCobrade={setPendingCobradeFilter}
-        cobradeValue={pendingCobradeFilter}
-        onSearch={handleSearch}
-        onClearFilters={handleClearFilters}
-      />
-
-      {loading ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-700">
-          Carregando planos...
+    <>
+      <main className="mx-auto mt-20 w-full px-6 py-6">
+        <div className="mb-5 ml-5 flex items-center justify-between">
+          <h1 className="mb-5 text-3xl font-bold">Planos de Contingência</h1>
         </div>
-      ) : (
-        <PlansTable
-          rows={filteredScenarios}
-          showPagination={showPagination}
-          selectedPlanIds={selectedScenarioIds}
-          onSelectionChange={setSelectedScenarioIds}
-          onEdit={onEdit}
-          onDownload={onDownload}
+
+        <FiltersBar
+          cobradeOptions={cobradeOptions}
+          cityOptions={cityNames}
+          cityValue={pendingCityFilter}
+          onSelectCity={setPendingCityFilter}
+          onSelectCobrade={setPendingCobradeFilter}
+          cobradeValue={pendingCobradeFilter}
+          onSearch={handleSearch}
+          onClearFilters={handleClearFilters}
         />
-      )}
 
-      {selectedScenarioIds.length > 0 && (
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleBulkDownload}
-            className="flex items-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-105"
-          >
-            Download ({selectedScenarioIds.length})
-          </button>
-        </div>
-      )}
+        {loading ? (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-700">
+            Carregando planos...
+          </div>
+        ) : (
+          <PlansTable
+            rows={filteredScenarios}
+            showPagination={showPagination}
+            selectedPlanIds={selectedScenarioIds}
+            onSelectionChange={setSelectedScenarioIds}
+            onEdit={onEdit}
+            onDownload={onDownload}
+          />
+        )}
 
-      <ConfirmDownloadModal
-        open={isDownloadModalOpen}
-        loading={downloadLoading}
-        scenario={scenarioForDownload}
-        onConfirm={handleConfirmDownload}
-        onClose={() => setDownloadModalOpen(false)}
-      />
-    </main>
+        {selectedScenarioIds.length > 0 && (
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleBulkDownload}
+              className="flex items-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-105"
+            >
+              Download ({selectedScenarioIds.length})
+            </button>
+          </div>
+        )}
+
+        <ConfirmDownloadModal
+          open={isDownloadModalOpen}
+          loading={downloadLoading}
+          scenario={scenarioForDownload}
+          onConfirm={handleConfirmDownload}
+          onClose={() => setDownloadModalOpen(false)}
+        />
+      </main>
+      <Footer />
+    </>
   );
 }

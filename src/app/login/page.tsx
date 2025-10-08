@@ -139,9 +139,7 @@ export default function LoginPage() {
           </div>
         </form>
       </div>
-      <div className="absolute bottom-0 mb-0 h-auto w-full">
-        <Footer />
-      </div>
+      <div className="absolute bottom-0 mb-0 h-auto w-full"></div>
     </main>
   );
 }

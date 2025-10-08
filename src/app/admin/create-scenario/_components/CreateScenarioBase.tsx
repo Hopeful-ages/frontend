@@ -20,6 +20,7 @@ import { CreateTask } from './CreateTask';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/useToast';
 import { Toaster } from '@/components/Toaster';
+import { Footer } from '@/components/Footer';
 
 type Props = {
   scenarioId?: string;
@@ -521,6 +522,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       />
 
       <Toaster />
+      <Footer />
     </div>
   );
 }
