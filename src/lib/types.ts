@@ -7,6 +7,7 @@ export type UserResponseDTO = {
   service: ServiceSummaryDTO | null;
   city: CitySummaryDTO | null;
   accountStatus: boolean;
+  role: RoleSummaryDTO | null;
 };
 
 export type UserRequestDTO = {
@@ -17,13 +18,16 @@ export type UserRequestDTO = {
   password: string;
   serviceId?: string;
   cityId?: string;
+  roleId?: string;
 };
 
 export type ServiceSummaryDTO = { id: string; name: string };
 export type CitySummaryDTO = { id: string; name: string; state: string };
+export type RoleSummaryDTO = { id: string; name: string };
 
 export type ServiceResponseDTO = ServiceSummaryDTO;
 export type CityResponseDTO = CitySummaryDTO;
+export type RoleResponseDTO = RoleSummaryDTO;
 
 export type TaskSummaryDTO = {
   id: string;

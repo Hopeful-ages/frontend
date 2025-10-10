@@ -64,6 +64,7 @@ export function FiltersBar({
               items={cityOptions}
               value={cityValue}
               onSelect={(value) => onSelectCity(value)}
+              onInputChange={(value) => onSelectCity(value)}
               fullWidth
               textSize="sm"
               border="none"
