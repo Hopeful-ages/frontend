@@ -24,13 +24,11 @@ export default function LoginPage() {
   const { isCheckingAuth, isAuthenticated } = useAuthRedirect();
 
   const { showLoading, hideLoading } = useLoading();
-  const { success, warning } = useToast();
 
   const loadingShown = useRef(false);
 
   useEffect(() => {
     if (isCheckingAuth) {
-      showLoading('Verificando autenticação...');
       if (!loadingShown.current) {
         loadingShown.current = true;
       }
@@ -41,14 +39,7 @@ export default function LoginPage() {
         router.push('/');
       }
     }
-  }, [
-    isCheckingAuth,
-    isAuthenticated,
-    showLoading,
-    hideLoading,
-    warning,
-    router,
-  ]);
+  }, [isCheckingAuth, isAuthenticated, showLoading, hideLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,10 +52,8 @@ export default function LoginPage() {
 
       if (result.redirectTo) {
         router.push(result.redirectTo);
-        success('Autenticado com sucesso!');
       } else {
         router.push('/');
-        success('Autenticado com sucesso!');
       }
     } catch {
       setError('Usuário ou senha inválidos. Tente novamente.');
