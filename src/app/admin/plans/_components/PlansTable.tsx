@@ -79,7 +79,9 @@ export function PlansTable({
                     ? `${row.city.name} - ${row.city.state}` 
                     : '—'}
                 </Table.Cell>
-                <Table.Cell>{row.cobrade.subgroup ?? '—'}</Table.Cell>
+                <Table.Cell>
+                  {`${row.cobrade.code} - ${row.cobrade.subType || row.cobrade.type || row.cobrade.subgroup}` } 
+                </Table.Cell>
                 <Table.Cell>
                   {lastUpdated ? formatDate(lastUpdated) : '—'}
                 </Table.Cell>
