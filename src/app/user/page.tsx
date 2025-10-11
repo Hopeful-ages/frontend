@@ -605,9 +605,6 @@ export default function UserPage() {
             : null
         }
       />
-      <div>
-        <Footer />
-      </div>
     </div>
   );
 }

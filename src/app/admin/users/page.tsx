@@ -471,65 +471,60 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <>
-      <main className="mx-auto mt-20 min-h-screen w-full px-6 py-6">
-        <div className="mb-5 ml-5 flex items-center justify-between">
-          <h1 className="mb-5 text-3xl font-bold">Usuários</h1>
-        </div>
-
-        <FiltersBar
-          cityOptions={cityNames}
-          cityValue={pendingCityFilter}
-          serviceOptions={serviceNames}
-          serviceValue={pendingServiceFilter}
-          onSelectCity={setPendingCityFilter}
-          onSelectService={setPendingServiceFilter}
-          onSearch={handleSearch}
-          onClearFilters={handleClearFilters}
-          onCreate={openCreate}
-        />
-
-        {loading ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-6 text-gray-700">
-            Carregando...
-          </div>
-        ) : (
-          <UsersTable
-            rows={filtered}
-            showPagination={showPagination}
-            onEdit={onEdit}
-            onToggleAsk={askToggleStatus}
-          />
-        )}
-
-        <UserFormModal
-          isOpen={isCreateOpen}
-          isEdit={isEdit}
-          form={form}
-          errors={errors}
-          canClickSave={canClickSave}
-          serviceNames={serviceNames}
-          cityNames={cityNames}
-          valueServiceName={serviceNameById(form.serviceId)}
-          valueCityName={cityNameById(form.cityId)}
-          onClose={closeCreate}
-          onSave={onSave}
-          onUpdate={onUpdate}
-          onSelectServiceByName={setServiceByName}
-          onSelectCityByName={setCityByName}
-        />
-
-        <ConfirmToggleModal
-          open={confirmOpen}
-          loading={confirmLoading}
-          isActive={confirmTarget?.accountStatus}
-          onConfirm={confirmToggle}
-          onClose={closeConfirm}
-        />
-      </main>
-      <div className="m-0 w-full">
-        <Footer />
+    <main className="mx-auto mt-20 min-h-screen w-full px-6 py-6">
+      <div className="mb-5 ml-5 flex items-center justify-between">
+        <h1 className="mb-5 text-3xl font-bold">Usuários</h1>
       </div>
-    </>
+
+      <FiltersBar
+        cityOptions={cityNames}
+        cityValue={pendingCityFilter}
+        serviceOptions={serviceNames}
+        serviceValue={pendingServiceFilter}
+        onSelectCity={setPendingCityFilter}
+        onSelectService={setPendingServiceFilter}
+        onSearch={handleSearch}
+        onClearFilters={handleClearFilters}
+        onCreate={openCreate}
+      />
+
+      {loading ? (
+        <div className="rounded-lg border border-gray-200 bg-white p-6 text-gray-700">
+          Carregando...
+        </div>
+      ) : (
+        <UsersTable
+          rows={filtered}
+          showPagination={showPagination}
+          onEdit={onEdit}
+          onToggleAsk={askToggleStatus}
+        />
+      )}
+
+      <UserFormModal
+        isOpen={isCreateOpen}
+        isEdit={isEdit}
+        form={form}
+        errors={errors}
+        canClickSave={canClickSave}
+        serviceNames={serviceNames}
+        cityNames={cityNames}
+        valueServiceName={serviceNameById(form.serviceId)}
+        valueCityName={cityNameById(form.cityId)}
+        onClose={closeCreate}
+        onSave={onSave}
+        onUpdate={onUpdate}
+        onSelectServiceByName={setServiceByName}
+        onSelectCityByName={setCityByName}
+      />
+
+      <ConfirmToggleModal
+        open={confirmOpen}
+        loading={confirmLoading}
+        isActive={confirmTarget?.accountStatus}
+        onConfirm={confirmToggle}
+        onClose={closeConfirm}
+      />
+    </main>
   );
 }

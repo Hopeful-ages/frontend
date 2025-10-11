@@ -522,7 +522,6 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       />
 
       <Toaster />
-      <Footer />
     </div>
   );
 }
