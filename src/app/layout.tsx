@@ -4,6 +4,7 @@ import { LoadingProvider } from '@/providers/LoadingProvider';
 import type { Metadata } from 'next';
 import { Barlow, Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import FooterWrapper from '@/components/FooterWrapper';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -41,6 +42,7 @@ export default function RootLayout({
           <HeaderWrapper />
           <Toaster />
           {children}
+          <FooterWrapper />
         </LoadingProvider>
       </body>
     </html>
