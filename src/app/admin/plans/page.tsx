@@ -215,7 +215,9 @@ export default function AdminPlansPage() {
           onClose={() => setDownloadModalOpen(false)}
         />
       </main>
-      <Footer />
+      <div className="m-0 w-full">
+        <Footer />
+      </div>
     </>
   );
 }

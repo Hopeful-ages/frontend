@@ -19,6 +19,7 @@ import {
 import { Plus, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CreateUserTask } from './_components/CreateUserTask';
+import { Footer } from '@/components/Footer';
 
 const PLAN_STEPS = ['Antes', 'Durante', 'Depois'];
 
@@ -604,6 +605,9 @@ export default function UserPage() {
             : null
         }
       />
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }
