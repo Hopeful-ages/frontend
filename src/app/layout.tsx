@@ -4,6 +4,7 @@ import { LoadingProvider } from '@/providers/LoadingProvider';
 import type { Metadata } from 'next';
 import { Barlow, Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import FooterWrapper from '@/components/FooterWrapper';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -38,9 +39,12 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <LoadingProvider>
-          <HeaderWrapper />
-          <Toaster />
-          {children}
+          <div className="flex min-h-screen flex-col">
+            <HeaderWrapper />
+            <Toaster />
+            <main className="flex-1">{children}</main>
+            <FooterWrapper />
+          </div>
         </LoadingProvider>
       </body>
     </html>

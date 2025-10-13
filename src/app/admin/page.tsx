@@ -1,5 +1,6 @@
 'use client';
 
+import { Footer } from '@/components/Footer';
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 
 export default function AdminPage() {

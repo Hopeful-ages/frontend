@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { ConfirmDownloadModal } from './_components/ConfirmDownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
+// Footer handled globally via FooterWrapper in layout
 
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
@@ -163,7 +164,7 @@ export default function AdminPlansPage() {
   }
 
   return (
-    <main className="mx-auto mt-20 w-full px-6 py-6">
+    <main className="mx-auto mt-20 w-full flex-1 px-6 py-6">
       <div className="mb-5 ml-5 flex items-center justify-between">
         <h1 className="mb-5 text-3xl font-bold">Planos de Contingência</h1>
       </div>

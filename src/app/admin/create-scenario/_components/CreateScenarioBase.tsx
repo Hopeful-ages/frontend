@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import Header from '@/components/Header';
+// Header handled by layout HeaderWrapper
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Dropdown } from '@/components/Dropdown';
@@ -281,10 +281,8 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       : protocols.filter((p) => !p.phase);
 
   return (
-    <div className="b-l b-r min-h-screen">
-      <Header />
-
-      <main className="mx-auto max-w-4xl border p-4 pt-24">
+    <div className="b-l b-r">
+      <main className="mx-auto mb-10 max-w-4xl flex-1 border p-4 pt-24">
         <h1 className="text-gray-850 my-1 mb-6 text-center text-3xl">
           {scenarioId ? 'Editar Cenário' : 'Cadastrar Cenário'}
         </h1>
