@@ -17,7 +17,7 @@ import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { UsersTable } from './_components/UsersTable';
-import { Footer } from '@/components/Footer';
+// Footer handled globally via FooterWrapper in layout
 
 type Field =
   | 'name'
@@ -471,7 +471,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <main className="mx-auto mt-20 min-h-screen w-full px-6 py-6">
+    <main className="mx-auto mt-20 w-full flex-1 px-6 py-6">
       <div className="mb-5 ml-5 flex items-center justify-between">
         <h1 className="mb-5 text-3xl font-bold">Usuários</h1>
       </div>

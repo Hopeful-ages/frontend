@@ -39,10 +39,12 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <LoadingProvider>
-          <HeaderWrapper />
-          <Toaster />
-          {children}
-          <FooterWrapper />
+          <div className="flex min-h-screen flex-col">
+            <HeaderWrapper />
+            <Toaster />
+            <main className="flex-1">{children}</main>
+            <FooterWrapper />
+          </div>
         </LoadingProvider>
       </body>
     </html>

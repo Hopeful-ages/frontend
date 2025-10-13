@@ -430,9 +430,8 @@ export default function UserPage() {
   }
 
   return (
-    <div className="b-l b-r min-h-screen">
-      <Header />
-      <main className="mx-auto max-w-4xl border p-4 pt-24">
+    <div className="b-l b-r">
+      <main className="mx-auto max-w-4xl flex-1 border p-4 pt-24">
         <h1 className="text-gray-850 my-1 mb-6 text-center text-3xl">
           Criar Cenário de Contingência
         </h1>

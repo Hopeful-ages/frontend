@@ -5,12 +5,13 @@ import { Footer } from './Footer';
 
 export default function FooterWrapper() {
   const pathname = usePathname();
-  if (pathname === '/login') return null;
-  if (pathname === '/' || pathname === '/pesquisa')
-    return (
-      <div className="absolute bottom-0 w-full">
-        <Footer />
-      </div>
-    );
-  return <Footer />;
+  const hiddenRoutes = ['/login'];
+
+  if (hiddenRoutes.includes(pathname)) return null;
+
+  return (
+    <footer className="z-50 w-full border-t border-gray-200 bg-white shadow-sm">
+      <Footer />
+    </footer>
+  );
 }

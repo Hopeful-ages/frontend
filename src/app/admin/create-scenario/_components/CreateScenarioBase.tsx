@@ -282,7 +282,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
   return (
     <div className="b-l b-r">
-      <main className="mx-auto max-w-4xl border p-4 pt-24">
+      <main className="mx-auto mb-10 max-w-4xl flex-1 border p-4 pt-24">
         <h1 className="text-gray-850 my-1 mb-6 text-center text-3xl">
           {scenarioId ? 'Editar Cenário' : 'Cadastrar Cenário'}
         </h1>
