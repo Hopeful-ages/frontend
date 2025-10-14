@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
 import { useLoading } from '@/providers/LoadingProvider';
 import { Lock, Send, User } from 'lucide-react';
+import PlanCard from '@/components/PlanCard';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,6 +27,12 @@ export default function LoginPage() {
   const { showLoading, hideLoading } = useLoading();
 
   const loadingShown = useRef(false);
+
+  const mockPlanData = {
+    city: 'Porto Alegre - RS',
+    category: 'Bombeiros - Alagamento',
+    lastUpdate: '11/08/2025',
+  };
 
   useEffect(() => {
     if (isCheckingAuth) {
@@ -126,6 +133,11 @@ export default function LoginPage() {
             </Button>
           </div>
         </form>
+        <PlanCard
+          city={mockPlanData.city}
+          category={mockPlanData.category}
+          lastUpdate={mockPlanData.lastUpdate}
+        />
       </div>
     </main>
   );
