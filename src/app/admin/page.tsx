@@ -5,7 +5,7 @@ import { useProtectedPage } from '@/hooks/useProtectedPage';
 export default function AdminPage() {
   const { isLoading, userInfo, hasAccess, logout } = useProtectedPage({
     requiredRole: 'ROLE_ADMIN',
-    redirectTo: '/user',
+    // redirectTo: '/user',
   });
 
   if (isLoading) {
