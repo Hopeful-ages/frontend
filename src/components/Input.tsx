@@ -7,7 +7,7 @@ function cn(...classes: Array<string | undefined | false | null>) {
 }
 
 const inputClasses = cva(
-  'w-full flex rounded-2xl border bg-white text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 text-black',
+  'w-full flex rounded-lg border bg-white text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 text-black',
   {
     variants: {
       variant: {
