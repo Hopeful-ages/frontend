@@ -196,16 +196,39 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       return;
     }
 
-    const currentPhaseProtocols = protocols.filter(
-      (p) =>
-        (mapStepToPhase(p.phase) ?? phaseMap[currentStep]) ===
-        phaseMap[currentStep],
+    // INÍCIO DA NOVA VALIDAÇÃO DE TAREFAS POR FASE
+    // 1. Agrupar todas as tarefas por fase
+    const tasksByPhase = protocols.reduce(
+      (acc, protocol) => {
+        // Usa a fase definida na tarefa, ou 'ANTES' como fallback se for a fase 0 (para tarefas antigas sem fase definida)
+        const phase = mapStepToPhase(protocol.phase) || 'ANTES';
+        acc[phase].push(protocol);
+        return acc;
+      },
+      { ANTES: [], DURANTE: [], DEPOIS: [] } as Record<
+        'ANTES' | 'DURANTE' | 'DEPOIS',
+        Protocol[]
+      >,
     );
 
-    if (currentPhaseProtocols.length === 0) {
-      warning('Adicione pelo menos uma tarefa antes de salvar o cenário.');
+    // 2. Verificar se todas as fases têm pelo menos uma tarefa
+    const isAntesEmpty = tasksByPhase.ANTES.length === 0;
+    const isDuranteEmpty = tasksByPhase.DURANTE.length === 0;
+    const isDepoisEmpty = tasksByPhase.DEPOIS.length === 0;
+
+    if (isAntesEmpty || isDuranteEmpty || isDepoisEmpty) {
+      // 3. Exibir mensagem de erro indicando qual aba está vazia
+      const missingPhases = [];
+      if (isAntesEmpty) missingPhases.push('Antes');
+      if (isDuranteEmpty) missingPhases.push('Durante');
+      if (isDepoisEmpty) missingPhases.push('Depois');
+
+      warning(
+        `É obrigatório ter pelo menos uma tarefa nas fases: ${missingPhases.join(', ')}.`,
+      );
       return;
     }
+    // FIM DA NOVA VALIDAÇÃO DE TAREFAS POR FASE
 
     try {
       const tasks = protocols.map((protocol) => {
@@ -283,23 +306,24 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
   return (
     <div className="b-l b-r min-h-screen">
-            <Header />     {' '}
+                  <Header />           {' '}
       <main className="mx-auto max-w-4xl border p-4 pt-24">
-               {' '}
+                               {' '}
         <h1 className="text-gray-850 my-1 mb-10 text-center text-3xl">
-                    {scenarioId ? 'Editar Cenário' : 'Cadastrar Cenário'}     
-           {' '}
+                             {' '}
+          {scenarioId ? 'Editar Cenário' : 'Cadastrar Cenário'}                 {' '}
+                 {' '}
         </h1>
-               {' '}
+                               {' '}
         {loadingScenario ? (
           <div className="text-center text-gray-600">Carregando cenário…</div>
         ) : (
           <>
-                       {' '}
+                                               {' '}
             <div className="mb-6 ml-4 flex w-full gap-8">
-                           {' '}
+                                                       {' '}
               <div className="flex-1">
-                               {' '}
+                                                               {' '}
                 <Dropdown
                   label="Cidade"
                   items={cities.map((c) => `${c.name} - ${c.state}`)}
@@ -313,11 +337,11 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                   }}
                   useAutoComplete
                 />
-                             {' '}
+                                                           {' '}
               </div>
-                           {' '}
+                                                       {' '}
               <div className="flex-1">
-                               {' '}
+                                                               {' '}
                 <Dropdown
                   label="Cobrade"
                   items={cobrades.map(
@@ -340,11 +364,11 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                   }}
                   useAutoComplete
                 />
-                             {' '}
+                                                           {' '}
               </div>
-                         {' '}
+                                                   {' '}
             </div>
-                       {' '}
+                                               {' '}
             <PlanStepsTabs
               steps={PLAN_STEPS as unknown as string[]}
               currentStep={currentStep}
@@ -353,11 +377,11 @@ export function CreateScenarioBase({ scenarioId }: Props) {
               }
               size="md"
             />
-                       {' '}
+                                               {' '}
             <div className="mt-6 mr-4 mb-4 ml-4 flex items-start gap-4">
-                           {' '}
+                                                       {' '}
               <label className="w-24 pt-2 text-lg font-medium">Parâmetro</label>
-                           {' '}
+                                                       {' '}
               <Input
                 name="parameter"
                 placeholder={`Parâmetro - ${currentStep}`}
@@ -373,13 +397,13 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                 }
                 className="flex-1"
               />
-                         {' '}
+                                                   {' '}
             </div>
-                       {' '}
+                                               {' '}
             <div className="mr-4 mb-4 ml-4 flex items-start gap-4">
-                           {' '}
-              <label className="w-24 pt-2 text-lg font-medium">Ação</label>
-                           {' '}
+                                                       {' '}
+              <label className="w-24 pt-2 text-lg font-medium">Ação</label>     
+                                                 {' '}
               <Input
                 name="action"
                 placeholder={`Ação - ${currentStep}`}
@@ -395,14 +419,15 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                   }))
                 }
               />
-                         {' '}
+                                                   {' '}
             </div>
-            {/* INSERÇÃO DO TEXTO DE OBRIGATORIEDADE */}           {' '}
-            <p className="mb-2 ml-4 text-sm font-semibold text-gray-500">
-                            Obrigatório para adicionar tarefas ao cenário.      
-                   {' '}
-            </p>
+                        {/* INSERÇÃO DO TEXTO DE OBRIGATORIEDADE */}           {' '}
                        {' '}
+            <p className="mb-2 ml-4 text-sm font-semibold text-gray-500">
+                                          Obrigatório para adicionar tarefas ao
+              cenário.                                      {' '}
+            </p>
+                                               {' '}
             <ProtocolList
               protocols={displayProtocols}
               onEdit={setEditTask}
@@ -410,9 +435,9 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                 setProtocols((prev) => prev.filter((x) => x.id !== p.id))
               }
             />
-                       {' '}
+                                               {' '}
             <div className="mt-8 mr-4 flex items-center justify-end gap-4">
-                           {' '}
+                                                       {' '}
               <Button
                 variant="outline"
                 size="md"
@@ -425,25 +450,27 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                     : undefined
                 }
               >
-                                Adicionar Tarefa              {' '}
+                                                Adicionar Tarefa                
+                           {' '}
               </Button>
-                           {' '}
+                                                       {' '}
               <Button
                 variant="secondary"
                 size="md"
                 onClick={handleSave}
                 leftIcon={<Save size={16} />}
               >
-                                Salvar              {' '}
+                                                Salvar                          
+                 {' '}
               </Button>
-                         {' '}
+                                                   {' '}
             </div>
-                     {' '}
+                                           {' '}
           </>
         )}
-             {' '}
+                           {' '}
       </main>
-           {' '}
+                       {' '}
       <CreateTask
         isOpen={isTaskModalOpen}
         onClose={() => {
@@ -489,7 +516,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
             : null
         }
       />
-            <Toaster />   {' '}
+                  <Toaster />       {' '}
     </div>
   );
 }
