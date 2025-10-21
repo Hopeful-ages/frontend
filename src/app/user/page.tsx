@@ -374,7 +374,6 @@ export default function UserPage() {
   if (userLoadingError || !hasUserDataAccess) {
     return (
       <div className="b-l b-r min-h-screen">
-        <Header />
         <main className="mx-auto max-w-4xl border p-4 pt-24">
           <div className="text-center">
             <h1 className="text-gray-850 my-1 mb-10 text-3xl">
@@ -430,7 +429,6 @@ export default function UserPage() {
 
   return (
     <div className="b-l b-r min-h-screen">
-      <Header />
       <main className="mx-auto max-w-4xl border p-4 pt-24">
         <h1 className="text-gray-850 my-1 mb-6 text-center text-3xl">
           Criar Cenário de Contingência
