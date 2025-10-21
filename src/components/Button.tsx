@@ -24,7 +24,7 @@ export interface ButtonProps
 }
 
 const buttonClasses = cva(
-  'inline-flex items-center justify-center gap-2 font-medium transition-colors select-none whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer',
+  'inline-flex rounded-lg items-center justify-center gap-2 font-medium transition-colors select-none whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer',
   {
     variants: {
       variant: {
