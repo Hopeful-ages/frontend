@@ -55,7 +55,7 @@ export const useAuthRedirect = () => {
   const logout = () => {
     Cookies.remove('token');
     Cookies.remove('user');
-    router.push('/login');
+    router.push('/');
   };
 
   return { isCheckingAuth, isAuthenticated, role, logout };

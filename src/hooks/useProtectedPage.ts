@@ -70,7 +70,7 @@ export const useProtectedPage = (options: UseProtectedPageOptions = {}) => {
   const logout = () => {
     Cookies.remove('token');
     Cookies.remove('user');
-    router.push('/login');
+    router.push('/');
   };
 
   return { isLoading, hasAccess, userInfo, logout };
