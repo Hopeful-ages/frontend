@@ -31,7 +31,7 @@ const rowHeights = { small: 32, medium: 40, large: 44, long: 40 } as const;
 const chevronBySize = { small: 16, medium: 18, large: 20, long: 18 } as const;
 
 const buttonClasses = cva(
-  'flex items-center gap-2 cursor-pointer text-left whitespace-nowrap select-none hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300',
+  'flex rounded-lg items-center gap-2 cursor-pointer text-left whitespace-nowrap select-none hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300',
   {
     variants: {
       size: {
@@ -51,7 +51,7 @@ const buttonClasses = cva(
         blue: 'border border-blue-500',
         black: 'border border-black',
       },
-      radius: { md: 'rounded-md', lg: 'rounded-xl', full: 'rounded-full' },
+      radius: { md: 'rounded-md', lg: 'rounded-lg', full: 'rounded-full' },
       width: { auto: '', full: '!w-full' },
       textSize: {
         xs: 'text-xs',
@@ -73,7 +73,7 @@ const buttonClasses = cva(
 );
 
 const menuClasses = cva(
-  'absolute left-0 right-0 z-20 mt-1 w-full overflow-y-auto overscroll-contain rounded-md shadow-lg',
+  'absolute left-0 right-0 z-20 mt-1 w-full overflow-y-auto overscroll-contain rounded-lg shadow-lg',
   {
     variants: {
       bgColor: {
@@ -146,7 +146,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
   textSize = 'md',
   bgColor = 'white',
   border = 'black',
-  roundedBorder = 'md',
+  roundedBorder = 'lg',
   fullWidth = false,
   maxItemsVisible = 4,
   value,

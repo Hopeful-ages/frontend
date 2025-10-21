@@ -16,7 +16,7 @@ export interface PlanStepsTabsProps extends VariantProps<typeof tabClasses> {
 }
 
 const tabClasses = cva(
-  'px-4 py-3 font-semibold transition-colors select-none text-center rounded-sm flex-1',
+  'px-4 py-3 font-semibold transition-colors select-none text-center rounded-lg flex-1',
   {
     variants: {
       active: {
@@ -27,6 +27,7 @@ const tabClasses = cva(
         sm: 'text-sm',
         md: 'text-base',
         lg: 'text-lg',
+        xl: 'text-xl',
       },
     },
     defaultVariants: {
@@ -40,12 +41,12 @@ export const PlanStepsTabs: React.FC<PlanStepsTabsProps> = ({
   steps,
   currentStep,
   onChange,
-  size = 'md',
+  size = 'xl',
   ...rest
 }) => {
   return (
     <div
-      className="flex ml-4 mr-4 overflow-hidden rounded-md border border-gray-300"
+      className="mr-4 ml-4 flex overflow-hidden rounded-lg border border-gray-300"
       role="tablist"
       aria-label="Etapas do Plano"
     >
