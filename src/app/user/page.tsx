@@ -422,7 +422,6 @@ export default function UserPage() {
           Criar Cenário de Contingência
         </h1>
 
-        {/* Informações do usuário */}
         <div className="mr-4 mb-4 ml-4 grid gap-6 md:grid-cols-2">
           <div>
             <div className="mb-2">

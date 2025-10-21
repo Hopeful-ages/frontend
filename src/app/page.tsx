@@ -131,7 +131,6 @@ export default function PlanSearchPage() {
         </h1>
       </div>
 
-      {/* Botão de Filtrar - Visível em mobile */}
       <div className="mb-5 flex md:hidden">
         <button
           onClick={() => setIsFiltersModalOpen(true)}
@@ -142,7 +141,6 @@ export default function PlanSearchPage() {
         </button>
       </div>
 
-      {/* FiltersBar - Visível apenas em desktop */}
       <div className="hidden md:block">
         <FiltersBar
           cobradeOptions={cobradeOptions}
@@ -162,7 +160,6 @@ export default function PlanSearchPage() {
         </div>
       ) : (
         <>
-          {/* Tabela - visível apenas em desktop (md e acima) */}
           <div className="hidden md:block">
             <PlansTable
               rows={filteredPlans}
@@ -199,7 +196,6 @@ export default function PlanSearchPage() {
         </>
       )}
 
-      {/* Modal de Filtros */}
       <FiltersModal
         isOpen={isFiltersModalOpen}
         onClose={() => setIsFiltersModalOpen(false)}
@@ -213,7 +209,6 @@ export default function PlanSearchPage() {
         onClearFilters={handleClearFilters}
       />
 
-      {/* Modal de Download */}
       <DownloadModal
         isOpen={isDownloadModalOpen}
         city={

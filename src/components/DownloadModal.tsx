@@ -34,12 +34,10 @@ export default function DownloadModal({
             exit={{ scale: 0.8, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Título */}
             <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl md:text-2xl">
               Confirmar download
             </h2>
 
-            {/* Ícone PDF */}
             <div className="mb-4 flex flex-col items-center justify-center sm:mb-6">
               <FileText className="mb-2 h-14 w-14 text-black sm:h-16 sm:w-16 md:h-20 md:w-20" />
               <p className="text-sm font-medium text-gray-800 sm:text-base md:text-lg">
@@ -50,7 +48,6 @@ export default function DownloadModal({
               </p>
             </div>
 
-            {/* Botões */}
             <div className="mt-3 flex flex-col justify-center gap-2 sm:mt-4 sm:flex-row sm:gap-3">
               <Button
                 onClick={onConfirm}

@@ -132,11 +132,6 @@ export default function LoginPage() {
             </Button>
           </div>
         </form>
-        {/* <PlanCard
-          city={mockPlanData.city}
-          category={mockPlanData.category}
-          lastUpdate={mockPlanData.lastUpdate}
-        /> */}
       </div>
     </main>
   );

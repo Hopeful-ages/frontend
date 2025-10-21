@@ -54,7 +54,6 @@ export default function FiltersModal({
             exit={{ scale: 0.8, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Cabeçalho */}
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold sm:text-2xl">Filtros</h2>
               <button
@@ -65,9 +64,7 @@ export default function FiltersModal({
               </button>
             </div>
 
-            {/* Formulário de Filtros */}
             <div className="mb-6 space-y-4">
-              {/* Filtro de Cidade */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Cidade:
@@ -83,7 +80,6 @@ export default function FiltersModal({
                 />
               </div>
 
-              {/* Filtro de COBRADE */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Cobrade:
@@ -100,7 +96,6 @@ export default function FiltersModal({
               </div>
             </div>
 
-            {/* Botões de Ação */}
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={handleClear}

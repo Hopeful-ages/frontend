@@ -21,7 +21,6 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 z-100 flex w-full items-center justify-between bg-black px-6 py-2 text-gray-300">
-      {/* Logo à esquerda */}
       <div className="flex items-center gap-2">
         <Link href="https://www.hopeful.pro/">
           <Image
@@ -46,7 +45,6 @@ export default function Header() {
         ))}
       </div>
 
-      {/* Botões à direita */}
       <div className="flex items-center gap-6">
         {(role === Role.ADMIN || role === Role.USER) && (
           <Button variant="primary" size="sm" className="h-0.5 w-52 p-0.5">
