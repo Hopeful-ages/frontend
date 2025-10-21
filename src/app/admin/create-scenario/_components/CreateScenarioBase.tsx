@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import Header from '@/components/Header';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Dropdown } from '@/components/Dropdown';
@@ -167,7 +166,8 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
   useEffect(() => {
     if (scenarioId) return;
-    const fetchExistingScenario = async () => {
+
+    (async () => {
       if (city?.id && cobrade?.id) {
         try {
           const scenario = await api.getScenarioByIdAndCobrade(
@@ -181,8 +181,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
           setParamByPhase(DEFAULT_PARAMS);
         }
       }
-    };
-    fetchExistingScenario();
+    })();
   }, [city?.id, cobrade?.id, scenarioId, prefillFromScenario]);
 
   const handleSave = async () => {
@@ -282,8 +281,6 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
   return (
     <div className="b-l b-r min-h-screen">
-      <Header />
-
       <main className="mx-auto max-w-4xl border p-4 pt-24">
         <h1 className="text-gray-850 my-1 mb-6 text-center text-3xl">
           {scenarioId ? 'Editar Cenário' : 'Cadastrar Cenário'}
