@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from './Button';
+import { formatDate } from '@/lib/utils';
 
 interface PlanCardProps {
   city: string;
@@ -23,7 +24,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
 
         <div className="mt-4 flex items-center gap-2 text-xs">
           <span className="text-gray-400">Última atualização:</span>
-          <span className="text-gray-500">{lastUpdate}</span>
+          <span className="text-gray-500">{formatDate(lastUpdate)}</span>
         </div>
       </div>
 
