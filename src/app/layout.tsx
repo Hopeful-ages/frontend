@@ -38,7 +38,7 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <LoadingProvider>
-          <HeaderWrapper />
+          {/* <HeaderWrapper /> */}
           <Toaster />
           {children}
         </LoadingProvider>
