@@ -1,164 +1,241 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Dropdown } from '@/components/Dropdown';
-import { CobradeDTO, CityResponseDTO } from '@/lib/types';
-// import { toastError } from '@/utils/toastError';
-
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { Button } from '@/components/Button';
+import { ScenarioResponseDTO } from '@/lib/types';
+import { useToast } from '@/hooks/useToast';
+import { FiltersBar } from './admin/plans/_components/FiltersBar';
+import { PlansTable } from './admin/plans/_components/PlansTable';
 import PlanCard from '@/components/PlanCard';
-import { Download } from 'lucide-react';
+import DownloadModal from '@/components/DownloadModal';
+import FiltersModal from '@/components/FiltersModal';
+import { Filter } from 'lucide-react';
 
 export default function PlanSearchPage() {
-  const [cities, setCities] = useState<CityResponseDTO[]>([]);
-  const [city, setCity] = useState<CityResponseDTO | null>(null);
+  const { error } = useToast();
 
-  const [cobrade, setCobrade] = useState<CobradeDTO | null>(null);
-  const [cobrades, setCobrades] = useState<CobradeDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [pendingCityFilter, setPendingCityFilter] = useState<string | null>(
+    null,
+  );
+  const [pendingCobradeFilter, setPendingCobradeFilter] = useState<
+    string | null
+  >(null);
+
+  const [appliedCityFilter, setAppliedCityFilter] = useState<string | null>(
+    null,
+  );
+  const [appliedCobradeFilter, setAppliedCobradeFilter] = useState<
+    string | null
+  >(null);
+
+  const [plans, setPlans] = useState<ScenarioResponseDTO[]>([]);
+
+  const [selectedPlanIds, setSelectedPlanIds] = useState<string[]>([]);
+
+  // Estados para as modais
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const [selectedPlanForDownload, setSelectedPlanForDownload] =
+    useState<ScenarioResponseDTO | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     (async () => {
       try {
-        const [citiesData, cobradesData] = await Promise.all([
-          api.getAllCities(),
-          api.getAllCobrades(),
-        ]);
-        setCities(citiesData);
-        setCobrades(cobradesData);
-      } catch (err) {
-        console.error(err);
-        // toastError('Erro ao carregar listas', 'Cidades ou COBRADE');
+        // Busca todos os cenários publicados sem filtros (null, null)
+        const publishedScenarios = await api.searchScenariosByCityAndCobrade(
+          null,
+          null,
+        );
+        if (!mounted) return;
+        setPlans(publishedScenarios);
+      } catch (e) {
+        console.error(e);
+        error('Falha ao carregar dados da página');
+      } finally {
+        if (mounted) setLoading(false);
       }
     })();
-  }, []);
+    return () => {
+      mounted = false;
+    };
+  }, [error]);
 
-  const handleSearch = async () => {
-    if (!city || !cobrade) {
-      // toastWarning('Por favor, selecione uma cidade e um COBRADE.');
-      console.log('Por favor, selecione uma cidade e um COBRADE.');
-      return;
-    }
-
-    // const handleClear = () => {
-    // setCity(null);
-    // setCobrade(null);
-    // setPlans([]);
-    // };
-
-    if (!city) {
-      // warning('Por favor, selecione uma cidade.');
-      return;
-    }
+  const handleSearch = () => {
+    setAppliedCityFilter(pendingCityFilter);
+    setAppliedCobradeFilter(pendingCobradeFilter);
   };
 
+  const handleClearFilters = () => {
+    setPendingCityFilter(null);
+    setPendingCobradeFilter(null);
+    setAppliedCityFilter(null);
+    setAppliedCobradeFilter(null);
+  };
+
+  const handleDownload = (plan: ScenarioResponseDTO) => {
+    setSelectedPlanForDownload(plan);
+    setIsDownloadModalOpen(true);
+  };
+
+  const handleConfirmDownload = () => {
+    if (selectedPlanForDownload) {
+      console.log('Download confirmado para', selectedPlanForDownload);
+      // Implementar lógica de download aqui
+      // Exemplo: window.open(url_do_pdf, '_blank');
+    }
+    setIsDownloadModalOpen(false);
+    setSelectedPlanForDownload(null);
+  };
+
+  const handleCancelDownload = () => {
+    setIsDownloadModalOpen(false);
+    setSelectedPlanForDownload(null);
+  };
+
+  // Extrai cidades e cobrades únicos dos planos carregados
+  const cityNames = useMemo(() => {
+    const uniqueCities = new Map<string, string>();
+    plans.forEach((plan) => {
+      const key = `${plan.city.name} - ${plan.city.state}`;
+      uniqueCities.set(plan.city.id, key);
+    });
+    return Array.from(uniqueCities.values()).sort();
+  }, [plans]);
+
+  const cobradeOptions = useMemo(() => {
+    const uniqueCobrades = new Map<string, string>();
+    plans.forEach((plan) => {
+      const key = `${plan.cobrade.code} - ${plan.cobrade.subType || plan.cobrade.type || plan.cobrade.subgroup}`;
+      uniqueCobrades.set(plan.cobrade.id, key);
+    });
+    return Array.from(uniqueCobrades.values()).sort();
+  }, [plans]);
+
+  const filteredPlans = useMemo(() => {
+    if (!appliedCityFilter && !appliedCobradeFilter) return plans;
+    return plans.filter((p) => {
+      const cityKey = `${p.city.name} - ${p.city.state}`;
+      const cobradeKey = `${p.cobrade.code} - ${p.cobrade.subType || p.cobrade.type || p.cobrade.subgroup}`;
+
+      const byCity = appliedCityFilter ? cityKey === appliedCityFilter : true;
+      const byCobrade = appliedCobradeFilter
+        ? cobradeKey === appliedCobradeFilter
+        : true;
+      return byCity && byCobrade;
+    });
+  }, [plans, appliedCityFilter, appliedCobradeFilter]);
+
   return (
-    <main>
-      <div className="container mx-auto mt-16 p-4 md:p-8">
-        <h1 className="mb-6 text-3xl font-bold">Planos de Contingência</h1>
-
-        <div className="mb-8 hidden items-center gap-4 md:flex">
-          <div className="flex-1">
-            <Dropdown
-              border="gray"
-              label="Selecione uma Cidade"
-              items={cities.map((c) => `${c.name} - ${c.state}`)}
-              size="large"
-              fullWidth
-              value={city ? `${city.name} - ${city.state}` : null}
-              onSelect={(cityString) => {
-                const cityName = cityString.split(' - ')[0];
-                const selectedCity =
-                  cities.find((c) => c.name === cityName) || null;
-                setCity(selectedCity);
-              }}
-            />
-          </div>
-          <div className="flex-1">
-            <Dropdown
-              border="gray"
-              label="Selecionar COBRADE"
-              items={cobrades.map(
-                (c) => `${c.code} - ${c.subType || c.type || c.subgroup}`,
-              )}
-              size="large"
-              fullWidth
-              value={
-                cobrade
-                  ? `${cobrade.code} - ${cobrade.subType || cobrade.type || cobrade.subgroup}`
-                  : null
-              }
-              onSelect={async (desc) => {
-                const selectedCobrade =
-                  cobrades.find(
-                    (c) =>
-                      `${c.code} - ${c.subType || c.type || c.subgroup}` ===
-                      desc,
-                  ) || null;
-                setCobrade(selectedCobrade);
-              }}
-              useAutoComplete
-            />
-          </div>
-
-          <Button
-            variant={'terciary'}
-            // onClick={handleClear}
-          >
-            Limpar Filtro
-          </Button>
-          <Button variant={'secondary'} onClick={handleSearch}>
-            Buscar
-          </Button>
-        </div>
-
-        <div className="mb-6 flex items-center gap-4 md:hidden">
-          <Button variant={'terciary'} className="flex-1">
-            Filtrar
-          </Button>
-          <Button
-            variant={'secondary'}
-            onClick={handleSearch}
-            className="flex-1"
-          >
-            Buscar
-          </Button>
-        </div>
-
-        {/* Tabela para Desktop */}
-        <div className="hidden md:block">
-          <table className="w-full text-left">
-            <thead className="border-b text-gray-500">
-              <tr>
-                <th className="p-4 font-normal">Cidade</th>
-                <th className="p-4 font-normal">Cobrade</th>
-                <th className="p-4 font-normal">Última Atualização</th>
-                <th className="font-normals flex justify-center p-4">
-                  Download
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Usando os dados do PlanCard fixo como exemplo */}
-              <tr className="border-b">
-                <td className="p-4 font-medium">São Paulo - SP</td>
-                <td className="p-4">COBRADE ABC</td>
-                <td className="p-4">15/06/2024</td>
-                <td className="flex justify-center p-4 text-gray-600">
-                  <Download size={20} />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="md:hidden">
-          <PlanCard
-            city="São Paulo - SP"
-            category="COBRADE ABC"
-            lastUpdate="2024-06-15"
-          />
-        </div>
+    <main className="mx-auto mt-15 w-full px-6 py-6">
+      <div className="mb-5 flex items-center justify-between">
+        <h1 className="text-2xl font-bold sm:text-3xl">
+          Planos de Contingência
+        </h1>
       </div>
+
+      {/* Botão de Filtrar - Visível em mobile */}
+      <div className="mb-5 flex md:hidden">
+        <button
+          onClick={() => setIsFiltersModalOpen(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 font-medium text-gray-700 transition hover:bg-gray-50"
+        >
+          <Filter className="h-4 w-4" />
+          Filtrar
+        </button>
+      </div>
+
+      {/* FiltersBar - Visível apenas em desktop */}
+      <div className="hidden md:block">
+        <FiltersBar
+          cobradeOptions={cobradeOptions}
+          cityOptions={cityNames}
+          cityValue={pendingCityFilter}
+          onSelectCity={setPendingCityFilter}
+          onSelectCobrade={setPendingCobradeFilter}
+          cobradeValue={pendingCobradeFilter}
+          onSearch={handleSearch}
+          onClearFilters={handleClearFilters}
+        />
+      </div>
+
+      {loading ? (
+        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-700">
+          Carregando planos...
+        </div>
+      ) : (
+        <>
+          {/* Tabela - visível apenas em desktop (md e acima) */}
+          <div className="hidden md:block">
+            <PlansTable
+              rows={filteredPlans}
+              showPagination={filteredPlans.length > 10}
+              selectedPlanIds={selectedPlanIds}
+              onSelectionChange={setSelectedPlanIds}
+              isEditable={false}
+              onDownload={handleDownload}
+            />
+          </div>
+
+          <div className="flex flex-col items-center space-y-4 md:hidden">
+            {filteredPlans.map((plan) => {
+              const latestUpdate =
+                plan.tasks.length > 0
+                  ? plan.tasks.reduce((latest, current) => {
+                      const latestDate = new Date(latest.lastUpdateDate);
+                      const currentDate = new Date(current.lastUpdateDate);
+                      return currentDate > latestDate ? current : latest;
+                    }).lastUpdateDate
+                  : 'N/A';
+
+              return (
+                <PlanCard
+                  key={plan.id}
+                  city={`${plan.city.name} - ${plan.city.state}`}
+                  cobrade={`${plan.cobrade.code} - ${plan.cobrade.subType || plan.cobrade.type || plan.cobrade.subgroup}`}
+                  lastUpdate={latestUpdate}
+                  onDownload={() => handleDownload(plan)}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Modal de Filtros */}
+      <FiltersModal
+        isOpen={isFiltersModalOpen}
+        onClose={() => setIsFiltersModalOpen(false)}
+        cityOptions={cityNames}
+        cobradeOptions={cobradeOptions}
+        cityValue={pendingCityFilter}
+        cobradeValue={pendingCobradeFilter}
+        onSelectCity={setPendingCityFilter}
+        onSelectCobrade={setPendingCobradeFilter}
+        onApplyFilters={handleSearch}
+        onClearFilters={handleClearFilters}
+      />
+
+      {/* Modal de Download */}
+      <DownloadModal
+        isOpen={isDownloadModalOpen}
+        city={
+          selectedPlanForDownload
+            ? `${selectedPlanForDownload.city.name} - ${selectedPlanForDownload.city.state}`
+            : ''
+        }
+        year={
+          selectedPlanForDownload && selectedPlanForDownload.tasks.length > 0
+            ? new Date(selectedPlanForDownload.tasks[0].lastUpdateDate)
+                .getFullYear()
+                .toString()
+            : new Date().getFullYear().toString()
+        }
+        onConfirm={handleConfirmDownload}
+        onCancel={handleCancelDownload}
+      />
     </main>
   );
 }

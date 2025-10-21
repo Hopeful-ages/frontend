@@ -3,23 +3,34 @@ import { Button } from './Button';
 
 interface PlanCardProps {
   city: string;
-  category: string;
+  cobrade: string;
   lastUpdate: string;
+  onDownload?: () => void;
 }
 
-const PlanCard: React.FC<PlanCardProps> = ({ city, category, lastUpdate }) => {
+const PlanCard: React.FC<PlanCardProps> = ({
+  city,
+  cobrade,
+  lastUpdate,
+  onDownload,
+}) => {
   return (
-    <div className="w-full max-w-xs rounded-lg border border-gray-300 p-4 shadow-sm">
-      <div className="flex w-full flex-col items-start gap-2">
-        <span className="text-black-500 text-sm">Cidade</span>
-        <h2 className="text-black-700 w-837 text-xl font-bold">{city}</h2>
-        <p className="text-black-400 font-bold- text-sm">{category}</p>
-        <span className="text-black-500 mt-4 text-sm">Última atualização</span>
-        <p className="text-black-500 text-sm font-bold">{lastUpdate}</p>
+    <div className="flex w-full flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-md">
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-400">Cidade</span>
+        <h2 className="truncate text-lg font-semibold text-gray-800">{city}</h2>
+        <p className="truncate text-sm text-gray-600">{cobrade}</p>
+
+        <div className="mt-4 flex items-center gap-2 text-xs">
+          <span className="text-gray-400">Última atualização:</span>
+          <span className="text-gray-500">{lastUpdate}</span>
+        </div>
       </div>
-      <div>
+
+      <div className="mt-4">
         <Button
-          className="text-black-600 mt-6 w-full text-center"
+          onClick={onDownload}
+          className="w-full text-center text-gray-700"
           variant="outline"
           size="lg"
         >
@@ -29,4 +40,5 @@ const PlanCard: React.FC<PlanCardProps> = ({ city, category, lastUpdate }) => {
     </div>
   );
 };
+
 export default PlanCard;
