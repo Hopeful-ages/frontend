@@ -160,7 +160,6 @@ export const api = {
       body: JSON.stringify(payload),
     }) as Promise<ScenarioResponseDTO>,
 
-  // Atualização de cenário (USER ou ADMIN) - backend decide permissões
   updateScenario: (id: string, payload: ScenarioRequestDTO) =>
     fetchWithAuth(`/api/scenarios/${id}`, {
       method: 'PUT',

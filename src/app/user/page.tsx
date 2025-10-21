@@ -121,7 +121,6 @@ export default function UserPage() {
     }
   }, [userInfo, hasAccess]);
 
-  // Buscar COBRADEs disponíveis
   useEffect(() => {
     const fetchCobrades = async () => {
       try {
@@ -135,7 +134,6 @@ export default function UserPage() {
     fetchCobrades();
   }, []);
 
-  // Buscar tasks existentes quando COBRADE é selecionado
   useEffect(() => {
     const fetchExistingTasks = async () => {
       if (!cobrade || !userDetails?.city) {
@@ -172,7 +170,6 @@ export default function UserPage() {
   }, [cobrade, userDetails]);
 
   const handleEditProtocol = (protocolToEdit: Protocol) => {
-    // Verificar se pode editar (apenas tasks do próprio serviço ou criadas localmente)
     if (protocolToEdit.isExisting && !protocolToEdit.canEdit) {
       warning('Você só pode editar tasks criadas pelo seu serviço.');
       return;
@@ -183,19 +180,16 @@ export default function UserPage() {
   };
 
   const handleRemoveProtocol = (protocolToRemove: Protocol) => {
-    // Verificar se pode remover (apenas tasks do próprio serviço ou criadas localmente)
     if (protocolToRemove.isExisting && !protocolToRemove.canEdit) {
       warning('Você só pode remover tasks criadas pelo seu serviço.');
       return;
     }
 
     if (protocolToRemove.isExisting) {
-      // Para tasks existentes do servidor, remover da lista de existentes
       setExistingTasks((prev) =>
         prev.filter((t) => t.id !== protocolToRemove.id),
       );
     } else {
-      // Para tasks criadas localmente, remover da lista de protocolos
       setProtocols((prev) => prev.filter((p) => p.id !== protocolToRemove.id));
     }
   };
@@ -219,7 +213,6 @@ export default function UserPage() {
       return;
     }
 
-    // Verificar se há pelo menos uma task (local ou existente)
     const localTasks = protocols.filter((p) => !p.isExisting);
 
     if (localTasks.length === 0 && existingTasks.length === 0) {
@@ -228,7 +221,6 @@ export default function UserPage() {
     }
 
     try {
-      // Converter tasks locais (novas)
       const newTasks = localTasks.map((protocol) => {
         const description = protocol.description.split(' (')[0];
 
@@ -239,9 +231,8 @@ export default function UserPage() {
         };
       });
 
-      // Preservar tasks existentes (somente leitura para backend: enviamos novamente para não perder)
       const existingTasksPayload = existingTasks
-        .filter((t) => t.id) // garantir
+        .filter((t) => t.id)
         .map((t) => ({
           description: t.description,
           phase: mapStepToPhase(t.phase) || phaseMap[currentStep],
@@ -261,7 +252,6 @@ export default function UserPage() {
       };
 
       if (currentScenarioId) {
-        // UPDATE (user scope) - enviar conjunto completo (existentes + novas) para não sobrescrever
         if (newTasks.length === 0) {
           await api.updateScenario(currentScenarioId, baseScenarioData);
           info('Nenhuma nova tarefa', 'Cenário mantido sem adições.');
@@ -273,7 +263,6 @@ export default function UserPage() {
           );
         }
       } else {
-        // CREATE
         await api.createScenario({ ...baseScenarioData, tasks: [...newTasks] });
         success(
           'Cenário criado',
@@ -281,9 +270,7 @@ export default function UserPage() {
         );
       }
 
-      // Limpar apenas as tasks locais, manter COBRADE selecionado para ver tasks existentes
       setProtocols([]);
-      // Recarregar tasks existentes e cenário
       if (cobrade && userDetails?.city) {
         try {
           const scenario = await api.getScenarioByIdAndCobrade(
@@ -551,12 +538,10 @@ export default function UserPage() {
         }}
         onSave={(taskData) => {
           if (taskData.id) {
-            // Se a edição é de uma task existente do servidor, refletir apenas visualmente (não perdemos o id)
             const isExistingTask = existingTasks.some(
               (t) => t.id === taskData.id,
             );
             if (isExistingTask) {
-              // Atualiza em existingTasks para que próxima montagem do payload inclua descrição atualizada
               setExistingTasks((prev) =>
                 prev.map((t) =>
                   t.id === taskData.id
@@ -564,13 +549,12 @@ export default function UserPage() {
                         ...t,
                         description: taskData.description,
                         phase: phaseMap[currentStep],
-                        service: t.service, // mantém service original
+                        service: t.service,
                       }
                     : t,
                 ),
               );
             } else {
-              // Task local
               setProtocols((prev) =>
                 prev.map((p) =>
                   p.id === taskData.id

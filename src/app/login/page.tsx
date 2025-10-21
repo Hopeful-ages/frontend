@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/api';
 import { useLoading } from '@/providers/LoadingProvider';
 import { Lock, Send, User } from 'lucide-react';
-//import PlanCard from '@/components/PlanCard';
 
 export default function LoginPage() {
   const router = useRouter();

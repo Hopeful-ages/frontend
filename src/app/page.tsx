@@ -34,7 +34,6 @@ export default function PlanSearchPage() {
 
   const [selectedPlanIds, setSelectedPlanIds] = useState<string[]>([]);
 
-  // Estados para as modais
   const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [selectedPlanForDownload, setSelectedPlanForDownload] =
@@ -44,7 +43,6 @@ export default function PlanSearchPage() {
     let mounted = true;
     (async () => {
       try {
-        // Busca todos os cenários publicados sem filtros (null, null)
         const publishedScenarios = await api.searchScenariosByCityAndCobrade(
           null,
           null,
@@ -83,8 +81,6 @@ export default function PlanSearchPage() {
   const handleConfirmDownload = () => {
     if (selectedPlanForDownload) {
       console.log('Download confirmado para', selectedPlanForDownload);
-      // Implementar lógica de download aqui
-      // Exemplo: window.open(url_do_pdf, '_blank');
     }
     setIsDownloadModalOpen(false);
     setSelectedPlanForDownload(null);
@@ -95,7 +91,6 @@ export default function PlanSearchPage() {
     setSelectedPlanForDownload(null);
   };
 
-  // Extrai cidades e cobrades únicos dos planos carregados
   const cityNames = useMemo(() => {
     const uniqueCities = new Map<string, string>();
     plans.forEach((plan) => {

@@ -35,19 +35,18 @@ export function useHeaderAuth() {
     }
   }, [isCheckingAuth, isAuthenticated, role]);
 
-  // Seleciona links baseado na role
   const links =
     role === Role.ADMIN
       ? ADMIN_LINKS
       : role === Role.USER
         ? USER_LINKS
-        : GUEST_LINKS; // caso não tenha role
+        : GUEST_LINKS;
 
   return {
     shouldRenderHeader: !isCheckingAuth,
     links,
     logout,
-    role: role ?? 'guest', // role guest se não estiver logado
+    role: role ?? 'guest',
     isAuthenticated,
   };
 }

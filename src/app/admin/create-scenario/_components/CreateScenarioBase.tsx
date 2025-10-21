@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
-// Header handled by layout HeaderWrapper
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Dropdown } from '@/components/Dropdown';
@@ -108,7 +107,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
             : new Date().getFullYear();
 
           return {
-            id: String(task.id), // normaliza ID para string
+            id: String(task.id),
             description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${lastUpdateYear})`,
             phase: task.phase,
             isExisting: true,
@@ -307,7 +306,6 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                     const selectedCity =
                       cities.find((c) => c.name === cityName) || null;
                     setCity(selectedCity);
-                    // Buscar tarefas do cenário se cobrade também estiver selecionada
                     if (selectedCity && cobrade) {
                       try {
                         const scenario = await api.getScenarioByIdAndCobrade(
@@ -357,7 +355,6 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                           desc,
                       ) || null;
                     setCobrade(selectedCobrade);
-                    // Buscar tarefas do cenário se cidade também estiver selecionada
                     if (city && selectedCobrade) {
                       try {
                         const scenario = await api.getScenarioByIdAndCobrade(
@@ -434,7 +431,6 @@ export function CreateScenarioBase({ scenarioId }: Props) {
             <ProtocolList
               protocols={displayProtocols}
               onEdit={(p) => {
-                // garante string e abre modal
                 setEditTask({ ...p, id: String(p.id) });
                 setIsTaskModalOpen(true);
               }}

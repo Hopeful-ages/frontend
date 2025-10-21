@@ -35,7 +35,6 @@ export function CreateUserTask({
   const [task, setTask] = useState('');
   const { warning } = useToast();
 
-  // Atualiza os campos quando editingTask muda
   useEffect(() => {
     if (editingTask) {
       setTask(editingTask.description || '');

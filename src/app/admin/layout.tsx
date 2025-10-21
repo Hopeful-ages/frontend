@@ -1,6 +1,5 @@
 'use client';
 
-// Update the import path if the alias '@' is not configured or incorrect
 import ProtectedPage from '../../components/ProtectedPage';
 
 export default function AdminLayout({

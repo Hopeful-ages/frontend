@@ -22,7 +22,6 @@ export const useProtectedPage = (options: UseProtectedPageOptions = {}) => {
     const token = Cookies.get('token');
     const user = Cookies.get('user');
 
-    // 🚫 Não autenticado → login
     if (!token || !user) {
       router.push('/login');
       return;

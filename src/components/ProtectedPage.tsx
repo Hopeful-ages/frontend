@@ -22,16 +22,13 @@ export default function ProtectedPage({
     redirectTo,
   });
 
-  // Mostra loading enquanto verifica autenticação
   if (isLoading) {
     return <Loading text="Verificando permissões..." />;
   }
 
-  // Não renderiza o conteúdo se não tiver acesso
   if (!hasAccess) {
     return null;
   }
 
-  // Renderiza o conteúdo protegido
   return <>{children}</>;
 }
