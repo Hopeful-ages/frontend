@@ -33,7 +33,7 @@ export function FiltersBar({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="mb-6 ml-5 flex flex-wrap items-center gap-3">
+      <div className="mb-6 ml-5 flex items-end justify-between gap-3">
         <div className="flex w-full max-w-lg gap-4">
           <div className="flex-1">
             <label
@@ -89,13 +89,14 @@ export function FiltersBar({
           </Button>
         </div>
 
-        <button
+        <Button
           onClick={onCreate}
           title="Criar usuário"
-          className="mt-8 mr-5 ml-auto inline-flex -translate-y-[4px] items-center justify-center rounded-lg border border-black bg-white px-8 py-1 hover:bg-gray-100"
+          className="mt-8 mr-5 ml-auto items-center border border-black bg-white px-8 py-1 hover:bg-gray-100"
+          variant="outline"
         >
           <UserPlus className="h-5 w-5 align-middle" />
-        </button>
+        </Button>
       </div>
     </form>
   );
