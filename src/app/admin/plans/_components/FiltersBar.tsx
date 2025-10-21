@@ -63,10 +63,10 @@ export function FiltersBar({
               htmlFor="cobrade-select"
               className="mb-1 block text-sm font-medium"
             >
-              Cobrade:
+              COBRADE:
             </label>
             <Dropdown
-              label="Selecionar Cobrade"
+              label="Selecionar COBRADE"
               items={cobradeOptions}
               onSelect={(value) => onSelectCobrade(value)}
               value={cobradeValue}
