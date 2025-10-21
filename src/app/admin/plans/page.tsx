@@ -189,6 +189,7 @@ export default function AdminPlansPage() {
           showPagination={showPagination}
           selectedPlanIds={selectedScenarioIds}
           onSelectionChange={setSelectedScenarioIds}
+          isEditable={true}
           onEdit={onEdit}
           onDownload={onDownload}
         />
