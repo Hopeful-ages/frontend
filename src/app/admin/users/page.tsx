@@ -374,7 +374,7 @@ export default function AdminUsersPage() {
     if (u.role?.name === 'ADMIN') {
       warning('Usuários administradores não podem ser desativados');
       return;
-    } else { 
+    } else {
       setConfirmTarget(u);
       setConfirmOpen(true);
     }

@@ -4,11 +4,8 @@ import React from 'react';
 export interface Protocol {
   id: string | number;
   description: string;
-  // Fase (Antes/Durante/Depois) opcional para permitir filtragem externa
   phase?: string;
-  // Indica se é uma task existente do servidor ou criada localmente
   isExisting?: boolean;
-  // Indica se o usuário pode editar/remover esta task
   canEdit?: boolean;
 }
 

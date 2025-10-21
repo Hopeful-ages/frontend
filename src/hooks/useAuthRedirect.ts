@@ -1,11 +1,12 @@
 'use client';
 
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export const useAuthRedirect = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState<string | null>(null);
@@ -49,12 +50,12 @@ export const useAuthRedirect = () => {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, pathname]);
 
   const logout = () => {
     Cookies.remove('token');
     Cookies.remove('user');
-    router.push('/login');
+    router.push('/');
   };
 
   return { isCheckingAuth, isAuthenticated, role, logout };

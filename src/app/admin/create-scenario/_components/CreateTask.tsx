@@ -38,7 +38,6 @@ export function CreateTask({
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [task, setTask] = useState('');
 
-  // Atualiza os campos quando editingTask muda
   useEffect(() => {
     if (editingTask) {
       setSelectedService(editingTask.service || null);
@@ -121,7 +120,6 @@ export function CreateTask({
             roundedBorder="lg"
             maxItemsVisible={3}
             fullWidth
-            // IMPORTANTE: não passar string vazia, senão o componente entende que já existe valor
             value={selectedService ?? null}
             icon={<Hammer className="h-4 w-4" />}
             useAutoComplete

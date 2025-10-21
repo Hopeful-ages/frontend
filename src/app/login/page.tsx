@@ -27,6 +27,12 @@ export default function LoginPage() {
 
   const loadingShown = useRef(false);
 
+  const mockPlanData = {
+    city: 'Porto Alegre - RS',
+    category: 'Bombeiros - Alagamento',
+    lastUpdate: '11/08/2025',
+  };
+
   useEffect(() => {
     if (isCheckingAuth) {
       if (!loadingShown.current) {

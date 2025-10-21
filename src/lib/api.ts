@@ -62,6 +62,20 @@ async function fetchWithAuthVoid(
   await handleResponse(res);
 }
 
+async function fetchPublic(input: string, init?: RequestInit) {
+  const headers = new Headers(init?.headers || {});
+  if (!headers.has('Content-Type'))
+    headers.set('Content-Type', 'application/json');
+
+  const res = await fetch(`${BASE_URL}${input}`, {
+    ...init,
+    headers,
+    credentials: 'omit',
+  });
+
+  return handleResponse(res);
+}
+
 export const api = {
   login: async (email: string, password: string) => {
     console.log('API URL:', BASE_URL);
@@ -146,7 +160,6 @@ export const api = {
       body: JSON.stringify(payload),
     }) as Promise<ScenarioResponseDTO>,
 
-  // Atualização de cenário (USER ou ADMIN) - backend decide permissões
   updateScenario: (id: string, payload: ScenarioRequestDTO) =>
     fetchWithAuth(`/api/scenarios/${id}`, {
       method: 'PUT',
@@ -160,4 +173,17 @@ export const api = {
     fetchWithAuth(
       `/api/scenarios/by-city-cobrade?cityId=${encodeURIComponent(cityId)}&cobradeId=${encodeURIComponent(cobradeId)}`,
     ) as Promise<ScenarioResponseDTO>,
+
+  searchScenariosByCityAndCobrade: (
+    cityId: string | null,
+    cobradeId: string | null,
+  ) => {
+    const params = new URLSearchParams();
+    if (cityId) params.append('cityId', cityId);
+    if (cobradeId) params.append('cobradeId', cobradeId);
+    const queryString = params.toString();
+    return fetchPublic(
+      `/api/scenarios/search/by-city-cobrade${queryString ? `?${queryString}` : ''}`,
+    ) as Promise<ScenarioResponseDTO[]>;
+  },
 };

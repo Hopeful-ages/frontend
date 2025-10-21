@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import { ConfirmDownloadModal } from './_components/ConfirmDownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
-// Footer handled globally via FooterWrapper in layout
 
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
@@ -190,6 +189,7 @@ export default function AdminPlansPage() {
           showPagination={showPagination}
           selectedPlanIds={selectedScenarioIds}
           onSelectionChange={setSelectedScenarioIds}
+          isEditable={true}
           onEdit={onEdit}
           onDownload={onDownload}
         />

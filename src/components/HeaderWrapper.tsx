@@ -5,7 +5,10 @@ import Header from './Header';
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
-  if (pathname === '/login') return null;
+
+  const noHeaderRoutes = ['/register', '/forgot-password'];
+
+  if (noHeaderRoutes.includes(pathname)) return null;
 
   return <Header />;
 }
