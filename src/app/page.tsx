@@ -57,9 +57,7 @@ export default function PlanSearchPage() {
       <div className="container mx-auto mt-16 p-4 md:p-8">
         <h1 className="mb-6 text-3xl font-bold">Planos de Contingência</h1>
 
-        {/* FILTROS E AÇÕES PARA DESKTOP (md:flex) */}
         <div className="mb-8 hidden items-center gap-4 md:flex">
-          {/* Envolvemos cada dropdown em uma div para que ocupem o espaço corretamente */}
           <div className="flex-1">
             <Dropdown
               border="gray"
@@ -153,8 +151,6 @@ export default function PlanSearchPage() {
             </tbody>
           </table>
         </div>
-
-        {/* Card para Mobile (md:hidden) */}
         <div className="md:hidden">
           <PlanCard
             city="São Paulo - SP"
