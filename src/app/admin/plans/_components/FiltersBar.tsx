@@ -47,8 +47,8 @@ export function FiltersBar({
               label="Buscar cidade"
               items={cityOptions}
               value={cityValue}
-              onSelect={(v) => onSelectCity(v)}
-              onInputChange={(v) => onSelectCity(v)}
+              onSelect={(v) => onSelectCity(v || null)}
+              onInputChange={(v) => onSelectCity(v || null)}
               fullWidth
               textSize="sm"
               border="none"
@@ -68,7 +68,7 @@ export function FiltersBar({
             <Dropdown
               label="Selecionar COBRADE"
               items={cobradeOptions}
-              onSelect={(value) => onSelectCobrade(value)}
+              onSelect={(value) => onSelectCobrade(value || null)}
               value={cobradeValue}
               fullWidth
               textSize="sm"

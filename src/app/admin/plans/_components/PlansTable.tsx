@@ -9,8 +9,9 @@ type PlansTableProps = {
   showPagination: boolean;
   selectedPlanIds: string[];
   onSelectionChange: (ids: string[]) => void;
-  onEdit: (id: string) => void;
+  onEdit?: (id: string) => void;
   onDownload: (scenario: ScenarioResponseDTO) => void;
+  isEditable?: boolean;
 };
 
 const getLatestUpdate = (scenario: ScenarioResponseDTO): string | null => {
@@ -29,6 +30,7 @@ export function PlansTable({
   onSelectionChange,
   onEdit,
   onDownload,
+  isEditable = false,
 }: PlansTableProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -42,6 +44,11 @@ export function PlansTable({
     [onSelectionChange],
   );
 
+  const columnWidths = isEditable
+    ? ['25%', '25%', '20%', '15%', '15%']
+    : ['35%', '35%', '20%', '10%'];
+  const cellPadding = isEditable ? 'px-3 py-2' : 'px-4 py-3';
+
   return (
     <Table<ScenarioResponseDTO>
       rows={rows}
@@ -54,15 +61,22 @@ export function PlansTable({
     >
       <Table.Header plain>
         <Table.Row>
-          <Table.Heading accessor="city.name" sortable width="30%">
+          <Table.Heading width={columnWidths[0]} accessor="city.name" sortable>
             Cidade
           </Table.Heading>
-          <Table.Heading width="30%">Cobrade</Table.Heading>
-          <Table.Heading width="20%">Última Atualização</Table.Heading>
-          <Table.Heading width="15%" align="center">
-            Editar
+          <Table.Heading width={columnWidths[1]}>Cobrade</Table.Heading>
+          <Table.Heading width={columnWidths[2]}>
+            Última Atualização
           </Table.Heading>
-          <Table.Heading width="5%" align="center">
+          {isEditable && (
+            <Table.Heading width={columnWidths[3]} align="center">
+              Editar
+            </Table.Heading>
+          )}
+          <Table.Heading
+            width={isEditable ? columnWidths[4] : columnWidths[3]}
+            align="center"
+          >
             Download
           </Table.Heading>
         </Table.Row>
@@ -74,32 +88,32 @@ export function PlansTable({
             const lastUpdated = getLatestUpdate(row);
             return (
               <Table.Row key={row.id} row={row}>
-                <Table.Cell>
-                  {row.city 
-                    ? `${row.city.name} - ${row.city.state}` 
-                    : '—'}
+                <Table.Cell className={cellPadding}>
+                  {row.city ? `${row.city.name} - ${row.city.state}` : '—'}
                 </Table.Cell>
-                <Table.Cell>
-                  {`${row.cobrade.code} - ${row.cobrade.subType || row.cobrade.type || row.cobrade.subgroup}` } 
+                <Table.Cell className={cellPadding}>
+                  {`${row.cobrade.code} - ${row.cobrade.subType || row.cobrade.type || row.cobrade.subgroup}`}
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell className={cellPadding}>
                   {lastUpdated ? formatDate(lastUpdated) : '—'}
                 </Table.Cell>
-                <Table.Cell align="center">
-                  <button
-                    type="button"
-                    title="Editar Plano"
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md hover:bg-gray-100"
-                    onClick={() => onEdit(row.id)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                </Table.Cell>
-                <Table.Cell align="center">
+                {isEditable && (
+                  <Table.Cell align="center" className={cellPadding}>
+                    <button
+                      type="button"
+                      title="Editar Plano"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-200"
+                      onClick={() => onEdit?.(row.id)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  </Table.Cell>
+                )}
+                <Table.Cell align="center" className={cellPadding}>
                   <button
                     type="button"
                     title="Download do Plano"
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md hover:bg-gray-100"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-200"
                     onClick={() => onDownload(row)}
                   >
                     <FileDown className="h-4 w-4" />
