@@ -186,4 +186,34 @@ export const api = {
       `/api/scenarios/search/by-city-cobrade${queryString ? `?${queryString}` : ''}`,
     ) as Promise<ScenarioResponseDTO[]>;
   },
+
+  downloadScenarioPdf: async (scenarioId: string) => {
+    const token = Cookies.get('token');
+    const headers: HeadersInit = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(
+      `${BASE_URL}/api/scenarios/pdf/${scenarioId}/scenarios-by-subgroup`,
+      {
+        method: 'GET',
+        headers,
+        credentials: 'omit',
+      },
+    );
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new Error(`Erro ao baixar PDF: ${res.status} ${txt}`);
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plano-contingencia-${scenarioId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
 };

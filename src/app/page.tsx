@@ -78,9 +78,14 @@ export default function PlanSearchPage() {
     setIsDownloadModalOpen(true);
   };
 
-  const handleConfirmDownload = () => {
+  const handleConfirmDownload = async () => {
     if (selectedPlanForDownload) {
-      console.log('Download confirmado para', selectedPlanForDownload);
+      try {
+        await api.downloadScenarioPdf(selectedPlanForDownload.id);
+      } catch (err) {
+        console.error('Erro ao baixar PDF:', err);
+        error('Erro ao baixar o PDF. Tente novamente.');
+      }
     }
     setIsDownloadModalOpen(false);
     setSelectedPlanForDownload(null);
