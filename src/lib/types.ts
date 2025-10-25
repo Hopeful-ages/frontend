@@ -56,6 +56,7 @@ export type ScenarioResponseDTO = {
   cobrade: CobradeDTO;
   tasks: TaskSummaryDTO[];
   parameters: ParameterSummaryDTO[];
+  published?: boolean;
 };
 
 export type UserUpdateDTO = Partial<{
@@ -110,6 +111,7 @@ export type ScenarioRequestDTO = {
   cobradeId: string;
   tasks?: TaskRequestDTO[];
   parameters?: ParameterRequestDTO[];
+  published?: boolean;
 };
 
 export type ScenarioUpdateDTO = Partial<{

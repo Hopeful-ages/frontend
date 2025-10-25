@@ -6,7 +6,7 @@ import { Input } from '@/components/Input';
 import { Dropdown } from '@/components/Dropdown';
 import ProtocolList, { Protocol } from '@/components/ProtocolList';
 import { PlanStepsTabs } from '@/components/PlanStepsTabs';
-import { Plus, Save } from 'lucide-react';
+import { Plus, Save, Upload } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
   CobradeDTO,
@@ -19,6 +19,7 @@ import { CreateTask } from './CreateTask';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/useToast';
 import { Toaster } from '@/components/Toaster';
+import { ConfirmPublishModal } from '../../plans/_components/ConfirmPublishModal';
 
 type Props = {
   scenarioId?: string;
@@ -58,6 +59,9 @@ export function CreateScenarioBase({ scenarioId }: Props) {
   const [existingScenario, setExistingScenario] =
     useState<ScenarioResponseDTO | null>(null);
   const [loadingScenario, setLoadingScenario] = useState(false);
+
+  const [isPublishModalOpen, setPublishModalOpen] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
 
   const phaseMap: Record<string, 'ANTES' | 'DURANTE' | 'DEPOIS'> = useMemo(
     () => ({ Antes: 'ANTES', Durante: 'DURANTE', Depois: 'DEPOIS' }),
@@ -245,6 +249,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
         cobradeId: cobrade.id,
         tasks,
         parameters,
+        published: existingScenario?.published,
       };
 
       if (existingScenario) {
@@ -263,6 +268,27 @@ export function CreateScenarioBase({ scenarioId }: Props) {
     } catch (error) {
       console.error('Erro ao salvar cenário:', error);
       toastError('Erro ao salvar o cenário', 'Tente novamente.');
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!existingScenario) return;
+    setPublishLoading(true);
+    try {
+      await api.publishScenario(existingScenario.id);
+      success(
+        `Plano "${existingScenario.city.name} - ${existingScenario.cobrade.code}" publicado com sucesso!`,
+      );
+      setPublishModalOpen(false);
+
+      setExistingScenario((prev) =>
+        prev ? { ...prev, published: true } : prev,
+      );
+    } catch (err) {
+      console.error(err);
+      toastError('Erro ao publicar o cenário', 'Tente novamente.');
+    } finally {
+      setPublishLoading(false);
     }
   };
 
@@ -439,30 +465,52 @@ export function CreateScenarioBase({ scenarioId }: Props) {
               }
             />
 
-            <div className="mt-8 mr-4 flex items-center justify-end gap-4">
-              <Button
-                variant="outline"
-                size="md"
-                onClick={() => setIsTaskModalOpen(true)}
-                leftIcon={<Plus size={16} />}
-                disabled={!city || !cobrade}
-                title={
-                  !city || !cobrade
-                    ? 'Selecione Cidade e COBRADE primeiro'
-                    : undefined
-                }
-              >
-                Adicionar Tarefa
-              </Button>
+            <div className="mt-8 mr-4 ml-4 flex items-center justify-between">
+              {scenarioId ? (
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setPublishModalOpen(true)}
+                  leftIcon={<Upload size={16} />}
+                  className="disabled:cursor-not-allowed disabled:opacity-70"
+                  disabled={!!existingScenario?.published}
+                  title={
+                    existingScenario?.published
+                      ? 'Cenário já publicado'
+                      : 'Publicar cenário'
+                  }
+                >
+                  {existingScenario?.published ? 'Publicado' : 'Publicar'}
+                </Button>
+              ) : (
+                <div className="w-[130px]" />
+              )}
 
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={handleSave}
-                leftIcon={<Save size={16} />}
-              >
-                Salvar
-              </Button>
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  size="md"
+                  onClick={() => setIsTaskModalOpen(true)}
+                  leftIcon={<Plus size={16} />}
+                  disabled={!city || !cobrade}
+                  title={
+                    !city || !cobrade
+                      ? 'Selecione Cidade e COBRADE primeiro'
+                      : undefined
+                  }
+                >
+                  Adicionar Tarefa
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={handleSave}
+                  leftIcon={<Save size={16} />}
+                >
+                  Salvar
+                </Button>
+              </div>
             </div>
           </>
         )}
@@ -512,6 +560,14 @@ export function CreateScenarioBase({ scenarioId }: Props) {
               }
             : null
         }
+      />
+
+      <ConfirmPublishModal
+        open={isPublishModalOpen}
+        loading={publishLoading}
+        scenario={existingScenario}
+        onConfirm={handlePublish}
+        onClose={() => setPublishModalOpen(false)}
       />
 
       <Toaster />
