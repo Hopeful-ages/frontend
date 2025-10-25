@@ -38,6 +38,13 @@ export default function AdminPlansPage() {
     string | null
   >(null);
 
+  const [pendingPublishedFilter, setPendingPublishedFilter] = useState<
+    string | null
+  >(null);
+  const [appliedPublishedFilter, setAppliedPublishedFilter] = useState<
+    string | null
+  >(null);
+
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [scenarioForDownload, setScenarioForDownload] =
     useState<ScenarioResponseDTO | null>(null);
@@ -78,19 +85,22 @@ export default function AdminPlansPage() {
 
     setAppliedCityFilter(adjustedCity);
     setAppliedCobradeFilter(pendingCobradeFilter);
+    setAppliedPublishedFilter(pendingPublishedFilter);
   };
 
   const handleClearFilters = () => {
     setPendingCityFilter(null);
     setPendingCobradeFilter(null);
+    setPendingPublishedFilter(null);
     setAppliedCityFilter(null);
     setAppliedCobradeFilter(null);
+    setAppliedPublishedFilter(null);
   };
 
   const filteredScenarios = useMemo(() => {
-    if (!appliedCityFilter && !appliedCobradeFilter) {
+    if (!appliedCityFilter && !appliedCobradeFilter && !appliedPublishedFilter)
       return scenarios;
-    }
+
     return scenarios.filter((s) => {
       const byCity = appliedCityFilter
         ? s.city.name.toLowerCase().includes(appliedCityFilter.toLowerCase())
@@ -99,9 +109,21 @@ export default function AdminPlansPage() {
         ? s.cobrade.subgroup.toLowerCase() ===
           appliedCobradeFilter.toLowerCase()
         : true;
-      return byCity && byCobrade;
+      const byPublished =
+        appliedPublishedFilter === 'Publicado'
+          ? s.published
+          : appliedPublishedFilter === 'Não publicado'
+            ? !s.published
+            : true;
+
+      return byCity && byCobrade && byPublished;
     });
-  }, [scenarios, appliedCityFilter, appliedCobradeFilter]);
+  }, [
+    scenarios,
+    appliedCityFilter,
+    appliedCobradeFilter,
+    appliedPublishedFilter,
+  ]);
 
   const showPagination = filteredScenarios.length > 10;
 
@@ -208,6 +230,9 @@ export default function AdminPlansPage() {
         cobradeValue={pendingCobradeFilter}
         onSearch={handleSearch}
         onClearFilters={handleClearFilters}
+        publishedSearchable={true}
+        publishedValue={pendingPublishedFilter}
+        onSelectPublished={setPendingPublishedFilter}
       />
 
       {loading ? (

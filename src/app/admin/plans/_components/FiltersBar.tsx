@@ -12,6 +12,9 @@ type FiltersBarProps = {
   onSelectCobrade: (value: string | null) => void;
   onSearch: () => void;
   onClearFilters: () => void;
+  publishedSearchable?: boolean;
+  publishedValue?: string | null;
+  onSelectPublished?: (value: string | null) => void;
 };
 
 export function FiltersBar({
@@ -23,6 +26,9 @@ export function FiltersBar({
   onSelectCobrade,
   onSearch,
   onClearFilters,
+  publishedSearchable = false,
+  publishedValue,
+  onSelectPublished,
 }: FiltersBarProps) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -78,9 +84,33 @@ export function FiltersBar({
               size="small"
             />
           </div>
+
+          {publishedSearchable && (
+            <div className="flex-1">
+              <label className="mb-1 block text-sm font-medium">
+                Publicação:
+              </label>
+              <Dropdown
+                label="Status de Publicação"
+                items={['Publicado', 'Não publicado']}
+                value={publishedValue}
+                onSelect={(v) => onSelectPublished?.(v || null)}
+                fullWidth
+                textSize="sm"
+                border="none"
+                bgColor="gray"
+                textColor="gray"
+                size="small"
+              />
+            </div>
+          )}
         </div>
 
-        <div className="flex gap-2">
+        <div
+          className={`flex w-full flex-col items-start gap-5 px-6 md:flex-row ${
+            publishedSearchable ? 'ml-20 md:items-center' : 'md:items-end'
+          }`}
+        >
           <Button variant="terciary" onClick={onClearFilters} type="button">
             Limpar Filtro
           </Button>
