@@ -9,12 +9,11 @@ import { Role } from '@/components/Header';
 const ADMIN_LINKS = [
   { href: '/admin/users', label: 'Usuários' },
   { href: '/admin/plans', label: 'Planos' },
-  { href: '/', label: 'Publicados' },
 ];
 
-const USER_LINKS = [{ href: '/', label: 'Pesquisa' }];
+const USER_LINKS = [{ href: '/', label: 'Planos de Contingência' }];
 
-const GUEST_LINKS = [{ href: '/', label: 'Pesquisa' }];
+const GUEST_LINKS = [{ href: '/', label: 'Planos de Contingência' }];
 
 export function useHeaderAuth() {
   const router = useRouter();
