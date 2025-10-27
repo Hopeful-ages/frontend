@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { ConfirmDownloadModal } from './_components/ConfirmDownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
+import { ConfirmPublishModal } from './_components/ConfirmPublishModal';
 
 type Field = 'cityId' | 'serviceId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
@@ -37,10 +38,22 @@ export default function AdminPlansPage() {
     string | null
   >(null);
 
+  const [pendingPublishedFilter, setPendingPublishedFilter] = useState<
+    string | null
+  >(null);
+  const [appliedPublishedFilter, setAppliedPublishedFilter] = useState<
+    string | null
+  >(null);
+
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [scenarioForDownload, setScenarioForDownload] =
     useState<ScenarioResponseDTO | null>(null);
   const [downloadLoading, setDownloadLoading] = useState(false);
+
+  const [isPublishModalOpen, setPublishModalOpen] = useState(false);
+  const [scenarioForPublish, setScenarioForPublish] =
+    useState<ScenarioResponseDTO | null>(null);
+  const [publishLoading, setPublishLoading] = useState(false);
 
   const { success, error } = useToast();
   const { showLoading, hideLoading } = useLoading();
@@ -72,19 +85,22 @@ export default function AdminPlansPage() {
 
     setAppliedCityFilter(adjustedCity);
     setAppliedCobradeFilter(pendingCobradeFilter);
+    setAppliedPublishedFilter(pendingPublishedFilter);
   };
 
   const handleClearFilters = () => {
     setPendingCityFilter(null);
     setPendingCobradeFilter(null);
+    setPendingPublishedFilter(null);
     setAppliedCityFilter(null);
     setAppliedCobradeFilter(null);
+    setAppliedPublishedFilter(null);
   };
 
   const filteredScenarios = useMemo(() => {
-    if (!appliedCityFilter && !appliedCobradeFilter) {
+    if (!appliedCityFilter && !appliedCobradeFilter && !appliedPublishedFilter)
       return scenarios;
-    }
+
     return scenarios.filter((s) => {
       const byCity = appliedCityFilter
         ? s.city.name.toLowerCase().includes(appliedCityFilter.toLowerCase())
@@ -93,9 +109,21 @@ export default function AdminPlansPage() {
         ? s.cobrade.subgroup.toLowerCase() ===
           appliedCobradeFilter.toLowerCase()
         : true;
-      return byCity && byCobrade;
+      const byPublished =
+        appliedPublishedFilter === 'Publicado'
+          ? s.published
+          : appliedPublishedFilter === 'Não publicado'
+            ? !s.published
+            : true;
+
+      return byCity && byCobrade && byPublished;
     });
-  }, [scenarios, appliedCityFilter, appliedCobradeFilter]);
+  }, [
+    scenarios,
+    appliedCityFilter,
+    appliedCobradeFilter,
+    appliedPublishedFilter,
+  ]);
 
   const showPagination = filteredScenarios.length > 10;
 
@@ -158,6 +186,31 @@ export default function AdminPlansPage() {
     }
   };
 
+  const onPublish = (scenario: ScenarioResponseDTO) => {
+    setScenarioForPublish(scenario);
+    setPublishModalOpen(true);
+  };
+
+  const handleConfirmPublish = async () => {
+    if (!scenarioForPublish) return;
+    setPublishLoading(true);
+    try {
+      const updated = await api.publishScenario(scenarioForPublish.id);
+      success(
+        `Plano "${updated.city.name} - ${updated.cobrade.code}" publicado com sucesso!`,
+      );
+      setPublishModalOpen(false);
+      setScenarios((prev) =>
+        prev.map((s) => (s.id === updated.id ? updated : s)),
+      );
+    } catch (e) {
+      console.error(e);
+      error('Erro ao publicar o plano.');
+    } finally {
+      setPublishLoading(false);
+    }
+  };
+
   if (isAuthLoading) {
     return null;
   }
@@ -177,6 +230,9 @@ export default function AdminPlansPage() {
         cobradeValue={pendingCobradeFilter}
         onSearch={handleSearch}
         onClearFilters={handleClearFilters}
+        publishedSearchable={true}
+        publishedValue={pendingPublishedFilter}
+        onSelectPublished={setPendingPublishedFilter}
       />
 
       {loading ? (
@@ -190,8 +246,10 @@ export default function AdminPlansPage() {
           selectedPlanIds={selectedScenarioIds}
           onSelectionChange={setSelectedScenarioIds}
           isEditable={true}
+          isPublishable={true}
           onEdit={onEdit}
           onDownload={onDownload}
+          onPublish={onPublish}
         />
       )}
 
@@ -212,6 +270,14 @@ export default function AdminPlansPage() {
         scenario={scenarioForDownload}
         onConfirm={handleConfirmDownload}
         onClose={() => setDownloadModalOpen(false)}
+      />
+
+      <ConfirmPublishModal
+        open={isPublishModalOpen}
+        loading={publishLoading}
+        scenario={scenarioForPublish}
+        onConfirm={handleConfirmPublish}
+        onClose={() => setPublishModalOpen(false)}
       />
     </main>
   );

@@ -35,10 +35,10 @@ const buttonClasses = cva(
   {
     variants: {
       size: {
-        small: 'h-8 px-3 w-26 md:w-28 lg:w-30',
-        medium: 'h-10 px-4 w-40 md:w-50 lg:w-62',
-        large: 'h-11 px-5 w-52 md:w-60 lg:w-72',
-        long: 'h-10 px-4 w-64 md:w-80 lg:w-96',
+        small: 'h-8 px-3 min-w-[7.5rem] md:min-w-[8rem] lg:min-w-[11rem]',
+        medium: 'h-10 px-4 min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem]',
+        large: 'h-11 px-5 min-w-[11rem] md:min-w-[12rem] lg:min-w-[13rem]',
+        long: 'h-10 px-4 min-w-[14rem] md:min-w-[16rem] lg:min-w-[18rem]',
       },
       bgColor: {
         white: 'bg-white',

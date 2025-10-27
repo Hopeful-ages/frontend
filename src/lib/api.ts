@@ -216,4 +216,9 @@ export const api = {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   },
+
+  publishScenario: (id: string) =>
+    fetchWithAuth(`/api/scenarios/${id}/publish`, {
+      method: 'PATCH',
+    }) as Promise<ScenarioResponseDTO>,
 };

@@ -1,7 +1,7 @@
 'use client';
 import Table from '@/components/Table';
 import { ScenarioResponseDTO } from '@/lib/types';
-import { FileDown, Pencil } from 'lucide-react';
+import { Check, FileDown, Pencil, X } from 'lucide-react';
 import { useCallback } from 'react';
 
 type PlansTableProps = {
@@ -11,7 +11,9 @@ type PlansTableProps = {
   onSelectionChange: (ids: string[]) => void;
   onEdit?: (id: string) => void;
   onDownload: (scenario: ScenarioResponseDTO) => void;
+  onPublish?: (scenario: ScenarioResponseDTO) => void;
   isEditable?: boolean;
+  isPublishable?: boolean;
 };
 
 const getLatestUpdate = (scenario: ScenarioResponseDTO): string | null => {
@@ -30,7 +32,9 @@ export function PlansTable({
   onSelectionChange,
   onEdit,
   onDownload,
+  onPublish,
   isEditable = false,
+  isPublishable = false,
 }: PlansTableProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -44,9 +48,16 @@ export function PlansTable({
     [onSelectionChange],
   );
 
-  const columnWidths = isEditable
-    ? ['25%', '25%', '20%', '15%', '15%']
-    : ['35%', '35%', '20%', '10%'];
+  const columnWidths = (() => {
+    if (isEditable && isPublishable)
+      return ['22%', '23%', '18%', '12%', '12%', '13%'];
+    if (isEditable && !isPublishable)
+      return ['25%', '25%', '20%', '15%', '15%'];
+    if (!isEditable && isPublishable)
+      return ['30%', '30%', '20%', '10%', '10%'];
+    return ['35%', '35%', '20%', '10%'];
+  })();
+
   const cellPadding = isEditable ? 'px-3 py-2' : 'px-4 py-3';
 
   return (
@@ -73,8 +84,20 @@ export function PlansTable({
               Editar
             </Table.Heading>
           )}
+          {isPublishable && (
+            <Table.Heading
+              width={isEditable ? columnWidths[4] : columnWidths[3]}
+              align="center"
+            >
+              Publicar
+            </Table.Heading>
+          )}
           <Table.Heading
-            width={isEditable ? columnWidths[4] : columnWidths[3]}
+            width={
+              isEditable
+                ? columnWidths[isPublishable ? 5 : 4]
+                : columnWidths[isPublishable ? 4 : 3]
+            }
             align="center"
           >
             Download
@@ -109,6 +132,25 @@ export function PlansTable({
                     </button>
                   </Table.Cell>
                 )}
+                {isPublishable && (
+                  <Table.Cell align="center" className={cellPadding}>
+                    <button
+                      type="button"
+                      title={
+                        row.published ? 'Plano publicado' : 'Publicar Plano'
+                      }
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-200"
+                      onClick={() => !row.published && onPublish?.(row)}
+                    >
+                      {row.published ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <X className="h-4 w-4" />
+                      )}
+                    </button>
+                  </Table.Cell>
+                )}
+
                 <Table.Cell align="center" className={cellPadding}>
                   <button
                     type="button"
