@@ -51,7 +51,7 @@ function handleApiErrors(
     const [field, ...rest] = p.split(':');
     if (field && rest.length) {
       const f = field.trim() as Field;
-      let msg = rest.join(':').trim();
+      const msg = rest.join(':').trim();
 
       next[f] = msg.charAt(0).toUpperCase() + msg.slice(1);
     }
