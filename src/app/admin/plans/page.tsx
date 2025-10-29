@@ -6,9 +6,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 import { useToast } from '@/hooks/useToast';
+import { useDownloadPdf } from '@/hooks/useDownloadPdf';
 import { useLoading } from '@/providers/LoadingProvider';
 import { useRouter } from 'next/navigation';
-import { ConfirmDownloadModal } from './_components/ConfirmDownloadModal';
+import DownloadModal from '@/components/DownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
 import { ConfirmPublishModal } from './_components/ConfirmPublishModal';
@@ -23,6 +24,15 @@ export default function AdminPlansPage() {
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
 
   const [selectedScenarioIds, setSelectedScenarioIds] = useState<string[]>([]);
+
+  const {
+    isDownloadModalOpen,
+    selectedPlanForDownload,
+    handleDownload,
+    handleConfirmDownload,
+    handleCancelDownload,
+    downloadPdf,
+  } = useDownloadPdf();
 
   const [pendingCityFilter, setPendingCityFilter] = useState<string | null>(
     null,
@@ -44,11 +54,6 @@ export default function AdminPlansPage() {
   const [appliedPublishedFilter, setAppliedPublishedFilter] = useState<
     string | null
   >(null);
-
-  const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [scenarioForDownload, setScenarioForDownload] =
-    useState<ScenarioResponseDTO | null>(null);
-  const [downloadLoading, setDownloadLoading] = useState(false);
 
   const [isPublishModalOpen, setPublishModalOpen] = useState(false);
   const [scenarioForPublish, setScenarioForPublish] =
@@ -157,12 +162,7 @@ export default function AdminPlansPage() {
     router.push(`/admin/create-scenario/${id}`);
   };
 
-  const onDownload = (scenario: ScenarioResponseDTO) => {
-    setScenarioForDownload(scenario);
-    setDownloadModalOpen(true);
-  };
-
-  const handleBulkDownload = () => {
+  const handleBulkDownload = async () => {
     const selectedScenarios = scenarios.filter((s) =>
       selectedScenarioIds.includes(s.id),
     );
@@ -172,17 +172,18 @@ export default function AdminPlansPage() {
     }
 
     success(`Iniciando download de ${selectedScenarios.length} plano(s)...`);
-    selectedScenarios.forEach((scenario) => {
-      const downloadUrl = `/api/scenarios/${scenario.id}/download`;
-      window.open(downloadUrl, '_blank');
-    });
-  };
 
-  const handleConfirmDownload = () => {
-    if (scenarioForDownload) {
-      const downloadUrl = `/api/scenarios/${scenarioForDownload.id}/download`;
-      window.open(downloadUrl, '_blank');
-      setDownloadModalOpen(false);
+    for (const scenario of selectedScenarios) {
+      try {
+        await downloadPdf(scenario);
+        // Pequeno delay entre downloads para evitar problemas
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      } catch (err) {
+        console.error(
+          `Erro ao baixar PDF do plano ${scenario.city.name}:`,
+          err,
+        );
+      }
     }
   };
 
@@ -248,7 +249,7 @@ export default function AdminPlansPage() {
           isEditable={true}
           isPublishable={true}
           onEdit={onEdit}
-          onDownload={onDownload}
+          onDownload={handleDownload}
           onPublish={onPublish}
         />
       )}
@@ -264,12 +265,22 @@ export default function AdminPlansPage() {
         </div>
       )}
 
-      <ConfirmDownloadModal
-        open={isDownloadModalOpen}
-        loading={downloadLoading}
-        scenario={scenarioForDownload}
+      <DownloadModal
+        isOpen={isDownloadModalOpen}
+        city={
+          selectedPlanForDownload
+            ? `${selectedPlanForDownload.city.name} - ${selectedPlanForDownload.city.state}`
+            : ''
+        }
+        year={
+          selectedPlanForDownload && selectedPlanForDownload.tasks.length > 0
+            ? new Date(selectedPlanForDownload.tasks[0].lastUpdateDate)
+                .getFullYear()
+                .toString()
+            : new Date().getFullYear().toString()
+        }
         onConfirm={handleConfirmDownload}
-        onClose={() => setDownloadModalOpen(false)}
+        onCancel={handleCancelDownload}
       />
 
       <ConfirmPublishModal

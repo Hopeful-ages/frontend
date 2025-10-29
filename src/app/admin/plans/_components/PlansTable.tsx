@@ -154,9 +154,18 @@ export function PlansTable({
                 <Table.Cell align="center" className={cellPadding}>
                   <button
                     type="button"
-                    title="Download do Plano"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-200"
-                    onClick={() => onDownload(row)}
+                    title={
+                      row.published
+                        ? 'Download do Plano'
+                        : 'Download disponível apenas para planos publicados'
+                    }
+                    disabled={!row.published}
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
+                      row.published
+                        ? 'hover:bg-gray-200'
+                        : 'cursor-not-allowed opacity-40'
+                    }`}
+                    onClick={() => row.published && onDownload(row)}
                   >
                     <FileDown className="h-4 w-4" />
                   </button>

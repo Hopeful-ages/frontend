@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { ScenarioResponseDTO } from '@/lib/types';
 import { useToast } from '@/hooks/useToast';
+import { useDownloadPdf } from '@/hooks/useDownloadPdf';
 import { FiltersBar } from './admin/plans/_components/FiltersBar';
 import { PlansTable } from './admin/plans/_components/PlansTable';
 import PlanCard from '@/components/PlanCard';
@@ -13,6 +14,13 @@ import { Filter } from 'lucide-react';
 
 export default function PlanSearchPage() {
   const { error } = useToast();
+  const {
+    isDownloadModalOpen,
+    selectedPlanForDownload,
+    handleDownload,
+    handleConfirmDownload,
+    handleCancelDownload,
+  } = useDownloadPdf();
 
   const [loading, setLoading] = useState(true);
 
@@ -35,9 +43,6 @@ export default function PlanSearchPage() {
   const [selectedPlanIds, setSelectedPlanIds] = useState<string[]>([]);
 
   const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
-  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
-  const [selectedPlanForDownload, setSelectedPlanForDownload] =
-    useState<ScenarioResponseDTO | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -71,38 +76,6 @@ export default function PlanSearchPage() {
     setPendingCobradeFilter(null);
     setAppliedCityFilter(null);
     setAppliedCobradeFilter(null);
-  };
-
-  const handleDownload = (plan: ScenarioResponseDTO) => {
-    setSelectedPlanForDownload(plan);
-    setIsDownloadModalOpen(true);
-  };
-
-  const handleConfirmDownload = async () => {
-    if (selectedPlanForDownload) {
-      try {
-        const res = await api.downloadScenarioPdf(selectedPlanForDownload.id);
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `plano-contingencia-${selectedPlanForDownload.city.name}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } catch (err) {
-        console.error('Erro ao baixar PDF:', err);
-        error('Erro ao baixar o PDF. Tente novamente.');
-      }
-    }
-    setIsDownloadModalOpen(false);
-    setSelectedPlanForDownload(null);
-  };
-
-  const handleCancelDownload = () => {
-    setIsDownloadModalOpen(false);
-    setSelectedPlanForDownload(null);
   };
 
   const cityNames = useMemo(() => {
