@@ -4,7 +4,7 @@ import {
   CityResponseDTO,
   ScenarioRequestDTO,
   ScenarioResponseDTO,
-  ScenarioUpdateDTO,
+  ServiceRequestDTO,
   ServiceResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
@@ -212,4 +212,18 @@ export const api = {
     fetchWithAuth(`/api/scenarios/${id}/publish`, {
       method: 'PATCH',
     }) as Promise<ScenarioResponseDTO>,
+
+  createService: (payload: ServiceRequestDTO) =>
+    fetchWithAuth('/api/services', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }) as Promise<ServiceResponseDTO>,
+
+  getService: (id: string) =>
+    fetchWithAuth(`/api/services/${id}`) as Promise<ServiceResponseDTO>,
+
+  deleteService: (id: string) =>
+    fetchWithAuthVoid(`/api/services/${id}`, {
+      method: 'DELETE',
+    }),
 };
