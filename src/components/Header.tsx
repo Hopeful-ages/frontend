@@ -4,7 +4,6 @@ import { LogOut, LogIn } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button } from './Button';
 import { useHeaderAuth } from '@/hooks/useHeaderAuth';
 
 export enum Role {
@@ -47,13 +46,12 @@ export default function Header() {
 
       <div className="flex items-center gap-6">
         {(role === Role.ADMIN || role === Role.USER) && (
-          <Button variant="primary" size="sm" className="h-0.5 w-52 p-0.5">
-            <Link
-              href={role === Role.ADMIN ? '/admin/create-scenario' : '/user'}
-            >
-              Criar Cenário
-            </Link>
-          </Button>
+          <Link
+            href={role === Role.ADMIN ? '/admin/create-scenario' : '/user'}
+            className="inline-flex h-8 w-52 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 text-sm font-medium text-white transition-colors hover:bg-blue-900 focus-visible:ring-0 focus-visible:outline-none active:bg-blue-800"
+          >
+            Criar Cenário
+          </Link>
         )}
 
         {isAuthenticated ? (
