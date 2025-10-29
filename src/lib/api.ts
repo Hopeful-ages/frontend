@@ -205,16 +205,7 @@ export const api = {
       const txt = await res.text().catch(() => '');
       throw new Error(`Erro ao baixar PDF: ${res.status} ${txt}`);
     }
-
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `plano-contingencia-${scenarioId}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    return res;
   },
 
   publishScenario: (id: string) =>

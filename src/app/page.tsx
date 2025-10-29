@@ -81,7 +81,16 @@ export default function PlanSearchPage() {
   const handleConfirmDownload = async () => {
     if (selectedPlanForDownload) {
       try {
-        await api.downloadScenarioPdf(selectedPlanForDownload.id);
+        const res = await api.downloadScenarioPdf(selectedPlanForDownload.id);
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `plano-contingencia-${selectedPlanForDownload.city.name}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       } catch (err) {
         console.error('Erro ao baixar PDF:', err);
         error('Erro ao baixar o PDF. Tente novamente.');
