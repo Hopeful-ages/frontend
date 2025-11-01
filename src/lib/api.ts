@@ -111,6 +111,12 @@ export const api = {
     Cookies.remove('user');
   },
 
+  post: (url: string, body: any) => 
+    fetchPublic(url, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
   getUsers: (status?: 'active' | 'inactive') =>
     fetchWithAuth(`/api/users${status ? `?status=${status}` : ''}`) as Promise<
       UserResponseDTO[]

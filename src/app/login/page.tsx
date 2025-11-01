@@ -113,7 +113,7 @@ export default function LoginPage() {
 
           <div className="flex justify-end">
             <Link
-              href="/esqueci-senha"
+              href="/forgot-password"
               className="text-sm text-gray-600 hover:text-black hover:underline"
             >
               Esqueci minha senha
