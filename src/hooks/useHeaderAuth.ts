@@ -9,6 +9,7 @@ import { Role } from '@/components/Header';
 const ADMIN_LINKS = [
   { href: '/admin/users', label: 'Usuários' },
   { href: '/admin/plans', label: 'Planos' },
+  { href: '/admin/services', label: 'Serviços' },
 ];
 
 const USER_LINKS = [{ href: '/', label: 'Planos de Contingência' }];

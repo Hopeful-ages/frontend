@@ -25,7 +25,9 @@ export type ServiceSummaryDTO = { id: string; name: string };
 export type CitySummaryDTO = { id: string; name: string; state: string };
 export type RoleSummaryDTO = { id: string; name: string };
 
+export type ServiceRequestDTO = { name: string; };
 export type ServiceResponseDTO = ServiceSummaryDTO;
+
 export type CityResponseDTO = CitySummaryDTO;
 export type RoleResponseDTO = RoleSummaryDTO;
 
