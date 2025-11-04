@@ -73,7 +73,7 @@ export default function UserPage() {
           return;
         }
 
-        if (!userData.service) {
+        if (!userData.department) {
           setUserLoadingError(
             'Sua conta não tem um serviço associado. Entre em contato com o administrador para configurar seu serviço.',
           );
@@ -205,7 +205,7 @@ export default function UserPage() {
       return;
     }
 
-    if (!userDetails?.service) {
+    if (!userDetails?.department) {
       toastError(
         'Erro: Serviço não associado',
         'Associe-se a um serviço para criar cenários.',
@@ -227,7 +227,7 @@ export default function UserPage() {
         return {
           description,
           phase: mapStepToPhase(protocol.phase) || phaseMap[currentStep],
-          serviceId: userDetails.service!.id,
+          departmentId: userDetails.department!.id,
         };
       });
 
@@ -236,12 +236,12 @@ export default function UserPage() {
         .map((t) => ({
           description: t.description,
           phase: mapStepToPhase(t.phase) || phaseMap[currentStep],
-          serviceId: t.service?.id || userDetails.service!.id,
+          departmentId: t.department?.id || userDetails.department!.id,
         }));
 
       const baseScenarioData: ScenarioRequestDTO = {
         description: `Plano de contingência para ${cobrade.subgroup || cobrade.type || 'emergências'}`,
-        origin: `Plano criado por ${userDetails.service.name} para ${cobrade.subType || cobrade.type || 'emergências'} em ${userDetails.city.name}`,
+        origin: `Plano criado por ${userDetails.department.name} para ${cobrade.subType || cobrade.type || 'emergências'} em ${userDetails.city.name}`,
         cityId: userDetails.city.id,
         cobradeId: cobrade.id,
         tasks:
@@ -314,10 +314,10 @@ export default function UserPage() {
 
       return {
         id: task.id,
-        description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${lastUpdateYear})`,
+        description: `${task.description} (${task.department?.name || 'Sem serviço'}, ${lastUpdateYear})`,
         phase: task.phase,
         isExisting: true,
-        canEdit: task.service?.id === userDetails?.service?.id,
+        canEdit: task.department?.id === userDetails?.department?.id,
       };
     }),
     ...protocols.map(
@@ -402,7 +402,7 @@ export default function UserPage() {
     );
   }
 
-  if (!userDetails || !userDetails.city || !userDetails.service) {
+  if (!userDetails || !userDetails.city || !userDetails.department) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -441,7 +441,7 @@ export default function UserPage() {
                 Seu Serviço
               </label>
               <div className="mt-1 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700">
-                {userDetails.service.name}
+                {userDetails.department.name}
               </div>
               <p className="mt-1 text-xs text-gray-500">
                 Todas as tarefas serão associadas ao seu serviço
@@ -505,11 +505,13 @@ export default function UserPage() {
             size="md"
             onClick={() => setIsTaskModalOpen(true)}
             leftIcon={<Plus size={16} />}
-            disabled={!cobrade || !userDetails?.city || !userDetails?.service}
+            disabled={
+              !cobrade || !userDetails?.city || !userDetails?.department
+            }
             title={
               !cobrade
                 ? 'Selecione um COBRADE primeiro'
-                : !userDetails?.city || !userDetails?.service
+                : !userDetails?.city || !userDetails?.department
                   ? 'Dados de cidade/serviço indisponíveis'
                   : undefined
             }
@@ -536,7 +538,7 @@ export default function UserPage() {
           setEditTask(null);
         }}
         onSave={(taskData) => {
-          if (taskData.id) {
+          if (taskData.departmentId) {
             const isExistingTask = existingTasks.some(
               (t) => t.id === taskData.id,
             );
@@ -548,7 +550,7 @@ export default function UserPage() {
                         ...t,
                         description: taskData.description,
                         phase: phaseMap[currentStep],
-                        service: t.service,
+                        departmentId: taskData.departmentId,
                       }
                     : t,
                 ),
@@ -559,7 +561,7 @@ export default function UserPage() {
                   p.id === taskData.id
                     ? {
                         ...p,
-                        description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
+                        description: `${taskData.description} (${taskData.departmentId}, ${new Date().getFullYear()})`,
                         phase: phaseMap[currentStep],
                       }
                     : p,
@@ -569,13 +571,13 @@ export default function UserPage() {
           } else {
             const newProtocol: Protocol = {
               id: Date.now().toString(),
-              description: `${taskData.description} (${taskData.service}, ${new Date().getFullYear()})`,
+              description: `${taskData.description} (${taskData.departmentId}, ${new Date().getFullYear()})`,
               phase: phaseMap[currentStep],
             };
             setProtocols((prev) => [...prev, newProtocol]);
           }
         }}
-        userServiceName={userDetails.service.name}
+        userDepartmentId={userDetails.department.id}
         currentPhase={currentStep}
         editingTask={
           editTask

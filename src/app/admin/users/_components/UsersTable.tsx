@@ -58,7 +58,7 @@ export function UsersTable({
                   <span>{row.name}</span>
                 </div>
               </Table.Cell>
-              <Table.Cell>{row.service?.name ?? '—'}</Table.Cell>
+              <Table.Cell>{row.department?.name ?? '—'}</Table.Cell>
               <Table.Cell>
                 {row.city ? `${row.city.name} - ${row.city.state}` : '—'}
               </Table.Cell>

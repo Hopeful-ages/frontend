@@ -1,10 +1,10 @@
 'use client';
 import Table from '@/components/Table';
-import { ServiceResponseDTO } from '@/lib/types';
+import { DepartmentResponseDTO } from '@/lib/types';
 import { Hammer, X } from 'lucide-react';
 
 type ServicesTableProps = {
-  rows: ServiceResponseDTO[];
+  rows: DepartmentResponseDTO[];
   showPagination: boolean;
   onDeleteAction: (id: string) => void;
 };
@@ -16,7 +16,7 @@ export function ServicesTable({
 }: ServicesTableProps) {
   return (
     <div className="w-full overflow-x-auto">
-      <Table<ServiceResponseDTO>
+      <Table<DepartmentResponseDTO>
         rows={rows}
         size="md"
         divider
@@ -28,23 +28,27 @@ export function ServicesTable({
           <Table.Row>
             <Table.Heading accessor="name" sortable width="35%">
               Nome
-            </Table.Heading>         
-            <Table.Heading width="7%" align="center" className="sticky right-0 bg-white">
+            </Table.Heading>
+            <Table.Heading
+              width="7%"
+              align="center"
+              className="sticky right-0 bg-white"
+            >
               Excluir
             </Table.Heading>
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
-          <Table.Rows<ServiceResponseDTO>>
+          <Table.Rows<DepartmentResponseDTO>>
             {(row) => (
               <Table.Row key={row.id} row={row}>
                 <Table.Cell>
                   <div className="flex items-center gap-2">
-                    <Hammer className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                    <Hammer className="h-5 w-5 flex-shrink-0 text-gray-600" />
                     <span className="truncate">{row.name}</span>
                   </div>
-                </Table.Cell>                                  
+                </Table.Cell>
                 <Table.Cell align="center" className="sticky right-0 bg-white">
                   <button
                     type="button"

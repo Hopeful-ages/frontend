@@ -87,14 +87,14 @@ export type CobradeDTO = {
 export type TaskRequestDTO = {
   description: string;
   phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
-  serviceId?: string | null;
+  departmentId?: string | null;
 };
 
 export type TaskUpdateDTO = Partial<{
   description: string;
   phase: 'ANTES' | 'DURANTE' | 'DEPOIS';
   lastUpdateDate: string;
-  serviceId: string | null;
+  departmentId?: string | null;
 }>;
 
 export type ParameterRequestDTO = {

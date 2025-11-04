@@ -1,21 +1,20 @@
 'use client';
 
 import { api } from '@/lib/api';
-import {
-  ApiError,
-  ServiceResponseDTO,
-} from '@/lib/types';
+import { ApiError, DepartmentResponseDTO } from '@/lib/types';
 import { useEffect, useRef, useState } from 'react';
 
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 import { useToast } from '@/hooks/useToast';
 import { useLoading } from '@/providers/LoadingProvider';
 import { FiltersBar } from './_components/FiltersBar';
-import { ServiceFormModal, ServiceFormState } from './_components/ServiceFormModal';
+import {
+  ServiceFormModal,
+  ServiceFormState,
+} from './_components/ServiceFormModal';
 import { ServicesTable } from './_components/ServicesTable';
 
-type Field =
-  | 'name';
+type Field = 'name';
 
 type Errors = Partial<Record<Field, string>>;
 function handleApiErrors(
@@ -36,7 +35,7 @@ function handleApiErrors(
   if (!backendMsg) {
     fallback(
       apiErr.raw ||
-      'Não foi possível completar a ação. Verifique sua conexão ou tente novamente.',
+        'Não foi possível completar a ação. Verifique sua conexão ou tente novamente.',
     );
     return;
   }
@@ -62,9 +61,7 @@ function handleApiErrors(
     return;
   }
 
-  const possibleFields: Field[] = [
-    'name',
-  ];
+  const possibleFields: Field[] = ['name'];
 
   const lowerMsg = backendMsg.toLowerCase();
   const matchedField = possibleFields.find((f) =>
@@ -83,7 +80,7 @@ function handleApiErrors(
 
 export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
-  const [services, setServices] = useState<ServiceResponseDTO[]>([]);
+  const [services, setServices] = useState<DepartmentResponseDTO[]>([]);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -134,17 +131,14 @@ export default function AdminUsersPage() {
     return ok;
   }
 
-  const canClickSave = isEdit
-    ? !!form.name.trim() : !!form.name.trim();
+  const canClickSave = isEdit ? !!form.name.trim() : !!form.name.trim();
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        const [s] = await Promise.all([
-          api.getAllServices(),
-        ]);
+        const [s] = await Promise.all([api.getAllDepartments()]);
         if (!mounted) return;
         setServices(s);
       } catch (e) {
@@ -184,9 +178,11 @@ export default function AdminUsersPage() {
       const apiErr = err as ApiError;
       const errorMessage = apiErr?.data?.message || apiErr?.raw || '';
 
-      if (errorMessage.includes('foreign key constraint') || 
-          errorMessage.includes('fk_servico') ||
-          errorMessage.includes('still referenced')) {
+      if (
+        errorMessage.includes('foreign key constraint') ||
+        errorMessage.includes('fk_servico') ||
+        errorMessage.includes('still referenced')
+      ) {
         error('Não é possível excluir um serviço pertencente a algum usuário');
       } else {
         error('Falha ao deletar o serviço');
@@ -231,17 +227,15 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <main className="mx-auto mt-16 sm:mt-20 w-full flex-1 px-4 sm:px-6 py-4 sm:py-6">
-      <div className="mb-4 sm:mb-5 ml-0 sm:ml-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-0">Serviços</h1>
+    <main className="mx-auto mt-16 w-full flex-1 px-4 py-4 sm:mt-20 sm:px-6 sm:py-6">
+      <div className="mb-4 ml-0 flex flex-col items-start justify-between gap-3 sm:mb-5 sm:ml-5 sm:flex-row sm:items-center sm:gap-0">
+        <h1 className="mb-0 text-2xl font-bold sm:text-3xl">Serviços</h1>
       </div>
 
-      <FiltersBar
-        onCreateAction={openCreate}
-      />
+      <FiltersBar onCreateAction={openCreate} />
 
       {loading ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 text-gray-700 text-sm sm:text-base">
+        <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700 sm:p-6 sm:text-base">
           Carregando...
         </div>
       ) : (
