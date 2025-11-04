@@ -4,11 +4,13 @@ import {
   CityResponseDTO,
   ScenarioRequestDTO,
   ScenarioResponseDTO,
-  ServiceRequestDTO,
-  ServiceResponseDTO,
+  DepartmentRequestDTO,
+  DepartmentResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
   UserUpdateDTO,
+  RoleRequestDTO,
+  RoleResponseDTO,
   CobradeDTO,
 } from './types';
 
@@ -117,12 +119,14 @@ export const api = {
     >,
 
   getAllServices: () =>
-    fetchWithAuth('/api/services') as Promise<ServiceResponseDTO[]>,
+    fetchWithAuth('/api/services') as Promise<DepartmentResponseDTO[]>,
   getAllCobrades: () => fetchWithAuth('/api/cobrades') as Promise<CobradeDTO[]>,
   getCobradeById: (id: string) =>
     fetchWithAuth(`/api/cobrades/${id}`) as Promise<CobradeDTO>,
 
   getAllCities: () => fetchWithAuth('/api/city') as Promise<CityResponseDTO[]>,
+
+  getAllRoles: () => fetchWithAuth('/api/roles') as Promise<RoleResponseDTO[]>,
 
   createUser: (payload: UserRequestDTO) =>
     fetchWithAuth('/api/users', {
@@ -213,14 +217,14 @@ export const api = {
       method: 'PATCH',
     }) as Promise<ScenarioResponseDTO>,
 
-  createService: (payload: ServiceRequestDTO) =>
+  createService: (payload: DepartmentRequestDTO) =>
     fetchWithAuth('/api/services', {
       method: 'POST',
       body: JSON.stringify(payload),
-    }) as Promise<ServiceResponseDTO>,
+    }) as Promise<DepartmentResponseDTO>,
 
   getService: (id: string) =>
-    fetchWithAuth(`/api/services/${id}`) as Promise<ServiceResponseDTO>,
+    fetchWithAuth(`/api/services/${id}`) as Promise<DepartmentResponseDTO>,
 
   deleteService: (id: string) =>
     fetchWithAuthVoid(`/api/services/${id}`, {

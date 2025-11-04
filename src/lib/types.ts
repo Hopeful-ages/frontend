@@ -4,7 +4,7 @@ export type UserResponseDTO = {
   cpf: string;
   email: string;
   phone: string;
-  service: ServiceSummaryDTO | null;
+  department: DepartmentSummaryDTO | null;
   city: CitySummaryDTO | null;
   accountStatus: boolean;
   role: RoleSummaryDTO | null;
@@ -16,19 +16,21 @@ export type UserRequestDTO = {
   email: string;
   phone: string;
   password: string;
-  serviceId?: string;
+  departmentId?: string;
   cityId?: string;
   roleId?: string;
 };
 
-export type ServiceSummaryDTO = { id: string; name: string };
+export type DepartmentSummaryDTO = { id: string; name: string };
 export type CitySummaryDTO = { id: string; name: string; state: string };
 export type RoleSummaryDTO = { id: string; name: string };
 
-export type ServiceRequestDTO = { name: string; };
-export type ServiceResponseDTO = ServiceSummaryDTO;
+export type DepartmentRequestDTO = { name: string };
+export type DepartmentResponseDTO = DepartmentSummaryDTO;
 
 export type CityResponseDTO = CitySummaryDTO;
+
+export type RoleRequestDTO = { name: string };
 export type RoleResponseDTO = RoleSummaryDTO;
 
 export type TaskSummaryDTO = {
@@ -36,7 +38,7 @@ export type TaskSummaryDTO = {
   description: string;
   phase: string;
   lastUpdateDate: string;
-  service: ServiceSummaryDTO | null;
+  department: DepartmentSummaryDTO | null;
 };
 
 export type TaskResponseDTO = TaskSummaryDTO;
@@ -67,8 +69,9 @@ export type UserUpdateDTO = Partial<{
   email: string;
   phone: string;
   password: string;
-  serviceId: string | null;
+  departmentId: string | null;
   cityId: string | null;
+  roleId: string | null;
   accountStatus: boolean;
 }>;
 

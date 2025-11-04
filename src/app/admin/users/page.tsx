@@ -4,9 +4,10 @@ import { api } from '@/lib/api';
 import {
   ApiError,
   CityResponseDTO,
-  ServiceResponseDTO,
+  DepartmentResponseDTO,
   UserResponseDTO,
   UserUpdateDTO,
+  RoleResponseDTO,
 } from '@/lib/types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -26,8 +27,9 @@ type Field =
   | 'phone'
   | 'password'
   | 'confirm'
-  | 'serviceId'
-  | 'cityId';
+  | 'departmentId'
+  | 'cityId'
+  | 'roleId';
 
 type Errors = Partial<Record<Field, string>>;
 function handleApiErrors(
@@ -89,8 +91,9 @@ function handleApiErrors(
     'phone',
     'password',
     'confirm',
-    'serviceId',
+    'departmentId',
     'cityId',
+    'roleId',
   ];
 
   const lowerMsg = backendMsg.toLowerCase();
@@ -114,8 +117,9 @@ const CPF_RE = /^[0-9.\-]{11,14}$/;
 export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<UserResponseDTO[]>([]);
-  const [services, setServices] = useState<ServiceResponseDTO[]>([]);
+  const [services, setServices] = useState<DepartmentResponseDTO[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
+  const [roles, setRoles] = useState<RoleResponseDTO[]>([]);
 
   const [pendingCityFilter, setPendingCityFilter] = useState<string | null>(
     null,
@@ -158,7 +162,7 @@ export default function AdminUsersPage() {
     phone: '',
     password: '',
     confirm: '',
-    serviceId: '',
+    departmentId: '',
     cityId: '',
     roleId: '',
   });
@@ -166,6 +170,7 @@ export default function AdminUsersPage() {
 
   const serviceNames = services.map((s) => s.name);
   const cityNames = cities.map((c) => `${c.name} - ${c.state}`);
+  const roleNames = roles.map((r) => r.name);
 
   useEffect(() => {
     if (isLoading) {
@@ -187,10 +192,16 @@ export default function AdminUsersPage() {
     return city ? `${city.name} - ${city.state}` : null;
   };
 
+  const roleNameById = (id: string) => {
+    const role = roles.find((r) => r.id === id);
+    return role ? role.name : null;
+  };
+
   const setServiceByName = (name: string) => {
     const id = services.find((s) => s.name === name)?.id ?? '';
-    setForm((f) => ({ ...f, serviceId: id }));
-    if (errors.serviceId) setErrors((e) => ({ ...e, serviceId: undefined }));
+    setForm((f) => ({ ...f, departmentId: id }));
+    if (errors.departmentId)
+      setErrors((e) => ({ ...e, departmentId: undefined }));
   };
 
   const setCityByName = (value: string) => {
@@ -198,6 +209,12 @@ export default function AdminUsersPage() {
     const id = cities.find((c) => c.name === cityName)?.id ?? '';
     setForm((f) => ({ ...f, cityId: id }));
     if (errors.cityId) setErrors((e) => ({ ...e, cityId: undefined }));
+  };
+
+  const setRoleByName = (name: string) => {
+    const id = roles.find((r) => r.name === name)?.id ?? '';
+    setForm((f) => ({ ...f, roleId: id }));
+    if (errors.roleId) setErrors((e) => ({ ...e, roleId: undefined }));
   };
 
   function validateField(field: Field, value: string, snapshot = form): string {
@@ -221,10 +238,12 @@ export default function AdminUsersPage() {
         return value && value === snapshot.password
           ? ''
           : 'As senhas não coincidem';
-      case 'serviceId':
+      case 'departmentId':
         return value ? '' : 'Selecione um serviço';
       case 'cityId':
         return value ? '' : 'Selecione uma cidade';
+      case 'roleId':
+        return value ? '' : 'Selecione uma função';
       default:
         return '';
     }
@@ -238,8 +257,9 @@ export default function AdminUsersPage() {
       phone: validateField('phone', form.phone),
       password: validateField('password', form.password),
       confirm: validateField('confirm', form.confirm, form),
-      serviceId: validateField('serviceId', form.serviceId),
+      departmentId: validateField('departmentId', form.departmentId),
       cityId: validateField('cityId', form.cityId),
+      roleId: validateField('roleId', form.roleId),
     };
     setErrors(next);
     const ok = Object.values(next).every((v) => !v);
@@ -254,31 +274,35 @@ export default function AdminUsersPage() {
       !!form.cpf.trim() &&
       !!form.email.trim() &&
       !!form.phone.trim() &&
-      !!form.serviceId &&
-      !!form.cityId
+      !!form.departmentId &&
+      !!form.cityId &&
+      !!form.roleId
     : !!form.name.trim() &&
       !!form.cpf.trim() &&
       !!form.email.trim() &&
       !!form.phone.trim() &&
       !!form.password.trim() &&
       !!form.confirm.trim() &&
-      !!form.serviceId &&
-      !!form.cityId;
+      !!form.departmentId &&
+      !!form.cityId &&
+      !!form.roleId;
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        const [u, s, c] = await Promise.all([
+        const [u, s, c, r] = await Promise.all([
           api.getUsers(),
           api.getAllServices(),
           api.getAllCities(),
+          api.getAllRoles(),
         ]);
         if (!mounted) return;
         setUsers(u);
         setServices(s);
         setCities(c);
+        setRoles(r);
       } catch (e) {
         console.error(e);
         error('Falha ao carregar dados');
@@ -294,7 +318,7 @@ export default function AdminUsersPage() {
   const filtered = useMemo(() => {
     return users.filter((u) => {
       const byService = appliedServiceFilter
-        ? (u.service?.name ?? '').toLowerCase() ===
+        ? (u.department?.name ?? '').toLowerCase() ===
           appliedServiceFilter.toLowerCase()
         : true;
       const byCity = appliedCityFilter
@@ -339,7 +363,7 @@ export default function AdminUsersPage() {
       phone: '',
       password: '',
       confirm: '',
-      serviceId: '',
+      departmentId: '',
       cityId: '',
       roleId: '',
     });
@@ -358,7 +382,7 @@ export default function AdminUsersPage() {
         phone: u.phone ?? '',
         password: '',
         confirm: '',
-        serviceId: u.service?.id ?? '',
+        departmentId: u.department?.id ?? '',
         cityId: u.city?.id ?? '',
         roleId: u.role?.id ?? '',
       });
@@ -419,8 +443,9 @@ export default function AdminUsersPage() {
         cpf: form.cpf.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
-        serviceId: form.serviceId,
+        departmentId: form.departmentId,
         cityId: form.cityId,
+        roleId: form.roleId,
         ...(form.password ? { password: form.password } : {}),
       };
       try {
@@ -442,8 +467,9 @@ export default function AdminUsersPage() {
         email: form.email.trim(),
         phone: form.phone.trim(),
         password: form.password,
-        serviceId: form.serviceId,
+        departmentId: form.departmentId,
         cityId: form.cityId,
+        roleId: form.roleId,
       };
       try {
         const created = await api.createUser(payload);
@@ -517,13 +543,16 @@ export default function AdminUsersPage() {
         canClickSave={canClickSave}
         serviceNames={serviceNames}
         cityNames={cityNames}
-        valueServiceName={serviceNameById(form.serviceId)}
+        roleNames={roleNames}
+        valueServiceName={serviceNameById(form.departmentId)}
         valueCityName={cityNameById(form.cityId)}
+        valueRoleName={roleNameById(form.roleId)}
         onClose={closeCreate}
         onSave={onSave}
         onUpdate={onUpdate}
         onSelectServiceByName={setServiceByName}
         onSelectCityByName={setCityByName}
+        onSelectRoleByName={setRoleByName}
       />
 
       <ConfirmToggleModal
