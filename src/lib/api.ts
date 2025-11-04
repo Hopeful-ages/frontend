@@ -118,7 +118,7 @@ export const api = {
       UserResponseDTO[]
     >,
 
-  getAllServices: () =>
+  getAllDepartments: () =>
     fetchWithAuth('/api/services') as Promise<DepartmentResponseDTO[]>,
   getAllCobrades: () => fetchWithAuth('/api/cobrades') as Promise<CobradeDTO[]>,
   getCobradeById: (id: string) =>

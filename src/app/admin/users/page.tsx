@@ -117,7 +117,7 @@ const CPF_RE = /^[0-9.\-]{11,14}$/;
 export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<UserResponseDTO[]>([]);
-  const [services, setServices] = useState<DepartmentResponseDTO[]>([]);
+  const [departments, setDepartments] = useState<DepartmentResponseDTO[]>([]);
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
   const [roles, setRoles] = useState<RoleResponseDTO[]>([]);
 
@@ -168,7 +168,7 @@ export default function AdminUsersPage() {
   });
   const [errors, setErrors] = useState<Errors>({});
 
-  const serviceNames = services.map((s) => s.name);
+  const departmentNames = departments.map((s) => s.name);
   const cityNames = cities.map((c) => `${c.name} - ${c.state}`);
   const roleNames = roles.map((r) => r.name);
 
@@ -186,7 +186,7 @@ export default function AdminUsersPage() {
   }, [isLoading, showLoading, hideLoading, warning]);
 
   const serviceNameById = (id: string) =>
-    services.find((s) => s.id === id)?.name ?? null;
+    departments.find((s) => s.id === id)?.name ?? null;
   const cityNameById = (id: string) => {
     const city = cities.find((c) => c.id === id);
     return city ? `${city.name} - ${city.state}` : null;
@@ -198,7 +198,7 @@ export default function AdminUsersPage() {
   };
 
   const setServiceByName = (name: string) => {
-    const id = services.find((s) => s.name === name)?.id ?? '';
+    const id = departments.find((s) => s.name === name)?.id ?? '';
     setForm((f) => ({ ...f, departmentId: id }));
     if (errors.departmentId)
       setErrors((e) => ({ ...e, departmentId: undefined }));
@@ -292,15 +292,15 @@ export default function AdminUsersPage() {
     (async () => {
       try {
         setLoading(true);
-        const [u, s, c, r] = await Promise.all([
+        const [u, d, c, r] = await Promise.all([
           api.getUsers(),
-          api.getAllServices(),
+          api.getAllDepartments(),
           api.getAllCities(),
           api.getAllRoles(),
         ]);
         if (!mounted) return;
         setUsers(u);
-        setServices(s);
+        setDepartments(d);
         setCities(c);
         setRoles(r);
       } catch (e) {
@@ -513,7 +513,7 @@ export default function AdminUsersPage() {
       <FiltersBar
         cityOptions={cityNames}
         cityValue={pendingCityFilter}
-        serviceOptions={serviceNames}
+        serviceOptions={departmentNames}
         serviceValue={pendingServiceFilter}
         onSelectCity={setPendingCityFilter}
         onSelectService={setPendingServiceFilter}
@@ -541,7 +541,7 @@ export default function AdminUsersPage() {
         form={form}
         errors={errors}
         canClickSave={canClickSave}
-        serviceNames={serviceNames}
+        serviceNames={departmentNames}
         cityNames={cityNames}
         roleNames={roleNames}
         valueServiceName={serviceNameById(form.departmentId)}
