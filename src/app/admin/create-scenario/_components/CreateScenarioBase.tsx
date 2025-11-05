@@ -10,7 +10,7 @@ import { Plus, Save, Upload } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
   CobradeDTO,
-  ServiceSummaryDTO,
+  DepartmentSummaryDTO,
   ScenarioResponseDTO,
   ScenarioRequestDTO,
   CityResponseDTO,
@@ -53,7 +53,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
   const [paramByPhase, setParamByPhase] =
     useState<typeof DEFAULT_PARAMS>(DEFAULT_PARAMS);
 
-  const [services, setServices] = useState<ServiceSummaryDTO[]>([]);
+  const [departments, setDepartments] = useState<DepartmentSummaryDTO[]>([]);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editTask, setEditTask] = useState<Protocol | null>(null);
   const [existingScenario, setExistingScenario] =
@@ -83,14 +83,14 @@ export function CreateScenarioBase({ scenarioId }: Props) {
   useEffect(() => {
     (async () => {
       try {
-        const [citiesData, cobradesData, servicesData] = await Promise.all([
+        const [citiesData, cobradesData, departmentsData] = await Promise.all([
           api.getAllCities(),
           api.getAllCobrades(),
-          api.getAllServices(),
+          api.getAllDepartments(),
         ]);
         setCities(citiesData);
         setCobrades(cobradesData);
-        setServices(servicesData);
+        setDepartments(departmentsData);
       } catch (err) {
         console.error(err);
         toastError('Erro ao carregar listas', 'Cidades, cobrade ou serviços');
@@ -112,7 +112,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
           return {
             id: String(task.id),
-            description: `${task.description} (${task.service?.name || 'Sem serviço'}, ${lastUpdateYear})`,
+            description: `${task.description} (${task.department?.name || 'Sem serviço'}, ${lastUpdateYear})`,
             phase: task.phase,
             isExisting: true,
             canEdit: true,
@@ -215,7 +215,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
         const serviceMatch = protocol.description.match(/\(([^,]+),/);
         const serviceName = serviceMatch?.[1]?.trim();
-        const service = services.find((s) => s.name === serviceName);
+        const service = departments.find((d) => d.name === serviceName);
 
         return {
           description,
@@ -548,7 +548,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
             setProtocols((prev) => [...prev, newProtocol]);
           }
         }}
-        serviceNames={services.map((s) => s.name)}
+        serviceNames={departments.map((s) => s.name)}
         currentPhase={currentStep}
         editingTask={
           editTask

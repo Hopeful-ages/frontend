@@ -11,12 +11,12 @@ type CreateUserTaskProps = {
   isOpen: boolean;
   onClose: () => void;
   onSave: (taskData: {
-    service: string;
+    departmentId: string;
     description: string;
     phase: string;
     id?: string;
   }) => void;
-  userServiceName: string;
+  userDepartmentId: string;
   currentPhase: string;
   editingTask?: {
     id: string;
@@ -28,7 +28,7 @@ export function CreateUserTask({
   isOpen,
   onClose,
   onSave,
-  userServiceName,
+  userDepartmentId,
   currentPhase,
   editingTask = null,
 }: CreateUserTaskProps) {
@@ -50,7 +50,7 @@ export function CreateUserTask({
     }
 
     const taskData = {
-      service: userServiceName,
+      departmentId: userDepartmentId,
       description: task.trim(),
       phase: currentPhase,
       ...(editingTask && { id: editingTask.id }),
@@ -98,7 +98,7 @@ export function CreateUserTask({
               Serviço
             </label>
             <div className="mt-1 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-700">
-              {userServiceName}
+              {userDepartmentId}
             </div>
             <p className="mt-1 text-xs text-gray-500">
               Este é o seu serviço atual e não pode ser alterado

@@ -22,8 +22,9 @@ type Field =
   | 'phone'
   | 'password'
   | 'confirm'
-  | 'serviceId'
-  | 'cityId';
+  | 'departmentId'
+  | 'cityId'
+  | 'roleId';
 
 export type UserFormState = {
   name: string;
@@ -32,7 +33,7 @@ export type UserFormState = {
   phone: string;
   password: string;
   confirm: string;
-  serviceId: string;
+  departmentId: string;
   cityId: string;
   roleId: string;
 };
@@ -48,13 +49,16 @@ type UserFormModalProps = {
   canClickSave: boolean;
   serviceNames: string[];
   cityNames: string[];
+  roleNames: string[];
   valueServiceName: string | null;
   valueCityName: string | null;
+  valueRoleName: string | null;
   onClose: () => void;
   onSave: () => void;
   onUpdate: (field: Field, value: string) => void;
   onSelectServiceByName: (name: string) => void;
   onSelectCityByName: (name: string) => void;
+  onSelectRoleByName: (name: string) => void;
 };
 
 export function UserFormModal({
@@ -66,13 +70,16 @@ export function UserFormModal({
   canClickSave,
   serviceNames,
   cityNames,
+  roleNames,
   valueServiceName,
   valueCityName,
+  valueRoleName,
   onClose,
   onSave,
   onUpdate,
   onSelectServiceByName,
   onSelectCityByName,
+  onSelectRoleByName,
 }: UserFormModalProps) {
   function formatCPF(value: string) {
     return value
@@ -170,9 +177,9 @@ export function UserFormModal({
             fullWidth
             value={valueServiceName}
           />
-          {errors.serviceId && (
+          {errors.departmentId && (
             <p className="mt-1.5 text-xs font-medium text-red-600">
-              {errors.serviceId}
+              {errors.departmentId}
             </p>
           )}
         </div>
@@ -211,6 +218,28 @@ export function UserFormModal({
           error={errors.phone}
           maxLength={15}
         />
+
+        <div className="w-full">
+          <Dropdown
+            label="Selecione a Função"
+            items={roleNames}
+            onSelect={onSelectRoleByName}
+            size="medium"
+            bgColor="white"
+            border="gray"
+            textColor="gray"
+            textSize="sm"
+            roundedBorder="lg"
+            maxItemsVisible={3}
+            fullWidth
+            value={valueRoleName}
+          />
+          {errors.roleId && (
+            <p className="mt-1.5 text-xs font-medium text-red-600">
+              {errors.roleId}
+            </p>
+          )}
+        </div>
       </div>
     </Modal>
   );
