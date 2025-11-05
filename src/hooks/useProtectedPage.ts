@@ -12,6 +12,18 @@ interface UseProtectedPageOptions {
   redirectTo?: string;
 }
 
+// Função helper para limpar autenticação
+const clearAuth = () => {
+  Cookies.remove('token');
+  Cookies.remove('user');
+};
+
+// Função helper para verificar se o token expirou
+const isTokenExpired = (userData: JWTPayload): boolean => {
+  const now = Math.floor(Date.now() / 1000);
+  return !userData.exp || userData.exp < now;
+};
+
 export const useProtectedPage = (options: UseProtectedPageOptions = {}) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -22,24 +34,26 @@ export const useProtectedPage = (options: UseProtectedPageOptions = {}) => {
     const token = Cookies.get('token');
     const user = Cookies.get('user');
 
+    // Se não tiver token ou user, redireciona para login
     if (!token || !user) {
+      clearAuth();
       router.push('/login');
       return;
     }
 
     try {
       const userData = JSON.parse(user) as JWTPayload;
-      const now = Math.floor(Date.now() / 1000);
 
-      if (!userData.exp || userData.exp < now) {
-        Cookies.remove('token');
-        Cookies.remove('user');
+      // Verifica se o token expirou
+      if (isTokenExpired(userData)) {
+        clearAuth();
         router.push('/login');
         return;
       }
 
       const roles = userData.roles || [];
 
+      // Verifica permissão baseada na role requerida
       if (options.requiredRole) {
         const isAdmin = roles.includes('ROLE_ADMIN');
         const isUser = roles.includes('ROLE_USER');
@@ -57,9 +71,9 @@ export const useProtectedPage = (options: UseProtectedPageOptions = {}) => {
 
       setUserInfo(userData);
       setHasAccess(true);
-    } catch {
-      Cookies.remove('token');
-      Cookies.remove('user');
+    } catch (error) {
+      console.error('Erro ao validar autenticação:', error);
+      clearAuth();
       router.push('/login');
     } finally {
       setIsLoading(false);
@@ -67,8 +81,7 @@ export const useProtectedPage = (options: UseProtectedPageOptions = {}) => {
   }, [router, options.requiredRole, options.redirectTo]);
 
   const logout = () => {
-    Cookies.remove('token');
-    Cookies.remove('user');
+    clearAuth();
     router.push('/');
   };
 

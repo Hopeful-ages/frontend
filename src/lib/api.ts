@@ -4,15 +4,31 @@ import {
   CityResponseDTO,
   ScenarioRequestDTO,
   ScenarioResponseDTO,
-  ScenarioUpdateDTO,
-  ServiceResponseDTO,
+  DepartmentRequestDTO,
+  DepartmentResponseDTO,
   UserRequestDTO,
   UserResponseDTO,
   UserUpdateDTO,
+  RoleRequestDTO,
+  RoleResponseDTO,
   CobradeDTO,
 } from './types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+// Função para limpar autenticação e redirecionar
+function handleAuthError() {
+  Cookies.remove('token');
+  Cookies.remove('user');
+
+  // Redireciona apenas se não estiver já na página de login
+  if (
+    typeof window !== 'undefined' &&
+    !window.location.pathname.includes('/login')
+  ) {
+    window.location.href = '/login';
+  }
+}
 
 async function handleResponse(res: Response) {
   if (!res.ok) {
@@ -21,6 +37,12 @@ async function handleResponse(res: Response) {
     try {
       data = txt ? JSON.parse(txt) : undefined;
     } catch {}
+
+    // Verifica se é erro de autenticação (401) ou token inválido
+    if (res.status === 401) {
+      handleAuthError();
+    }
+
     throw { status: res.status, data, raw: txt };
   }
 
@@ -111,18 +133,26 @@ export const api = {
     Cookies.remove('user');
   },
 
+  post: <T = unknown>(url: string, body: unknown) =>
+    fetchPublic(url, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }) as Promise<T>,
+
   getUsers: (status?: 'active' | 'inactive') =>
     fetchWithAuth(`/api/users${status ? `?status=${status}` : ''}`) as Promise<
       UserResponseDTO[]
     >,
 
-  getAllServices: () =>
-    fetchWithAuth('/api/services') as Promise<ServiceResponseDTO[]>,
+  getAllDepartments: () =>
+    fetchWithAuth('/api/services') as Promise<DepartmentResponseDTO[]>,
   getAllCobrades: () => fetchWithAuth('/api/cobrades') as Promise<CobradeDTO[]>,
   getCobradeById: (id: string) =>
     fetchWithAuth(`/api/cobrades/${id}`) as Promise<CobradeDTO>,
 
   getAllCities: () => fetchWithAuth('/api/city') as Promise<CityResponseDTO[]>,
+
+  getAllRoles: () => fetchWithAuth('/api/roles') as Promise<RoleResponseDTO[]>,
 
   createUser: (payload: UserRequestDTO) =>
     fetchWithAuth('/api/users', {
@@ -212,4 +242,18 @@ export const api = {
     fetchWithAuth(`/api/scenarios/${id}/publish`, {
       method: 'PATCH',
     }) as Promise<ScenarioResponseDTO>,
+
+  createService: (payload: DepartmentRequestDTO) =>
+    fetchWithAuth('/api/services', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }) as Promise<DepartmentResponseDTO>,
+
+  getService: (id: string) =>
+    fetchWithAuth(`/api/services/${id}`) as Promise<DepartmentResponseDTO>,
+
+  deleteService: (id: string) =>
+    fetchWithAuthVoid(`/api/services/${id}`, {
+      method: 'DELETE',
+    }),
 };
