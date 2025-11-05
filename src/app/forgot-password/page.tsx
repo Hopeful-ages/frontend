@@ -26,14 +26,38 @@ export default function ForgotPasswordPage() {
 
     try {
       showLoading('Enviando...');
-      const data = await api.post('/api/auth/forgot-password', { email });
+      const cleanEmail = email.trim();
+      const data = await api.post<{ message?: string }>(
+        '/api/auth/forgot-password',
+        { email: cleanEmail },
+      );
       const message = data?.message || 'Enviamos um link para redefinir sua senha';
       success(message);
       router.push('/login');
     } catch (error) {
-      if (error && (error as any).status === 400) {
-        const err = error as any;
-        const errMsg = err.data?.error || 'Email é obrigatório';
+      const errUnknown: unknown = error;
+
+      function isApiError(e: unknown): e is { status: number; data?: unknown } {
+        return (
+          typeof e === 'object' &&
+          e !== null &&
+          'status' in e &&
+          typeof (e as Record<string, unknown>)['status'] === 'number'
+        );
+      }
+
+      if (isApiError(errUnknown) && errUnknown.status === 400) {
+        const data = errUnknown.data;
+        let errMsg = 'Email é obrigatório';
+        if (
+          data &&
+          typeof data === 'object' &&
+          'error' in data &&
+          typeof (data as Record<string, unknown>)['error'] === 'string'
+        ) {
+          errMsg = (data as Record<string, string>)['error'];
+        }
+
         toastError(errMsg);
       } else {
         toastError('Erro ao solicitar recuperação de senha');
