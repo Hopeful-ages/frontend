@@ -1,4 +1,5 @@
 'use client';
+
 import { cva } from 'class-variance-authority';
 import { ChevronDown } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState } from 'react';
@@ -176,6 +177,17 @@ export const Dropdown: React.FC<dropdownProps> = ({
     return () => document.removeEventListener('mousedown', out);
   }, []);
 
+  // Fechar com ESC
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [open]);
+
   const pick = (val: string) => {
     setSelected(val || null);
     onSelect(val);
@@ -196,7 +208,6 @@ export const Dropdown: React.FC<dropdownProps> = ({
   } as const;
 
   const placeholderTone = placeholderByText[textColor];
-
   const tone = toneByText[textColor];
 
   const filteredItems = useAutoComplete
@@ -224,7 +235,11 @@ export const Dropdown: React.FC<dropdownProps> = ({
           })}
           onClick={() => setOpen((o) => !o)}
         >
-          {icon && <span className={cn('shrink-0', tone)}>{icon}</span>}
+          {icon && (
+            <span className={cn('shrink-0', tone)} aria-hidden="true">
+              {icon}
+            </span>
+          )}
           <input
             type="text"
             value={filterText}
@@ -239,6 +254,9 @@ export const Dropdown: React.FC<dropdownProps> = ({
               'text-black',
               placeholderTone,
             )}
+            aria-label={`Filtrar ${label}`}
+            aria-autocomplete="list"
+            aria-controls={menuId}
           />
           <ChevronDown
             size={chevronBySize[size]}
@@ -247,6 +265,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
               open ? 'rotate-180' : 'rotate-0',
               tone,
             )}
+            aria-hidden="true"
           />
         </div>
       ) : (
@@ -266,7 +285,11 @@ export const Dropdown: React.FC<dropdownProps> = ({
             textSize,
           })}
         >
-          {icon && <span className={cn('shrink-0', tone)}>{icon}</span>}
+          {icon && (
+            <span className={cn('shrink-0', tone)} aria-hidden="true">
+              {icon}
+            </span>
+          )}
 
           <span
             className={cn(
@@ -284,6 +307,7 @@ export const Dropdown: React.FC<dropdownProps> = ({
               open ? 'rotate-180' : 'rotate-0',
               tone,
             )}
+            aria-hidden="true"
           />
         </button>
       )}
@@ -297,7 +321,11 @@ export const Dropdown: React.FC<dropdownProps> = ({
           style={{ maxHeight: `${maxH}` }}
         >
           {filteredItems.length === 0 ? (
-            <li className="px-4 py-2 text-gray-400 select-none">
+            <li
+              role="status"
+              aria-live="polite"
+              className="px-4 py-2 text-gray-400 select-none"
+            >
               Sem resultados
             </li>
           ) : (
