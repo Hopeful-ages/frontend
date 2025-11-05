@@ -1,6 +1,9 @@
+'use client';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileDown, X, FileText } from 'lucide-react';
 import { Button } from './Button';
+import { useEffect, useRef } from 'react';
 
 type DownloadModalProps = {
   isOpen: boolean;
@@ -17,10 +20,64 @@ export default function DownloadModal({
   onConfirm,
   onCancel,
 }: DownloadModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Fechar com ESC
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onCancel();
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onCancel]);
+
+  // Trap de foco
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+
+    const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    modalRef.current.addEventListener('keydown', handleKeyDown);
+
+    // Foco automático no primeiro botão
+    setTimeout(() => confirmButtonRef.current?.focus(), 100);
+
+    return () => {
+      modalRef.current?.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="download-modal-title"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -28,18 +85,25 @@ export default function DownloadModal({
           onClick={onCancel}
         >
           <motion.div
+            ref={modalRef}
             className="mx-auto w-full max-w-[90%] rounded-2xl bg-white p-5 text-center shadow-xl sm:max-w-md sm:p-6 md:p-8"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl md:text-2xl">
+            <h2
+              id="download-modal-title"
+              className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl md:text-2xl"
+            >
               Confirmar download
             </h2>
 
             <div className="mb-4 flex flex-col items-center justify-center sm:mb-6">
-              <FileText className="mb-2 h-14 w-14 text-black sm:h-16 sm:w-16 md:h-20 md:w-20" />
+              <FileText
+                className="mb-2 h-14 w-14 text-black sm:h-16 sm:w-16 md:h-20 md:w-20"
+                aria-hidden="true"
+              />
               <p className="text-sm font-medium text-gray-800 sm:text-base md:text-lg">
                 PDF
               </p>
@@ -50,10 +114,12 @@ export default function DownloadModal({
 
             <div className="mt-3 flex flex-col justify-center gap-2 sm:mt-4 sm:flex-row sm:gap-3">
               <Button
+                ref={confirmButtonRef}
                 onClick={onConfirm}
                 variant="primary"
                 size="md"
-                leftIcon={<FileDown className="h-4 w-4" />}
+                leftIcon={<FileDown className="h-4 w-4" aria-hidden="true" />}
+                aria-label={`Baixar PDF de ${city}, ${year}`}
               >
                 Baixar
               </Button>
@@ -61,7 +127,7 @@ export default function DownloadModal({
                 onClick={onCancel}
                 variant="outline"
                 size="md"
-                leftIcon={<X className="h-4 w-4" />}
+                leftIcon={<X className="h-4 w-4" aria-hidden="true" />}
               >
                 Cancelar
               </Button>

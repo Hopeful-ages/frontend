@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { X } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -23,9 +23,12 @@ export const Modal: React.FC<ModalProps> = ({
   footer,
   hideCloseIcon = false,
 }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Fechar com ESC
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
@@ -36,6 +39,43 @@ export const Modal: React.FC<ModalProps> = ({
       document.removeEventListener('keydown', handleEsc);
     };
   }, [isOpen, onClose]);
+
+  // Trap de foco
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+
+    const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    modalRef.current.addEventListener('keydown', handleKeyDown);
+
+    // Foco automático no primeiro elemento
+    setTimeout(() => firstElement?.focus(), 100);
+
+    return () => {
+      modalRef.current?.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -49,10 +89,14 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={onClose}
     >
       <div
+        ref={modalRef}
         className={clsx(
           'relative flex flex-col rounded-[8px] bg-white shadow-lg',
           'max-h-[90vh]',
@@ -62,15 +106,19 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {title && (
           <div className="relative mt-3 flex justify-center px-4 py-3">
-            <h2 className="text-center text-lg font-semibold text-black">
+            <h2
+              id="modal-title"
+              className="text-center text-lg font-semibold text-black"
+            >
               {title}
             </h2>
             {!hideCloseIcon && (
               <button
                 onClick={onClose}
-                className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer p-1 text-black transition hover:text-red-500"
+                className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer rounded p-1 text-black transition hover:text-red-500 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+                aria-label="Fechar modal"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" aria-hidden="true" />
               </button>
             )}
           </div>

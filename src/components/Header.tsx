@@ -21,7 +21,10 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 z-100 flex w-full items-center justify-between bg-black px-6 py-2 text-gray-300">
       <div className="flex items-center gap-2">
-        <Link href="https://www.hopeful.pro/">
+        <Link
+          href="https://www.hopeful.pro/"
+          aria-label="Hopeful - Página inicial"
+        >
           <Image
             src="/logoHopeful.png"
             alt="Hopeful Icon"
