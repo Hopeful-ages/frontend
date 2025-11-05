@@ -16,6 +16,20 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+// Função para limpar autenticação e redirecionar
+function handleAuthError() {
+  Cookies.remove('token');
+  Cookies.remove('user');
+
+  // Redireciona apenas se não estiver já na página de login
+  if (
+    typeof window !== 'undefined' &&
+    !window.location.pathname.includes('/login')
+  ) {
+    window.location.href = '/login';
+  }
+}
+
 async function handleResponse(res: Response) {
   if (!res.ok) {
     const txt = await res.text().catch(() => '');
@@ -23,6 +37,12 @@ async function handleResponse(res: Response) {
     try {
       data = txt ? JSON.parse(txt) : undefined;
     } catch {}
+
+    // Verifica se é erro de autenticação (401) ou token inválido
+    if (res.status === 401) {
+      handleAuthError();
+    }
+
     throw { status: res.status, data, raw: txt };
   }
 

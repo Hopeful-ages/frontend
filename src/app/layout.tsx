@@ -1,6 +1,7 @@
 import HeaderWrapper from '@/components/HeaderWrapper';
 import { Toaster } from '@/components/Toaster';
 import { LoadingProvider } from '@/providers/LoadingProvider';
+import { ApiErrorHandler } from '@/components/ApiErrorHandler';
 import type { Metadata } from 'next';
 import { Barlow, Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -39,12 +40,14 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <LoadingProvider>
-          <div className="flex min-h-screen flex-col">
-            <HeaderWrapper />
-            <Toaster />
-            <main className="flex-1">{children}</main>
-            <FooterWrapper />
-          </div>
+          <ApiErrorHandler>
+            <div className="flex min-h-screen flex-col">
+              <HeaderWrapper />
+              <Toaster />
+              <main className="flex-1">{children}</main>
+              <FooterWrapper />
+            </div>
+          </ApiErrorHandler>
         </LoadingProvider>
       </body>
     </html>
