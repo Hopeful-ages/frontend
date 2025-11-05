@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { showToast } = useToast();
+  const { success, error: toastError } = useToast();
 
   const { showLoading, hideLoading } = useLoading();
 
@@ -26,13 +26,18 @@ export default function ForgotPasswordPage() {
 
     try {
       showLoading('Enviando...');
-      await api.post('/auth/forgot-password', { email });
-      showToast('Enviamos um link para redefinir sua senha', {
-        type: 'success',
-      });
+      const data = await api.post('/api/auth/forgot-password', { email });
+      const message = data?.message || 'Enviamos um link para redefinir sua senha';
+      success(message);
       router.push('/login');
     } catch (error) {
-      showToast('E-mail não cadastrado', { type: 'error' });
+      if (error && (error as any).status === 400) {
+        const err = error as any;
+        const errMsg = err.data?.error || 'Email é obrigatório';
+        toastError(errMsg);
+      } else {
+        toastError('Erro ao solicitar recuperação de senha');
+      }
     } finally {
       hideLoading();
       setIsLoading(false);
