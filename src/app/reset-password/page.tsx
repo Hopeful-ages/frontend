@@ -40,8 +40,9 @@ function ResetPasswordContent() {
 
     try {
       const cleanPassword = password.trim();
+      console.log('Senha enviada:', cleanPassword); // Verifique o valor da senha aqui
       await api.post('/api/auth/reset-password', {
-        password: cleanPassword,
+        newPassword: cleanPassword,
         token,
       });
       success('Senha redefinida com sucesso');
