@@ -55,7 +55,7 @@ export default function ResetPasswordPage() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white p-4">
       <div className="w-full max-w-sm">
-        <div className="absolute top-4 left-4">
+        <div className="absolute left-4 top-4">
           <Link href="/login">
             <Button
               variant="terciary"
