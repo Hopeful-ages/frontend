@@ -2,15 +2,9 @@
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
-import {
-  Check,
-  Hammer,
-  X,
-} from 'lucide-react';
+import { Check, Hammer, X } from 'lucide-react';
 
-type Field =
-  | 'name'
-;
+type Field = 'name';
 
 export type ServiceFormState = {
   name: string;
@@ -39,7 +33,6 @@ export function ServiceFormModal({
   onSaveAction,
   onUpdateAction,
 }: ServiceFormModalProps) {
-
   return (
     <Modal
       isOpen={isOpen}
@@ -58,9 +51,9 @@ export function ServiceFormModal({
             Salvar
           </Button>
 
-          <Button 
-            onClick={onCloseAction} 
-            variant="danger" 
+          <Button
+            onClick={onCloseAction}
+            variant="danger"
             leftIcon={<X />}
             className="w-full sm:w-auto"
           >
@@ -79,7 +72,6 @@ export function ServiceFormModal({
           className="w-full"
         />
       </div>
-
     </Modal>
   );
 }

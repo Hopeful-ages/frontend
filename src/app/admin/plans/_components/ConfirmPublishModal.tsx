@@ -1,7 +1,8 @@
 'use client';
 import { Modal } from '@/components/Modal';
+import { Button } from '@/components/Button';
 import { ScenarioResponseDTO } from '@/lib/types';
-import { Check, Upload, X } from 'lucide-react';
+import { Check, Upload, FileX, X } from 'lucide-react';
 
 type ConfirmPublishModalProps = {
   open: boolean;
@@ -33,6 +34,7 @@ export function ConfirmPublishModal({
   onClose,
 }: ConfirmPublishModalProps) {
   const scenarioYear = getLatestUpdateYear(scenario);
+  const isPublished = scenario?.published ?? false;
 
   return (
     <Modal
@@ -43,31 +45,41 @@ export function ConfirmPublishModal({
       hideCloseIcon
       footer={
         <div className="flex w-full items-center justify-center gap-3">
-          <button
+          <Button
+            variant="secondary"
+            size="md"
             onClick={onConfirm}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-md border border-black bg-black px-5 py-2 text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+            leftIcon={<Check size={16} />}
           >
-            <Check className="h-3 w-3" />
-            <span>Publicar</span>
-          </button>
-          <button
+            {isPublished ? 'Remover Publicação' : 'Publicar Plano'}
+          </Button>
+          <Button
+            variant="outline"
+            size="md"
             onClick={onClose}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-md border border-red-600 bg-red-600 px-5 py-2 text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            leftIcon={<X size={16} />}
           >
-            <X className="h-3 w-3" />
-            <span>Cancelar</span>
-          </button>
+            Cancelar
+          </Button>
         </div>
       }
     >
       <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
-        <h2 className="text-2xl font-bold text-black">Publicar plano</h2>
-        <Upload className="text-black-600 my-4 h-16 w-16" />
+        <h2 className="text-2xl font-bold text-black">
+          {isPublished ? 'Remover a Publicação do Plano' : 'Publicar plano'}
+        </h2>
+        {isPublished ? (
+          <FileX className="text-black-600 my-4 h-16 w-16" />
+        ) : (
+          <Upload className="text-black-600 my-4 h-16 w-16" />
+        )}
         {scenario && (
           <p className="text-gray-600">
-            Deseja publicar o plano de{' '}
+            Deseja{' '}
+            {isPublished ? 'Remover a Publicação do Plano' : 'Publicar Plano'} o
+            plano de{' '}
             <strong>
               {scenario.city.name} - {scenario.cobrade.code}
             </strong>

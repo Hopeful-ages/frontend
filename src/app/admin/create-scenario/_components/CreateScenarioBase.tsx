@@ -198,6 +198,12 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       return;
     }
 
+    // Validação: deve ter pelo menos uma tarefa em qualquer fase
+    if (protocols.length === 0) {
+      warning('Adicione pelo menos uma tarefa antes de salvar o cenário.');
+      return;
+    }
+
     const currentPhaseProtocols = protocols.filter(
       (p) =>
         (mapStepToPhase(p.phase) ?? phaseMap[currentStep]) ===
@@ -205,7 +211,9 @@ export function CreateScenarioBase({ scenarioId }: Props) {
     );
 
     if (currentPhaseProtocols.length === 0) {
-      warning('Adicione pelo menos uma tarefa antes de salvar o cenário.');
+      warning(
+        `Adicione pelo menos uma tarefa na fase "${currentStep}" antes de salvar o cenário.`,
+      );
       return;
     }
 
@@ -220,7 +228,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
         return {
           description,
           phase: mapStepToPhase(protocol.phase) || phaseMap[currentStep],
-          serviceId: service?.id || null,
+          departmentId: service?.id || null,
         };
       });
 
@@ -275,18 +283,19 @@ export function CreateScenarioBase({ scenarioId }: Props) {
     if (!existingScenario) return;
     setPublishLoading(true);
     try {
-      await api.publishScenario(existingScenario.id);
+      const updated = await api.togglePublishScenario(existingScenario.id);
+      const action = updated.published ? 'publicado' : 'despublicado';
       success(
-        `Plano "${existingScenario.city.name} - ${existingScenario.cobrade.code}" publicado com sucesso!`,
+        `Plano "${updated.city.name} - ${updated.cobrade.code}" ${action} com sucesso!`,
       );
       setPublishModalOpen(false);
 
       setExistingScenario((prev) =>
-        prev ? { ...prev, published: true } : prev,
+        prev ? { ...prev, published: updated.published } : prev,
       );
     } catch (err) {
       console.error(err);
-      toastError('Erro ao publicar o cenário', 'Tente novamente.');
+      toastError('Erro ao alterar status de publicação', 'Tente novamente.');
     } finally {
       setPublishLoading(false);
     }

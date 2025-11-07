@@ -137,10 +137,12 @@ export function PlansTable({
                     <button
                       type="button"
                       title={
-                        row.published ? 'Plano publicado' : 'Publicar Plano'
+                        row.published
+                          ? 'Remover a Publicação do Plano'
+                          : 'Publicar Plano'
                       }
                       className="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-200"
-                      onClick={() => !row.published && onPublish?.(row)}
+                      onClick={() => onPublish?.(row)}
                     >
                       {row.published ? (
                         <Check className="h-4 w-4" />
