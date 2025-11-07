@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
     if (!token) {
       toastError('Token inválido ou ausente');
     }
-  }, [token]);
+  }, [token, toastError]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
