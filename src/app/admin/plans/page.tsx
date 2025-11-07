@@ -14,7 +14,7 @@ import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
 import { ConfirmPublishModal } from './_components/ConfirmPublishModal';
 
-type Field = 'cityId' | 'serviceId' | 'cobrade';
+type Field = 'cityId' | 'departmentId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
 
 export default function AdminPlansPage() {
@@ -196,9 +196,10 @@ export default function AdminPlansPage() {
     if (!scenarioForPublish) return;
     setPublishLoading(true);
     try {
-      const updated = await api.publishScenario(scenarioForPublish.id);
+      const updated = await api.togglePublishScenario(scenarioForPublish.id);
+      const action = updated.published ? 'publicado' : 'despublicado';
       success(
-        `Plano "${updated.city.name} - ${updated.cobrade.code}" publicado com sucesso!`,
+        `Plano "${updated.city.name} - ${updated.cobrade.code}" ${action} com sucesso!`,
       );
       setPublishModalOpen(false);
       setScenarios((prev) =>
@@ -206,7 +207,7 @@ export default function AdminPlansPage() {
       );
     } catch (e) {
       console.error(e);
-      error('Erro ao publicar o plano.');
+      error('Erro ao alterar status de publicação do plano.');
     } finally {
       setPublishLoading(false);
     }
