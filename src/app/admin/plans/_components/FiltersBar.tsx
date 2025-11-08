@@ -40,8 +40,8 @@ export function FiltersBar({
       onSubmit={handleSubmit}
       className="mb-6 flex flex-col gap-4 md:flex-row md:items-end"
     >
-      <div className="flex w-full flex-col items-start gap-5 px-6 md:flex-row md:items-end">
-        <div className="flex w-full max-w-lg gap-4">
+      <div className="flex w-full max-w-[675px] flex-col gap-4 px-6 md:flex-row md:items-end">
+        <div className="flex flex-1 gap-4">
           <div className="flex-1">
             <label
               htmlFor="city-search"
@@ -107,8 +107,8 @@ export function FiltersBar({
         </div>
 
         <div
-          className={`flex w-full flex-col items-start gap-5 px-6 md:flex-row ${
-            publishedSearchable ? 'md:items-center' : 'md:items-end'
+          className={`flex gap-3 ${
+            publishedSearchable ? 'items-center' : 'items-end'
           }`}
         >
           <Button variant="terciary" onClick={onClearFilters} type="button">
