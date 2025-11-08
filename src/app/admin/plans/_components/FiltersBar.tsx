@@ -108,7 +108,7 @@ export function FiltersBar({
 
         <div
           className={`flex w-full flex-col items-start gap-5 px-6 md:flex-row ${
-            publishedSearchable ? 'ml-20 md:items-center' : 'md:items-end'
+            publishedSearchable ? 'md:items-center' : 'md:items-end'
           }`}
         >
           <Button variant="terciary" onClick={onClearFilters} type="button">

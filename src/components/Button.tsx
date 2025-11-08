@@ -49,7 +49,7 @@ const buttonClasses = cva(
         save: 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-0',
       },
       size: {
-        sm: 'h-8 px-3 text-sm rounded-[8px] min-w-[100px]',
+        sm: 'h-7 px-3 text-sm rounded-[8px]',
         md: 'h-10 px-4 text-sm rounded-[8px] min-w-[120px]',
         lg: 'h-12 px-6 text-base rounded-[8px] min-w-[140px]',
         xl: 'h-14 px-8 text-lg rounded-[8px] min-w-[180px]',
