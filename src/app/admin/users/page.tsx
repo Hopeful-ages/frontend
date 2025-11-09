@@ -18,7 +18,9 @@ import { ConfirmToggleModal } from './_components/ConfirmToggleModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { UsersTable } from './_components/UsersTable';
-// Footer handled globally via FooterWrapper in layout
+import { UserCard } from './_components/UserCard';
+import FiltersModal from '@/components/FiltersModal';
+import { Filter } from 'lucide-react';
 
 type Field =
   | 'name'
@@ -140,6 +142,8 @@ export default function AdminUsersPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<UserResponseDTO | null>(
@@ -343,6 +347,7 @@ export default function AdminUsersPage() {
 
     setAppliedCityFilter(adjustedCity);
     setAppliedServiceFilter(pendingServiceFilter);
+    setIsFiltersModalOpen(false);
   };
 
   const handleClearFilters = () => {
@@ -350,6 +355,7 @@ export default function AdminUsersPage() {
     setPendingServiceFilter(null);
     setAppliedCityFilter(null);
     setAppliedServiceFilter(null);
+    setIsFiltersModalOpen(false);
   };
 
   const closeCreate = () => {
@@ -506,33 +512,59 @@ export default function AdminUsersPage() {
 
   return (
     <main className="mx-auto mt-20 w-full flex-1 px-6 py-6">
-      <div className="mb-5 ml-5 flex items-center justify-between">
+      <div className="mb-5 flex items-center justify-between">
         <h1 className="mb-5 text-3xl font-bold">Usuários</h1>
       </div>
 
-      <FiltersBar
-        cityOptions={cityNames}
-        cityValue={pendingCityFilter}
-        serviceOptions={departmentNames}
-        serviceValue={pendingServiceFilter}
-        onSelectCity={setPendingCityFilter}
-        onSelectService={setPendingServiceFilter}
-        onSearch={handleSearch}
-        onClearFilters={handleClearFilters}
-        onCreate={openCreate}
-      />
+      <div className="mb-5 flex md:hidden">
+        <button
+          onClick={() => setIsFiltersModalOpen(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 font-medium text-gray-700 transition hover:bg-gray-50"
+        >
+          <Filter className="h-4 w-4" />
+          Filtrar
+        </button>
+      </div>
+
+      <div className="hidden md:block">
+        <FiltersBar
+          cityOptions={cityNames}
+          cityValue={pendingCityFilter}
+          serviceOptions={departmentNames}
+          serviceValue={pendingServiceFilter}
+          onSelectCity={setPendingCityFilter}
+          onSelectService={setPendingServiceFilter}
+          onSearch={handleSearch}
+          onClearFilters={handleClearFilters}
+          onCreate={openCreate}
+        />
+      </div>
 
       {loading ? (
         <div className="rounded-lg border border-gray-200 bg-white p-6 text-gray-700">
           Carregando...
         </div>
       ) : (
-        <UsersTable
-          rows={filtered}
-          showPagination={showPagination}
-          onEdit={onEdit}
-          onToggleAsk={askToggleStatus}
-        />
+        <>
+          <div className="hidden md:block">
+            <UsersTable
+              rows={filtered}
+              showPagination={showPagination}
+              onEdit={onEdit}
+              onToggleAsk={askToggleStatus}
+            />
+          </div>
+          <div className="space-y-4 md:hidden">
+            {filtered.map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+                onEdit={onEdit}
+                onToggleAsk={askToggleStatus}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       <UserFormModal
@@ -561,6 +593,19 @@ export default function AdminUsersPage() {
         isActive={confirmTarget?.accountStatus}
         onConfirm={confirmToggle}
         onClose={closeConfirm}
+      />
+
+      <FiltersModal
+        isOpen={isFiltersModalOpen}
+        onClose={() => setIsFiltersModalOpen(false)}
+        cityOptions={cityNames}
+        cobradeOptions={departmentNames}
+        cityValue={pendingCityFilter}
+        cobradeValue={pendingServiceFilter}
+        onSelectCity={setPendingCityFilter}
+        onSelectCobrade={setPendingServiceFilter}
+        onApplyFilters={handleSearch}
+        onClearFilters={handleClearFilters}
       />
     </main>
   );
