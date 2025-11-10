@@ -20,7 +20,7 @@ import { UserFormModal, UserFormState } from './_components/UserFormModal';
 import { UsersTable } from './_components/UsersTable';
 import { UserCard } from './_components/UserCard';
 import FiltersModal from '@/components/FiltersModal';
-import { Filter } from 'lucide-react';
+import { Filter, UserPlus } from 'lucide-react';
 
 type Field =
   | 'name'
@@ -516,13 +516,21 @@ export default function AdminUsersPage() {
         <h1 className="mb-5 text-3xl font-bold">Usuários</h1>
       </div>
 
-      <div className="mb-5 flex md:hidden">
+      <div className="mb-5 flex flex-col gap-3 md:hidden">
         <button
           onClick={() => setIsFiltersModalOpen(true)}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 font-medium text-gray-700 transition hover:bg-gray-50"
         >
           <Filter className="h-4 w-4" />
           Filtrar
+        </button>
+
+        <button
+          onClick={openCreate}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 font-medium text-gray-700 transition hover:bg-gray-50"
+        >
+          <UserPlus className="h-4 w-4" />
+          Criar usuário
         </button>
       </div>
 
