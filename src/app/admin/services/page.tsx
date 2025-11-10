@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useProtectedPage } from '@/hooks/useProtectedPage';
 import { useToast } from '@/hooks/useToast';
 import { useLoading } from '@/providers/LoadingProvider';
+import { ConfirmDeleteModal } from './_components/ConfirmDeleteModal';
 import { FiltersBar } from './_components/FiltersBar';
 import {
   ServiceFormModal,
@@ -85,7 +86,12 @@ export default function AdminUsersPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
-  const { error, warning } = useToast();
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] =
+    useState<DepartmentResponseDTO | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const { error, warning, success } = useToast();
   const { showLoading, hideLoading } = useLoading();
   const loadingShown = useRef(false);
 
@@ -111,7 +117,7 @@ export default function AdminUsersPage() {
     }
   }, [isLoading, showLoading, hideLoading, warning]);
 
-  function validateField(field: Field, value: string, snapshot = form): string {
+  function validateField(field: Field, _value: string): string {
     switch (field) {
       case 'name':
       default:
@@ -143,7 +149,9 @@ export default function AdminUsersPage() {
         setServices(s);
       } catch (e) {
         console.error(e);
-        error('Falha ao carregar dados');
+        if (mounted) {
+          error('Falha ao carregar dados');
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -151,6 +159,7 @@ export default function AdminUsersPage() {
     return () => {
       mounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const showPagination = services.length > 10;
@@ -169,11 +178,31 @@ export default function AdminUsersPage() {
     setErrors({});
   };
 
-  const onDelete = async (id: string) => {
+  const askDelete = (id: string) => {
+    const service = services.find((s) => s.id === id);
+    if (service) {
+      setDeleteTarget(service);
+      setConfirmDeleteOpen(true);
+    }
+  };
+
+  const closeConfirmDelete = () => {
+    setConfirmDeleteOpen(false);
+    setDeleteTarget(null);
+    setDeleteLoading(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+
     try {
-      await api.deleteService(id);
-      setServices((prev) => prev.filter((service) => service.id !== id));
-      setErrors({});
+      setDeleteLoading(true);
+      await api.deleteService(deleteTarget.id);
+      setServices((prev) =>
+        prev.filter((service) => service.id !== deleteTarget.id),
+      );
+      success('Serviço excluído com sucesso');
+      closeConfirmDelete();
     } catch (err) {
       const apiErr = err as ApiError;
       const errorMessage = apiErr?.data?.message || apiErr?.raw || '';
@@ -187,6 +216,7 @@ export default function AdminUsersPage() {
       } else {
         error('Falha ao deletar o serviço');
       }
+      setDeleteLoading(false);
     }
   };
 
@@ -209,7 +239,7 @@ export default function AdminUsersPage() {
   const onUpdate = (field: Field, value: string) => {
     setForm((f) => ({ ...f, [field]: value }));
     if (errors[field]) {
-      const msg = validateField(field, value, { ...form, [field]: value });
+      const msg = validateField(field, value);
       setErrors((prev) => ({ ...prev, [field]: msg || undefined }));
     }
   };
@@ -217,7 +247,7 @@ export default function AdminUsersPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-base sm:text-lg">Carregando...</div>
+        <div className="text-lg">Carregando...</div>
       </div>
     );
   }
@@ -227,22 +257,22 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <main className="mx-auto mt-16 w-full flex-1 px-4 py-4 sm:mt-20 sm:px-6 sm:py-6">
-      <div className="mb-4 ml-0 flex flex-col items-start justify-between gap-3 sm:mb-5 sm:ml-5 sm:flex-row sm:items-center sm:gap-0">
-        <h1 className="mb-0 text-2xl font-bold sm:text-3xl">Serviços</h1>
+    <main className="mx-auto mt-20 w-full flex-1 px-6 py-6">
+      <div className="mb-5 ml-5 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Serviços</h1>
       </div>
 
       <FiltersBar onCreateAction={openCreate} />
 
       {loading ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700 sm:p-6 sm:text-base">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 text-gray-700">
           Carregando...
         </div>
       ) : (
         <ServicesTable
           rows={services}
           showPagination={showPagination}
-          onDeleteAction={onDelete}
+          onDeleteAction={askDelete}
         />
       )}
 
@@ -255,6 +285,14 @@ export default function AdminUsersPage() {
         onCloseAction={closeCreate}
         onSaveAction={onSave}
         onUpdateAction={onUpdate}
+      />
+
+      <ConfirmDeleteModal
+        open={confirmDeleteOpen}
+        loading={deleteLoading}
+        serviceName={deleteTarget?.name}
+        onConfirm={confirmDelete}
+        onClose={closeConfirmDelete}
       />
     </main>
   );

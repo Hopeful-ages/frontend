@@ -2,11 +2,11 @@ import React from 'react';
 
 export const Footer = () => {
   return (
-    <footer className="bg-black px-4 py-3 text-white">
-      <div className="mx-auto ml-8 max-w-7xl">
-        <div className="mb-2">
+    <footer className="bg-black px-4 py-1 text-white">
+      <div className="mx-auto ml-0 max-w-7xl md:ml-8">
+        <div>
           <a
-            className="inline-flex cursor-pointer items-center text-2xl font-bold transition-opacity hover:opacity-80"
+            className="inline-flex cursor-pointer items-center text-base font-bold transition-opacity hover:opacity-80"
             href="https://www.hopeful.pro/"
             target="_blank"
             rel="noopener noreferrer"
@@ -14,7 +14,7 @@ export const Footer = () => {
             Hopeful
           </a>
         </div>
-        <div className="mb-1 text-xs">
+        <div className="text-xs">
           TECNOPUC | Prédio 96A | Sala 215 | Av. Ipiranga, 6681 - Partenon,
           Porto Alegre - RS, 90619-900
         </div>

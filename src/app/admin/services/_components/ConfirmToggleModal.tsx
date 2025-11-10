@@ -44,7 +44,6 @@ export function ConfirmToggleModal({
           </button>
         </div>
       }
-    >
-    </Modal>
+    ></Modal>
   );
 }

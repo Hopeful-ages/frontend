@@ -6,7 +6,7 @@ function cn(...classes: Array<string | undefined | false | null>) {
   return classes.filter(Boolean).join(' ');
 }
 
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl' | 'icon';
 export type ButtonVariant =
   | 'primary'
   | 'secondary'
@@ -15,6 +15,10 @@ export type ButtonVariant =
   | 'outline'
   | 'danger'
   | 'save';
+
+// add an explicit 'icon' variant for small circular/icon-only buttons (e.g. back button)
+// this keeps the style consistent across the app without inline class overrides
+export type ButtonVariantExtended = ButtonVariant | 'icon';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -28,6 +32,7 @@ const buttonClasses = cva(
   {
     variants: {
       variant: {
+        icon: 'bg-black text-white hover:bg-black active:bg-black focus-visible:outline-none focus-visible:ring-0',
         primary:
           'bg-blue-600 text-white hover:bg-blue-900 active:bg-blue-800 focus-visible:outline-none focus-visible:ring-0',
         secondary:
@@ -44,10 +49,11 @@ const buttonClasses = cva(
         save: 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-0',
       },
       size: {
-        sm: 'h-8 px-3 text-sm rounded-[8px] min-w-[100px]',
+        sm: 'h-7 px-3 text-sm rounded-[8px]',
         md: 'h-10 px-4 text-sm rounded-[8px] min-w-[120px]',
         lg: 'h-12 px-6 text-base rounded-[8px] min-w-[140px]',
         xl: 'h-14 px-8 text-lg rounded-[8px] min-w-[180px]',
+        icon: 'h-10 w-10 p-2 rounded-full min-w-0',
       },
     },
     defaultVariants: {
