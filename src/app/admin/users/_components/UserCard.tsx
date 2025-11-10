@@ -18,13 +18,16 @@ export const UserCard = ({ user, onEdit, onToggleAsk }: UserCardProps) => {
         <p className="font-semibold text-gray-800">{user.name}</p>
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-4">
+      <div className="mb-4">
         <div>
           <span className="text-xs text-gray-500">Serviço</span>
           <p className="truncate text-sm font-medium text-gray-700">
             {user.department?.name ?? '—'}
           </p>
         </div>
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-4">
         <div>
           <span className="text-xs text-gray-500">Cidade</span>
           <p className="truncate text-sm font-medium text-gray-700">

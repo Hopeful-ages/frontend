@@ -8,12 +8,12 @@ import { useProtectedPage } from '@/hooks/useProtectedPage';
 import { useToast } from '@/hooks/useToast';
 import { useLoading } from '@/providers/LoadingProvider';
 import { ConfirmDeleteModal } from './_components/ConfirmDeleteModal';
-import { FiltersBar } from './_components/FiltersBar';
 import {
   ServiceFormModal,
   ServiceFormState,
 } from './_components/ServiceFormModal';
 import { ServicesTable } from './_components/ServicesTable';
+import { ServiceCard } from './_components/ServiceCard';
 
 type Field = 'name';
 
@@ -258,22 +258,41 @@ export default function AdminUsersPage() {
 
   return (
     <main className="mx-auto mt-20 w-full flex-1 px-6 py-6">
-      <div className="mb-5 ml-5 flex items-center justify-between">
+      <div className="mb-5">
         <h1 className="text-3xl font-bold">Serviços</h1>
+        <div className="mt-4">
+          <button
+            onClick={openCreate}
+            className="flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+          >
+            Adicionar Serviço
+          </button>
+        </div>
       </div>
-
-      <FiltersBar onCreateAction={openCreate} />
 
       {loading ? (
         <div className="rounded-lg border border-gray-200 bg-white p-6 text-gray-700">
           Carregando...
         </div>
       ) : (
-        <ServicesTable
-          rows={services}
-          showPagination={showPagination}
-          onDeleteAction={askDelete}
-        />
+        <>
+          <div className="hidden md:block">
+            <ServicesTable
+              rows={services}
+              showPagination={showPagination}
+              onDeleteAction={askDelete}
+            />
+          </div>
+          <div className="space-y-4 md:hidden">
+            {services.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                onDelete={askDelete}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       <ServiceFormModal
