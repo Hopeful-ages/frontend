@@ -84,7 +84,7 @@ export default function Header() {
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         links={links}
-        role={role}
+        role={role as Role}
         isAuthenticated={isAuthenticated}
         onLogout={logout}
         onLogin={() => router.push('/login')}
