@@ -112,6 +112,9 @@ export function UserFormModal({
         size="auto"
         footer={
           <div className="flex w-full items-center justify-center gap-3">
+            <Button onClick={onClose} variant="danger" leftIcon={<X />}>
+              Cancelar
+            </Button>
             <Button
               onClick={onSave}
               disabled={!canClickSave}
@@ -119,10 +122,6 @@ export function UserFormModal({
               leftIcon={<Check />}
             >
               Salvar
-            </Button>
-
-            <Button onClick={onClose} variant="danger" leftIcon={<X />}>
-              Cancelar
             </Button>
           </div>
         }
@@ -408,17 +407,17 @@ export function UserFormModal({
 
                 <div className="mt-4 mb-5 flex flex-col gap-3 sm:flex-row">
                   <button
-                    onClick={onClose}
-                    className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:text-base"
-                  >
-                    Cancelar
-                  </button>
-                  <button
                     onClick={onSave}
                     disabled={!canClickSave}
                     className="flex-1 rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 sm:text-base"
                   >
                     Salvar
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:text-base"
+                  >
+                    Cancelar
                   </button>
                 </div>
               </div>
