@@ -577,7 +577,7 @@ export default function UserPage() {
             setProtocols((prev) => [...prev, newProtocol]);
           }
         }}
-        userDepartmentId={userDetails.department.id}
+        userDepartmentId={userDetails.department.name}
         currentPhase={currentStep}
         editingTask={
           editTask
