@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   frontend:
     container_name: hopeful-frontend
@@ -7,8 +5,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - NEXT_PUBLIC_API_URL=http://app:8080
     restart: unless-stopped
+
+networks:
+  default:
+    external:
+      name: hopeful-network
