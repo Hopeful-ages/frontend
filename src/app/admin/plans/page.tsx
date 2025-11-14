@@ -12,7 +12,10 @@ import { useRouter } from 'next/navigation';
 import DownloadModal from '@/components/DownloadModal';
 import { FiltersBar } from './_components/FiltersBar';
 import { PlansTable } from './_components/PlansTable';
+import { AdminPlanCard } from './_components/AdminPlanCard';
 import { ConfirmPublishModal } from './_components/ConfirmPublishModal';
+import FiltersModal from '@/components/FiltersModal';
+import { Filter } from 'lucide-react';
 
 type Field = 'cityId' | 'departmentId' | 'cobrade';
 type Errors = Partial<Record<Field, string>>;
@@ -60,6 +63,8 @@ export default function AdminPlansPage() {
     useState<ScenarioResponseDTO | null>(null);
   const [publishLoading, setPublishLoading] = useState(false);
 
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+
   const { success, error } = useToast();
   const { showLoading, hideLoading } = useLoading();
   const loadingShown = useRef(false);
@@ -91,6 +96,7 @@ export default function AdminPlansPage() {
     setAppliedCityFilter(adjustedCity);
     setAppliedCobradeFilter(pendingCobradeFilter);
     setAppliedPublishedFilter(pendingPublishedFilter);
+    setIsFiltersModalOpen(false);
   };
 
   const handleClearFilters = () => {
@@ -100,6 +106,7 @@ export default function AdminPlansPage() {
     setAppliedCityFilter(null);
     setAppliedCobradeFilter(null);
     setAppliedPublishedFilter(null);
+    setIsFiltersModalOpen(false);
   };
 
   const filteredScenarios = useMemo(() => {
@@ -218,41 +225,68 @@ export default function AdminPlansPage() {
   }
 
   return (
-    <main className="mx-auto mt-20 w-full flex-1 px-6 py-6">
-      <div className="mb-5 ml-5 flex items-center justify-between">
+    <div className="mx-auto mt-20 w-full flex-1 px-6 py-6">
+      <div className="mb-5 flex items-center justify-between">
         <h1 className="mb-5 text-3xl font-bold">Planos de Contingência</h1>
       </div>
 
-      <FiltersBar
-        cobradeOptions={cobradeOptions}
-        cityOptions={cityNames}
-        cityValue={pendingCityFilter}
-        onSelectCity={setPendingCityFilter}
-        onSelectCobrade={setPendingCobradeFilter}
-        cobradeValue={pendingCobradeFilter}
-        onSearch={handleSearch}
-        onClearFilters={handleClearFilters}
-        publishedSearchable={true}
-        publishedValue={pendingPublishedFilter}
-        onSelectPublished={setPendingPublishedFilter}
-      />
+      <div className="mb-5 flex md:hidden">
+        <button
+          onClick={() => setIsFiltersModalOpen(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+        >
+          <Filter className="h-4 w-4" />
+          Filtrar
+        </button>
+      </div>
+
+      <div className="hidden md:block">
+        <FiltersBar
+          cobradeOptions={cobradeOptions}
+          cityOptions={cityNames}
+          cityValue={pendingCityFilter}
+          onSelectCity={setPendingCityFilter}
+          onSelectCobrade={setPendingCobradeFilter}
+          cobradeValue={pendingCobradeFilter}
+          onSearch={handleSearch}
+          onClearFilters={handleClearFilters}
+          publishedSearchable={true}
+          publishedValue={pendingPublishedFilter}
+          onSelectPublished={setPendingPublishedFilter}
+        />
+      </div>
 
       {loading ? (
         <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-700">
           Carregando planos...
         </div>
       ) : (
-        <PlansTable
-          rows={filteredScenarios}
-          showPagination={showPagination}
-          selectedPlanIds={selectedScenarioIds}
-          onSelectionChange={setSelectedScenarioIds}
-          isEditable={true}
-          isPublishable={true}
-          onEdit={onEdit}
-          onDownload={handleDownload}
-          onPublish={onPublish}
-        />
+        <>
+          <div className="hidden md:block">
+            <PlansTable
+              rows={filteredScenarios}
+              showPagination={showPagination}
+              selectedPlanIds={selectedScenarioIds}
+              onSelectionChange={setSelectedScenarioIds}
+              isEditable={true}
+              isPublishable={true}
+              onEdit={onEdit}
+              onDownload={handleDownload}
+              onPublish={onPublish}
+            />
+          </div>
+          <div className="space-y-4 md:hidden">
+            {filteredScenarios.map((plan) => (
+              <AdminPlanCard
+                key={plan.id}
+                plan={plan}
+                onEdit={onEdit}
+                onDownload={handleDownload}
+                onPublish={onPublish}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {selectedScenarioIds.length > 0 && (
@@ -291,6 +325,22 @@ export default function AdminPlansPage() {
         onConfirm={handleConfirmPublish}
         onClose={() => setPublishModalOpen(false)}
       />
-    </main>
+
+      <FiltersModal
+        isOpen={isFiltersModalOpen}
+        onClose={() => setIsFiltersModalOpen(false)}
+        cityOptions={cityNames}
+        cobradeOptions={cobradeOptions}
+        cityValue={pendingCityFilter}
+        cobradeValue={pendingCobradeFilter}
+        onSelectCity={setPendingCityFilter}
+        onSelectCobrade={setPendingCobradeFilter}
+        onApplyFilters={handleSearch}
+        onClearFilters={handleClearFilters}
+        publishedOptions={['Publicado', 'Não publicado']}
+        publishedValue={pendingPublishedFilter}
+        onSelectPublished={setPendingPublishedFilter}
+      />
+    </div>
   );
 }
