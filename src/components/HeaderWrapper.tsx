@@ -6,7 +6,7 @@ import Header from './Header';
 export default function HeaderWrapper() {
   const pathname = usePathname();
 
-  const noHeaderRoutes = ['/register', '/forgot-password'];
+  const noHeaderRoutes = ['/register', '/forgot-password', '/reset-password'];
 
   if (noHeaderRoutes.includes(pathname)) return null;
 
