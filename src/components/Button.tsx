@@ -116,6 +116,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonClasses({ variant, size }), className)}
         aria-disabled={isDisabled || undefined}
         aria-busy={loading || undefined}
+        aria-label={
+          !children && rest['aria-label'] ? rest['aria-label'] : undefined
+        }
         disabled={isDisabled}
         onClick={(e) => {
           if (isDisabled) return;

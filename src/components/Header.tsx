@@ -62,6 +62,7 @@ export default function Header() {
             onClick={logout}
             className="inline-flex h-10 w-9 items-center justify-center rounded-md hover:bg-gray-800"
             title="Sair"
+            aria-label="Sair"
           >
             <LogOut className="h-6 w-6" />
           </button>
@@ -70,6 +71,7 @@ export default function Header() {
             onClick={() => router.push('/login')}
             className="inline-flex h-10 w-9 items-center justify-center rounded-md hover:bg-gray-800"
             title="Entrar"
+            aria-label="Entrar"
           >
             <LogIn className="h-6 w-6" />
           </button>
