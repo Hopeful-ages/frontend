@@ -1,11 +1,13 @@
 'use client';
 import { Modal } from '@/components/Modal';
-import { Check, X } from 'lucide-react';
+import { Button } from '@/components/Button';
+import { Check, X, AlertTriangle } from 'lucide-react';
 
 type ConfirmToggleModalProps = {
   open: boolean;
   loading: boolean;
   isActive?: boolean;
+  serviceName?: string;
   onConfirmAction: () => void;
   onCloseAction: () => void;
 };
@@ -14,6 +16,7 @@ export function ConfirmToggleModal({
   open,
   loading,
   isActive,
+  serviceName,
   onConfirmAction,
   onCloseAction,
 }: ConfirmToggleModalProps) {
@@ -21,29 +24,49 @@ export function ConfirmToggleModal({
     <Modal
       isOpen={open}
       onClose={onCloseAction}
-      title=""
+      title={isActive ? 'Desativar Serviço' : 'Ativar Serviço'}
       size="sm"
-      hideCloseIcon
       footer={
         <div className="flex w-full items-center justify-center gap-3">
-          <button
+          <Button
             onClick={onConfirmAction}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-md border border-black bg-black px-5 py-2 text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+            variant={isActive ? 'danger' : 'secondary'}
+            leftIcon={<Check />}
           >
-            <Check className="h-4 w-4" />
-            <span>{isActive ? 'Desativar' : 'Ativar'}</span>
-          </button>
-          <button
+            {loading
+              ? isActive
+                ? 'Desativando...'
+                : 'Ativando...'
+              : isActive
+                ? 'Desativar'
+                : 'Ativar'}
+          </Button>
+          <Button
             onClick={onCloseAction}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-md border border-red-600 bg-red-600 px-5 py-2 text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            variant="outline"
+            leftIcon={<X />}
           >
-            <X className="h-4 w-4" />
-            <span>Cancelar</span>
-          </button>
+            Cancelar
+          </Button>
         </div>
       }
-    ></Modal>
+    >
+      <div className="flex flex-col items-center gap-3 py-2">
+        <AlertTriangle className="h-7 w-7 text-yellow-600" />
+        <div className="text-center">
+          <p className="text-sm text-gray-900">
+            {isActive
+              ? 'Tem certeza que deseja desativar o serviço '
+              : 'Tem certeza que deseja ativar o serviço '}
+            {serviceName && (
+              <span className="font-semibold">{serviceName}</span>
+            )}
+            ?
+          </p>
+        </div>
+      </div>
+    </Modal>
   );
 }

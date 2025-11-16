@@ -40,52 +40,58 @@ export function ConfirmPublishModal({
     <Modal
       isOpen={open}
       onClose={onClose}
-      title=""
+      title={isPublished ? 'Remover Publicação' : 'Publicar Plano'}
       size="sm"
-      hideCloseIcon
       footer={
         <div className="flex w-full items-center justify-center gap-3">
           <Button
-            variant="secondary"
-            size="md"
+            variant={isPublished ? 'danger' : 'secondary'}
             onClick={onConfirm}
             disabled={loading}
-            leftIcon={<Check size={16} />}
+            leftIcon={<Check />}
           >
-            {isPublished ? 'Remover Publicação' : 'Publicar Plano'}
+            {loading
+              ? isPublished
+                ? 'Removendo...'
+                : 'Publicando...'
+              : isPublished
+                ? 'Remover Publicação'
+                : 'Publicar'}
           </Button>
           <Button
             variant="outline"
-            size="md"
             onClick={onClose}
             disabled={loading}
-            leftIcon={<X size={16} />}
+            leftIcon={<X />}
           >
             Cancelar
           </Button>
         </div>
       }
     >
-      <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
-        <h2 className="text-2xl font-bold text-black">
-          {isPublished ? 'Remover a Publicação do Plano' : 'Publicar plano'}
-        </h2>
+      <div className="flex flex-col items-center gap-3 py-2">
         {isPublished ? (
-          <FileX className="text-black-600 my-4 h-16 w-16" />
+          <FileX className="h-7 w-7 text-red-600" />
         ) : (
-          <Upload className="text-black-600 my-4 h-16 w-16" />
+          <Upload className="h-7 w-7 text-green-600" />
         )}
-        {scenario && (
-          <p className="text-gray-600">
-            Deseja{' '}
-            {isPublished ? 'Remover a Publicação do Plano' : 'Publicar Plano'} o
-            plano de{' '}
-            <strong>
-              {scenario.city.name} - {scenario.cobrade.code}
-            </strong>
-            , {scenarioYear}?
+        <div className="text-center">
+          <p className="text-sm text-gray-900">
+            {isPublished
+              ? 'Tem certeza que deseja remover a publicação do plano '
+              : 'Tem certeza que deseja publicar o plano '}
+            {scenario && (
+              <>
+                de{' '}
+                <span className="font-semibold">
+                  {scenario.city.name} - {scenario.cobrade.code}
+                </span>
+                , {scenarioYear}
+              </>
+            )}
+            ?
           </p>
-        )}
+        </div>
       </div>
     </Modal>
   );
