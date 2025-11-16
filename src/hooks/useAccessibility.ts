@@ -3,15 +3,6 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 
-/**
- * Hook para gerenciar recursos de acessibilidade
- *
- * Funcionalidades:
- * - Anúncios para leitores de tela
- * - Gerenciamento de foco
- * - Trap de foco em modais
- * - Fechar com ESC
- */
 export function useAccessibility() {
   const liveRegionRef = useRef<HTMLDivElement | null>(null);
 
@@ -19,7 +10,6 @@ export function useAccessibility() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Verifica se já existe
     let liveRegion = document.getElementById(
       'a11y-live-region',
     ) as HTMLDivElement;
@@ -47,14 +37,9 @@ export function useAccessibility() {
 
     liveRegionRef.current = liveRegion;
 
-    return () => {
-      // Não remove na desmontagem para permitir reutilização
-    };
+    return () => {};
   }, []);
 
-  /**
-   * Anuncia mensagem para leitores de tela
-   */
   const announce = useCallback(
     (message: string, priority: 'polite' | 'assertive' = 'polite') => {
       if (!liveRegionRef.current) return;
@@ -71,9 +56,6 @@ export function useAccessibility() {
     [],
   );
 
-  /**
-   * Define foco em elemento específico
-   */
   const setFocus = useCallback(
     (
       element: HTMLElement | null,
@@ -93,9 +75,6 @@ export function useAccessibility() {
     [],
   );
 
-  /**
-   * Trap de foco dentro de um container (útil para modais)
-   */
   const trapFocus = useCallback((container: HTMLElement) => {
     const focusableElements = container.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
@@ -125,15 +104,11 @@ export function useAccessibility() {
     container.addEventListener('keydown', handleKeyDown);
     firstElement?.focus();
 
-    // Retorna função de cleanup
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
-  /**
-   * Adiciona listener para fechar com ESC
-   */
   const onEscape = useCallback((callback: () => void) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
