@@ -123,6 +123,15 @@ export default function AdminUsersPage() {
   const [cities, setCities] = useState<CityResponseDTO[]>([]);
   const [roles, setRoles] = useState<RoleResponseDTO[]>([]);
 
+  // novo mapeamento e helpers para exibição (não altera o backend)
+  const ROLE_LABELS: Record<string, string> = {
+    USER: 'Usuário',
+    ADMIN: 'Administrador',
+  };
+
+  const roleLabel = (name?: string | null) =>
+    name ? (ROLE_LABELS[name] ?? name) : null;
+
   const [pendingCityFilter, setPendingCityFilter] = useState<string | null>(
     null,
   );
@@ -174,7 +183,7 @@ export default function AdminUsersPage() {
 
   const departmentNames = departments.map((s) => s.name);
   const cityNames = cities.map((c) => `${c.name} - ${c.state}`);
-  const roleNames = roles.map((r) => r.name);
+  const roleNames = roles.map((r) => roleLabel(r.name) ?? r.name);
 
   useEffect(() => {
     if (isLoading) {
@@ -198,7 +207,7 @@ export default function AdminUsersPage() {
 
   const roleNameById = (id: string) => {
     const role = roles.find((r) => r.id === id);
-    return role ? role.name : null;
+    return role ? roleLabel(role.name) : null;
   };
 
   const setServiceByName = (name: string) => {
@@ -216,7 +225,8 @@ export default function AdminUsersPage() {
   };
 
   const setRoleByName = (name: string) => {
-    const id = roles.find((r) => r.name === name)?.id ?? '';
+    // procura o role cujo rótulo (ex.: "Usuário", "Administrador") corresponde ao selecionado na UI
+    const id = roles.find((r) => roleLabel(r.name) === name)?.id ?? '';
     setForm((f) => ({ ...f, roleId: id }));
     if (errors.roleId) setErrors((e) => ({ ...e, roleId: undefined }));
   };
