@@ -1,5 +1,5 @@
 'use client';
-import { Modal } from '@/components/Modal';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/Button';
 import { ScenarioResponseDTO } from '@/lib/types';
 import { Check, Upload, FileX, X } from 'lucide-react';
@@ -37,62 +37,78 @@ export function ConfirmPublishModal({
   const isPublished = scenario?.published ?? false;
 
   return (
-    <Modal
-      isOpen={open}
-      onClose={onClose}
-      title={isPublished ? 'Remover Publicação' : 'Publicar Plano'}
-      size="sm"
-      footer={
-        <div className="flex w-full items-center justify-center gap-3">
-          <Button
-            variant={isPublished ? 'danger' : 'secondary'}
-            onClick={onConfirm}
-            disabled={loading}
-            leftIcon={<Check />}
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-4 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className="mx-auto w-full max-w-[90%] rounded-2xl bg-white p-5 text-center shadow-xl sm:max-w-md sm:p-6 md:p-8"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
           >
-            {loading
-              ? isPublished
-                ? 'Removendo...'
-                : 'Publicando...'
-              : isPublished
-                ? 'Remover Publicação'
-                : 'Publicar'}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={loading}
-            leftIcon={<X />}
-          >
-            Cancelar
-          </Button>
-        </div>
-      }
-    >
-      <div className="flex flex-col items-center gap-3 py-2">
-        {isPublished ? (
-          <FileX className="h-7 w-7 text-red-600" />
-        ) : (
-          <Upload className="h-7 w-7 text-green-600" />
-        )}
-        <div className="text-center">
-          <p className="text-sm text-gray-900">
-            {isPublished
-              ? 'Tem certeza que deseja remover a publicação do plano '
-              : 'Tem certeza que deseja publicar o plano '}
-            {scenario && (
-              <>
-                de{' '}
-                <span className="font-semibold">
-                  {scenario.city.name} - {scenario.cobrade.code}
-                </span>
-                , {scenarioYear}
-              </>
-            )}
-            ?
-          </p>
-        </div>
-      </div>
-    </Modal>
+            <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl md:text-2xl">
+              {isPublished ? 'Remover Publicação' : 'Publicar Plano'}
+            </h2>
+
+            <div className="mb-4 flex flex-col items-center justify-center sm:mb-6">
+              {isPublished ? (
+                <FileX className="mb-2 h-14 w-14 text-red-600 sm:h-16 sm:w-16 md:h-20 md:w-20" />
+              ) : (
+                <Upload className="mb-2 h-14 w-14 text-green-600 sm:h-16 sm:w-16 md:h-20 md:w-20" />
+              )}
+              <p className="mt-1 max-w-full px-2 text-xs break-words text-gray-600 sm:text-sm md:text-base">
+                {isPublished
+                  ? 'Tem certeza que deseja remover a publicação do plano '
+                  : 'Tem certeza que deseja publicar o plano '}
+                {scenario && (
+                  <>
+                    de{' '}
+                    <span className="font-semibold">
+                      {scenario.city.name} - {scenario.cobrade.code}
+                    </span>
+                    , {scenarioYear}
+                  </>
+                )}
+                ?
+              </p>
+            </div>
+
+            <div className="mt-3 flex flex-col justify-center gap-2 sm:mt-4 sm:flex-row sm:gap-3">
+              <Button
+                variant={isPublished ? 'danger' : 'secondary'}
+                onClick={onConfirm}
+                disabled={loading}
+                size="md"
+                leftIcon={<Check className="h-4 w-4" />}
+              >
+                {loading
+                  ? isPublished
+                    ? 'Removendo...'
+                    : 'Publicando...'
+                  : isPublished
+                    ? 'Remover Publicação'
+                    : 'Publicar'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                disabled={loading}
+                size="md"
+                leftIcon={<X className="h-4 w-4" />}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
