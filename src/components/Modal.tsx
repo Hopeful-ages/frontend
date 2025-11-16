@@ -76,7 +76,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        <div className="mr-3 ml-3 flex-1 overflow-y-auto px-4 py-4">
+        <div className="mr-3 ml-3 flex-1 overflow-visible px-4 py-4">
           {children}
         </div>
 
