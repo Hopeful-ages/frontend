@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Button } from '@/components/Button';
@@ -20,6 +20,7 @@ function ResetPasswordContent() {
   const [isLoading, setIsLoading] = useState(false);
   const { success, error: toastError } = useToast();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const token = searchParams.get('token'); // Captura o token da URL
 
   useEffect(() => {
@@ -46,7 +47,11 @@ function ResetPasswordContent() {
         token,
       });
       success('Senha redefinida com sucesso');
-    } catch (error) {
+
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    } catch {
       toastError('Erro ao redefinir senha');
     } finally {
       setIsLoading(false);
