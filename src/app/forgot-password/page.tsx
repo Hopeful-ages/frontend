@@ -31,7 +31,8 @@ export default function ForgotPasswordPage() {
         '/api/auth/forgot-password',
         { email: cleanEmail },
       );
-      const message = data?.message || 'Enviamos um link para redefinir sua senha';
+      const message =
+        data?.message || 'Enviamos um link para redefinir sua senha';
       success(message);
       router.push('/login');
     } catch (error) {
@@ -75,7 +76,7 @@ export default function ForgotPasswordPage() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white p-4">
       <div className="w-full max-w-sm">
-        <div className="absolute left-4 top-4">
+        <div className="absolute top-4 left-4">
           <Link href="/login">
             <Button
               variant="terciary"

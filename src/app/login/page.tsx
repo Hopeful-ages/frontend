@@ -103,6 +103,7 @@ export default function LoginPage() {
             icon={<Lock />}
             type="password"
             placeholder="Digite sua senha"
+            aria-label="Digite sua senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
@@ -122,6 +123,7 @@ export default function LoginPage() {
 
           <div className="pt-4">
             <Button
+              aria-label="Entrar"
               type="submit"
               size="lg"
               className="w-full bg-black text-white hover:bg-gray-800 focus-visible:ring-black"

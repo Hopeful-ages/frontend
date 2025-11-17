@@ -2,6 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/Button';
 import { Check, X, AlertTriangle } from 'lucide-react';
+import { useModal } from '@/hooks/useModal';
 
 type ConfirmToggleModalProps = {
   open: boolean;
@@ -18,6 +19,8 @@ export function ConfirmToggleModal({
   onConfirm,
   onClose,
 }: ConfirmToggleModalProps) {
+  const { modalRef } = useModal({ isOpen: open, onClose });
+
   return (
     <AnimatePresence>
       {open && (
@@ -29,18 +32,28 @@ export function ConfirmToggleModal({
           onClick={onClose}
         >
           <motion.div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-toggle-user-modal-title"
             className="mx-auto w-full max-w-[90%] rounded-2xl bg-white p-5 text-center shadow-xl sm:max-w-md sm:p-6 md:p-8"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl md:text-2xl">
+            <h2
+              id="confirm-toggle-user-modal-title"
+              className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl md:text-2xl"
+            >
               {isActive ? 'Desativar Usuário' : 'Ativar Usuário'}
             </h2>
 
             <div className="mb-4 flex flex-col items-center justify-center sm:mb-6">
-              <AlertTriangle className="mb-2 h-14 w-14 text-yellow-600 sm:h-16 sm:w-16 md:h-20 md:w-20" />
+              <AlertTriangle
+                className="mb-2 h-14 w-14 text-yellow-600 sm:h-16 sm:w-16 md:h-20 md:w-20"
+                aria-hidden="true"
+              />
               <p className="mt-1 max-w-full px-2 text-xs break-words text-gray-600 sm:text-sm md:text-base">
                 {isActive
                   ? 'Tem certeza que deseja desativar este usuário?'
@@ -54,7 +67,8 @@ export function ConfirmToggleModal({
                 disabled={loading}
                 variant={isActive ? 'danger' : 'secondary'}
                 size="md"
-                leftIcon={<Check className="h-4 w-4" />}
+                leftIcon={<Check className="h-4 w-4" aria-hidden="true" />}
+                aria-label={`Confirmar ${isActive ? 'desativação' : 'ativação'} do usuário`}
               >
                 {loading
                   ? isActive
@@ -69,7 +83,7 @@ export function ConfirmToggleModal({
                 disabled={loading}
                 variant="outline"
                 size="md"
-                leftIcon={<X className="h-4 w-4" />}
+                leftIcon={<X className="h-4 w-4" aria-hidden="true" />}
               >
                 Cancelar
               </Button>

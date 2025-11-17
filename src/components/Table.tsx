@@ -43,6 +43,8 @@ type TableRootProps<T> = {
   onPageSizeChange?: (size: number) => void;
   selectable?: boolean;
   onSelectionChange?: (rows: T[]) => void;
+  caption?: string;
+  ariaLabel?: string;
 };
 
 type TableHeadingProps<T> = PropsWithChildren<{
@@ -146,6 +148,8 @@ function Root<T>({
   onPageSizeChange,
   selectable = false,
   onSelectionChange,
+  caption,
+  ariaLabel,
 }: PropsWithChildren<TableRootProps<T>>) {
   const [sort, setSortInner] = useState<SortState>({
     accessor: defaultSort?.accessor ?? null,
@@ -289,7 +293,19 @@ function Root<T>({
       }}
     >
       <div className={cx('mx-auto w-[98%] overflow-x-auto', className)}>
-        <table className="min-w-full border-collapse overflow-hidden rounded-xl">
+        {selectable && (
+          <div className="sr-only" aria-live="polite" aria-atomic="true">
+            {selectedRows.length} item
+            {selectedRows.length !== 1 ? 's' : ''} selecionado
+            {selectedRows.length !== 1 ? 's' : ''}
+          </div>
+        )}
+        <table
+          role="table"
+          aria-label={ariaLabel || 'Tabela de dados'}
+          className="min-w-full border-collapse overflow-hidden rounded-xl"
+        >
+          {caption && <caption className="sr-only">{caption}</caption>}
           {children}
         </table>
       </div>
@@ -344,9 +360,21 @@ function Row<T>({ row, className, children }: TableRowProps<T>) {
   const allSelectedOnPage = page.length > 0 && selectedOnPage === page.length;
   const someSelectedOnPage = selectedOnPage > 0 && selectedOnPage < page.length;
 
+  // build a friendly identifier for screen readers from common fields
+  const getRowIdentifier = (r: T | undefined) => {
+    if (!r) return undefined;
+    const byId = getValueFromPath(r, 'id');
+    if (byId != null) return String(byId);
+    const byName = getValueFromPath(r, 'name') ?? getValueFromPath(r, 'title');
+    if (byName != null) return String(byName);
+    return undefined;
+  };
+  const rowIdentifier = getRowIdentifier(row);
+
   return (
     <RowContext.Provider value={{ row }}>
       <tr
+        role="row"
         className={cx(
           divider && 'border-b border-gray-100',
           !isHeader && 'hover:bg-gray-50',
@@ -378,6 +406,14 @@ function Row<T>({ row, className, children }: TableRowProps<T>) {
                   }
                 }}
                 className="h-3.5 w-3.5 cursor-pointer accent-black"
+                aria-label="Selecionar todas as linhas da página"
+                aria-checked={
+                  allSelectedOnPage
+                    ? 'true'
+                    : someSelectedOnPage
+                      ? 'mixed'
+                      : 'false'
+                }
               />
             </th>
           ) : (
@@ -392,6 +428,14 @@ function Row<T>({ row, className, children }: TableRowProps<T>) {
                 checked={row ? isRowSelected(row) : false}
                 onChange={() => row && toggleRow(row)}
                 className="h-3.5 w-3.5 cursor-pointer accent-black"
+                aria-label={
+                  rowIdentifier
+                    ? `Selecionar linha: ${rowIdentifier}`
+                    : 'Selecionar linha'
+                }
+                aria-checked={
+                  row ? (isRowSelected(row) ? 'true' : 'false') : 'false'
+                }
               />
             </td>
           ))}
@@ -444,6 +488,8 @@ function Heading<T>({
 
   return (
     <th
+      scope="col"
+      aria-colindex={__colIndex != null ? __colIndex + 1 : undefined}
       style={width ? { width } : undefined}
       className={cx(
         'border-b border-gray-200 px-4 text-sm font-semibold whitespace-nowrap text-gray-700',
@@ -463,6 +509,7 @@ function Heading<T>({
         <button
           type="button"
           onClick={onClick}
+          aria-label={`Ordenar por ${String(children)}`}
           title="Ordenar"
           className={cx(
             'inline-flex items-center gap-2 select-none hover:opacity-80',
@@ -528,6 +575,7 @@ function Cell<T>({
 
   return (
     <td
+      aria-colindex={__colIndex != null ? __colIndex + 1 : undefined}
       style={width ? { width } : undefined}
       className={cx(
         'px-4 text-sm whitespace-nowrap text-gray-700',
