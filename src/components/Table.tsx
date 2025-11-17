@@ -43,6 +43,8 @@ type TableRootProps<T> = {
   onPageSizeChange?: (size: number) => void;
   selectable?: boolean;
   onSelectionChange?: (rows: T[]) => void;
+  caption?: string;
+  ariaLabel?: string;
 };
 
 type TableHeadingProps<T> = PropsWithChildren<{
@@ -146,6 +148,8 @@ function Root<T>({
   onPageSizeChange,
   selectable = false,
   onSelectionChange,
+  caption,
+  ariaLabel,
 }: PropsWithChildren<TableRootProps<T>>) {
   const [sort, setSortInner] = useState<SortState>({
     accessor: defaultSort?.accessor ?? null,
@@ -298,9 +302,10 @@ function Root<T>({
         )}
         <table
           role="table"
-          aria-label="Tabela de dados"
+          aria-label={ariaLabel || 'Tabela de dados'}
           className="min-w-full border-collapse overflow-hidden rounded-xl"
         >
+          {caption && <caption className="sr-only">{caption}</caption>}
           {children}
         </table>
       </div>
