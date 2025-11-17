@@ -3,7 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileDown, X, FileText } from 'lucide-react';
 import { Button } from './Button';
-import { useEffect, useRef } from 'react';
+import { useModal } from '@/hooks/useModal';
+import { useRef } from 'react';
 
 type DownloadModalProps = {
   isOpen: boolean;
@@ -20,56 +21,8 @@ export default function DownloadModal({
   onConfirm,
   onCancel,
 }: DownloadModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const { modalRef } = useModal({ isOpen, onClose: onCancel });
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Fechar com ESC
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onCancel();
-      }
-    };
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onCancel]);
-
-  // Trap de foco
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-
-    const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement?.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement?.focus();
-        }
-      }
-    };
-
-    modalRef.current.addEventListener('keydown', handleKeyDown);
-
-    // Foco automático no primeiro botão
-    setTimeout(() => confirmButtonRef.current?.focus(), 100);
-
-    return () => {
-      modalRef.current?.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen]);
 
   return (
     <AnimatePresence>

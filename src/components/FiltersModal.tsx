@@ -3,7 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Dropdown } from './Dropdown';
-import { useEffect, useRef } from 'react';
+import { useModal } from '@/hooks/useModal';
+import { useRef } from 'react';
 
 type FiltersModalProps = {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export default function FiltersModal({
   publishedValue,
   onSelectPublished,
 }: FiltersModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const { modalRef } = useModal({ isOpen, onClose });
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleApply = () => {
@@ -49,61 +50,10 @@ export default function FiltersModal({
     onClose();
   };
 
-  // Fechar com ESC
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onClose]);
-
-  // Trap de foco
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-
-    const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement?.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement?.focus();
-        }
-      }
-    };
-
-    modalRef.current.addEventListener('keydown', handleKeyDown);
-
-    // Foco automático no botão fechar
-    setTimeout(() => closeButtonRef.current?.focus(), 100);
-
-    return () => {
-      modalRef.current?.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen]);
-
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="filters-modal-title"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -112,6 +62,9 @@ export default function FiltersModal({
         >
           <motion.div
             ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="filters-modal-title"
             className="mx-auto w-full max-w-[90%] rounded-2xl bg-white p-5 shadow-xl sm:max-w-md sm:p-6 md:p-8"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useModal } from '@/hooks/useModal';
 
 interface ModalProps {
   isOpen: boolean;
@@ -23,59 +23,7 @@ export const Modal: React.FC<ModalProps> = ({
   footer,
   hideCloseIcon = false,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  // Fechar com ESC
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEsc);
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEsc);
-    };
-  }, [isOpen, onClose]);
-
-  // Trap de foco
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-
-    const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement?.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement?.focus();
-        }
-      }
-    };
-
-    modalRef.current.addEventListener('keydown', handleKeyDown);
-
-    // Foco automático no primeiro elemento
-    setTimeout(() => firstElement?.focus(), 100);
-
-    return () => {
-      modalRef.current?.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen]);
+  const { modalRef } = useModal({ isOpen, onClose });
 
   if (!isOpen) return null;
 
