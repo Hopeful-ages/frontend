@@ -232,6 +232,9 @@ export default function AdminUsersPage() {
   };
 
   function validateField(field: Field, value: string, snapshot = form): string {
+    const selectedRole = roles.find((r) => r.id === snapshot.roleId);
+    const isAdmin = selectedRole?.name === 'ADMIN';
+
     switch (field) {
       case 'name':
       case 'phone':
@@ -253,8 +256,10 @@ export default function AdminUsersPage() {
           ? ''
           : 'As senhas não coincidem';
       case 'departmentId':
+        if (isAdmin) return '';
         return value ? '' : 'Selecione um serviço';
       case 'cityId':
+        if (isAdmin) return '';
         return value ? '' : 'Selecione uma cidade';
       case 'roleId':
         return value ? '' : 'Selecione uma função';
@@ -283,23 +288,32 @@ export default function AdminUsersPage() {
     return ok;
   }
 
-  const canClickSave = isEdit
-    ? !!form.name.trim() &&
+  const canClickSave = useMemo(() => {
+    const selectedRole = roles.find((r) => r.id === form.roleId);
+    const isAdmin = selectedRole?.name === 'ADMIN';
+
+    const baseRequirements =
+      !!form.name.trim() &&
       !!form.cpf.trim() &&
       !!form.email.trim() &&
       !!form.phone.trim() &&
-      !!form.departmentId &&
-      !!form.cityId &&
-      !!form.roleId
-    : !!form.name.trim() &&
-      !!form.cpf.trim() &&
-      !!form.email.trim() &&
-      !!form.phone.trim() &&
-      !!form.password.trim() &&
-      !!form.confirm.trim() &&
-      !!form.departmentId &&
-      !!form.cityId &&
       !!form.roleId;
+
+    const cityAndServiceRequired = isAdmin
+      ? true
+      : !!form.departmentId && !!form.cityId;
+
+    if (isEdit) {
+      return baseRequirements && cityAndServiceRequired;
+    } else {
+      return (
+        baseRequirements &&
+        !!form.password.trim() &&
+        !!form.confirm.trim() &&
+        cityAndServiceRequired
+      );
+    }
+  }, [form, isEdit, roles]);
 
   useEffect(() => {
     let mounted = true;
@@ -327,6 +341,7 @@ export default function AdminUsersPage() {
     return () => {
       mounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = useMemo(() => {
@@ -453,16 +468,21 @@ export default function AdminUsersPage() {
   const onSave = async () => {
     if (!validateOnSubmit()) return;
 
+    const selectedRole = roles.find((r) => r.id === form.roleId);
+    const isAdmin = selectedRole?.name === 'ADMIN';
+
     if (isEdit && editingId) {
       const payload: UserUpdateDTO = {
         name: form.name.trim(),
         cpf: form.cpf.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
-        departmentId: form.departmentId,
-        cityId: form.cityId,
         roleId: form.roleId,
         ...(form.password ? { password: form.password } : {}),
+        // Apenas envia cidade e serviço se não for Admin
+        ...(!isAdmin
+          ? { departmentId: form.departmentId, cityId: form.cityId }
+          : {}),
       };
       try {
         const updated = await api.editUser(editingId, payload);
@@ -483,9 +503,11 @@ export default function AdminUsersPage() {
         email: form.email.trim(),
         phone: form.phone.trim(),
         password: form.password,
-        departmentId: form.departmentId,
-        cityId: form.cityId,
         roleId: form.roleId,
+        // Apenas envia cidade e serviço se não for Admin
+        ...(!isAdmin
+          ? { departmentId: form.departmentId, cityId: form.cityId }
+          : {}),
       };
       try {
         const created = await api.createUser(payload);

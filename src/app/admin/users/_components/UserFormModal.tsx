@@ -88,6 +88,11 @@ export function UserFormModal({
     [isEdit, titleWhenEdit],
   );
 
+  // Verifica se o role selecionado é Admin
+  const isAdminRole = useMemo(() => {
+    return valueRoleName === 'Administrador' || valueRoleName === 'ADMIN';
+  }, [valueRoleName]);
+
   function formatCPF(value: string) {
     return value
       .replace(/\D/g, '')
@@ -144,52 +149,56 @@ export function UserFormModal({
             maxLength={14}
           />
 
-          <div className="w-full">
-            <Dropdown
-              label="Selecione Cidade"
-              items={cityNames}
-              onSelect={onSelectCityByName}
-              size="medium"
-              bgColor="white"
-              border="gray"
-              textColor="gray"
-              textSize="sm"
-              roundedBorder="lg"
-              maxItemsVisible={3}
-              icon={<MapPin className="h-4 w-4" />}
-              fullWidth
-              value={valueCityName}
-              useAutoComplete={true}
-            />
-            {errors.cityId && (
-              <p className="mt-1.5 text-xs font-medium text-red-600">
-                {errors.cityId}
-              </p>
-            )}
-          </div>
+          {!isAdminRole && (
+            <>
+              <div className="w-full">
+                <Dropdown
+                  label="Selecione Cidade"
+                  items={cityNames}
+                  onSelect={onSelectCityByName}
+                  size="medium"
+                  bgColor="white"
+                  border="gray"
+                  textColor="gray"
+                  textSize="sm"
+                  roundedBorder="lg"
+                  maxItemsVisible={3}
+                  icon={<MapPin className="h-4 w-4" />}
+                  fullWidth
+                  value={valueCityName}
+                  useAutoComplete={true}
+                />
+                {errors.cityId && (
+                  <p className="mt-1.5 text-xs font-medium text-red-600">
+                    {errors.cityId}
+                  </p>
+                )}
+              </div>
 
-          <div className="w-full">
-            <Dropdown
-              label="Selecione o Serviço"
-              items={serviceNames}
-              onSelect={onSelectServiceByName}
-              size="medium"
-              bgColor="white"
-              border="gray"
-              textColor="gray"
-              textSize="sm"
-              roundedBorder="lg"
-              maxItemsVisible={3}
-              icon={<Hammer className="h-4 w-4" />}
-              fullWidth
-              value={valueServiceName}
-            />
-            {errors.departmentId && (
-              <p className="mt-1.5 text-xs font-medium text-red-600">
-                {errors.departmentId}
-              </p>
-            )}
-          </div>
+              <div className="w-full">
+                <Dropdown
+                  label="Selecione o Serviço"
+                  items={serviceNames}
+                  onSelect={onSelectServiceByName}
+                  size="medium"
+                  bgColor="white"
+                  border="gray"
+                  textColor="gray"
+                  textSize="sm"
+                  roundedBorder="lg"
+                  maxItemsVisible={3}
+                  icon={<Hammer className="h-4 w-4" />}
+                  fullWidth
+                  value={valueServiceName}
+                />
+                {errors.departmentId && (
+                  <p className="mt-1.5 text-xs font-medium text-red-600">
+                    {errors.departmentId}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           <Input
             type="password"
@@ -304,47 +313,51 @@ export function UserFormModal({
                   maxLength={14}
                 />
 
-                <Dropdown
-                  label="Selecione Cidade"
-                  items={cityNames}
-                  onSelect={onSelectCityByName}
-                  fullWidth
-                  size="long"
-                  useAutoComplete
-                  icon={<MapPin className="h-4 w-4" />}
-                  value={valueCityName}
-                  bgColor="white"
-                  border="gray"
-                  textColor="gray"
-                  textSize="sm"
-                  roundedBorder="lg"
-                  maxItemsVisible={3}
-                />
-                {errors.cityId && (
-                  <p className="mt-1.5 text-xs font-medium text-red-600">
-                    {errors.cityId}
-                  </p>
-                )}
+                {!isAdminRole && (
+                  <>
+                    <Dropdown
+                      label="Selecione Cidade"
+                      items={cityNames}
+                      onSelect={onSelectCityByName}
+                      fullWidth
+                      size="long"
+                      useAutoComplete
+                      icon={<MapPin className="h-4 w-4" />}
+                      value={valueCityName}
+                      bgColor="white"
+                      border="gray"
+                      textColor="gray"
+                      textSize="sm"
+                      roundedBorder="lg"
+                      maxItemsVisible={3}
+                    />
+                    {errors.cityId && (
+                      <p className="mt-1.5 text-xs font-medium text-red-600">
+                        {errors.cityId}
+                      </p>
+                    )}
 
-                <Dropdown
-                  label="Selecione o Serviço"
-                  items={serviceNames}
-                  onSelect={onSelectServiceByName}
-                  fullWidth
-                  size="long"
-                  icon={<Hammer className="h-4 w-4" />}
-                  value={valueServiceName}
-                  bgColor="white"
-                  border="gray"
-                  textColor="gray"
-                  textSize="sm"
-                  roundedBorder="lg"
-                  maxItemsVisible={3}
-                />
-                {errors.departmentId && (
-                  <p className="mt-1.5 text-xs font-medium text-red-600">
-                    {errors.departmentId}
-                  </p>
+                    <Dropdown
+                      label="Selecione o Serviço"
+                      items={serviceNames}
+                      onSelect={onSelectServiceByName}
+                      fullWidth
+                      size="long"
+                      icon={<Hammer className="h-4 w-4" />}
+                      value={valueServiceName}
+                      bgColor="white"
+                      border="gray"
+                      textColor="gray"
+                      textSize="sm"
+                      roundedBorder="lg"
+                      maxItemsVisible={3}
+                    />
+                    {errors.departmentId && (
+                      <p className="mt-1.5 text-xs font-medium text-red-600">
+                        {errors.departmentId}
+                      </p>
+                    )}
+                  </>
                 )}
 
                 <div className="grid grid-cols-1 gap-4">
