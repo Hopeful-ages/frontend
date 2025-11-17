@@ -238,8 +238,8 @@ export const api = {
     return res;
   },
 
-  publishScenario: (id: string) =>
-    fetchWithAuth(`/api/scenarios/${id}/publish`, {
+  togglePublishScenario: (id: string) =>
+    fetchWithAuth(`/api/scenarios/${id}/changes-publish-status`, {
       method: 'PATCH',
     }) as Promise<ScenarioResponseDTO>,
 

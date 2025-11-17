@@ -39,12 +39,12 @@ const ProtocolList: React.FC<ProtocolListProps> = ({
         {protocols.map((protocol) => (
           <div
             key={protocol.id}
-            className="flex items-start justify-between border-t border-b border-gray-200 p-4"
+            className="flex flex-col items-start justify-between gap-4 border-t border-b border-gray-200 p-4 md:flex-row"
           >
             <span className="text-gray-160 flex-grow overflow-hidden pr-4 text-sm font-medium break-words text-ellipsis">
               {protocol.description}
             </span>
-            <div className="mt-auto flex flex-shrink-0 flex-row items-center space-x-3">
+            <div className="flex w-full flex-shrink-0 flex-row items-center space-x-3 md:w-auto">
               {protocol.isExisting && protocol.canEdit === false && (
                 <span className="rounded border border-gray-500 px-2 py-1 text-xs text-gray-500">
                   Somente leitura

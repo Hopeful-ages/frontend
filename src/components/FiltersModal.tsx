@@ -16,6 +16,9 @@ type FiltersModalProps = {
   onSelectCobrade: (value: string | null) => void;
   onApplyFilters: () => void;
   onClearFilters: () => void;
+  publishedOptions?: string[];
+  publishedValue?: string | null;
+  onSelectPublished?: (value: string | null) => void;
 };
 
 export default function FiltersModal({
@@ -29,6 +32,9 @@ export default function FiltersModal({
   onSelectCobrade,
   onApplyFilters,
   onClearFilters,
+  publishedOptions,
+  publishedValue,
+  onSelectPublished,
 }: FiltersModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -165,6 +171,22 @@ export default function FiltersModal({
                   useAutoComplete
                 />
               </div>
+
+              {publishedOptions && onSelectPublished && (
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Status de Publicação:
+                  </label>
+                  <Dropdown
+                    label="Selecione o Status"
+                    items={publishedOptions}
+                    onSelect={onSelectPublished}
+                    value={publishedValue}
+                    fullWidth
+                    size="long"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">

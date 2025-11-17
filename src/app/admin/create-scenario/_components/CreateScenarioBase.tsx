@@ -198,6 +198,12 @@ export function CreateScenarioBase({ scenarioId }: Props) {
       return;
     }
 
+    // Validação: deve ter pelo menos uma tarefa em qualquer fase
+    if (protocols.length === 0) {
+      warning('Adicione pelo menos uma tarefa antes de salvar o cenário.');
+      return;
+    }
+
     const currentPhaseProtocols = protocols.filter(
       (p) =>
         (mapStepToPhase(p.phase) ?? phaseMap[currentStep]) ===
@@ -205,7 +211,9 @@ export function CreateScenarioBase({ scenarioId }: Props) {
     );
 
     if (currentPhaseProtocols.length === 0) {
-      warning('Adicione pelo menos uma tarefa antes de salvar o cenário.');
+      warning(
+        `Adicione pelo menos uma tarefa na fase "${currentStep}" antes de salvar o cenário.`,
+      );
       return;
     }
 
@@ -220,7 +228,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
         return {
           description,
           phase: mapStepToPhase(protocol.phase) || phaseMap[currentStep],
-          serviceId: service?.id || null,
+          departmentId: service?.id || null,
         };
       });
 
@@ -275,18 +283,19 @@ export function CreateScenarioBase({ scenarioId }: Props) {
     if (!existingScenario) return;
     setPublishLoading(true);
     try {
-      await api.publishScenario(existingScenario.id);
+      const updated = await api.togglePublishScenario(existingScenario.id);
+      const action = updated.published ? 'publicado' : 'despublicado';
       success(
-        `Plano "${existingScenario.city.name} - ${existingScenario.cobrade.code}" publicado com sucesso!`,
+        `Plano "${updated.city.name} - ${updated.cobrade.code}" ${action} com sucesso!`,
       );
       setPublishModalOpen(false);
 
       setExistingScenario((prev) =>
-        prev ? { ...prev, published: true } : prev,
+        prev ? { ...prev, published: updated.published } : prev,
       );
     } catch (err) {
       console.error(err);
-      toastError('Erro ao publicar o cenário', 'Tente novamente.');
+      toastError('Erro ao alterar status de publicação', 'Tente novamente.');
     } finally {
       setPublishLoading(false);
     }
@@ -307,7 +316,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
 
   return (
     <div className="b-l b-r">
-      <main className="mx-auto mb-10 max-w-4xl flex-1 border p-4 pt-24">
+      <main className="mx-auto mb-10 max-w-4xl flex-1 border p-4 pt-24 md:px-8 md:pb-8">
         <h1 className="text-gray-850 my-1 mb-6 text-center text-3xl">
           {scenarioId ? 'Editar Cenário' : 'Cadastrar Cenário'}
         </h1>
@@ -316,7 +325,7 @@ export function CreateScenarioBase({ scenarioId }: Props) {
           <div className="text-center text-gray-600">Carregando cenário…</div>
         ) : (
           <>
-            <div className="flex w-full gap-8 p-4">
+            <div className="flex w-full flex-col gap-8 p-4 md:flex-row">
               <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Cidade
@@ -416,8 +425,10 @@ export function CreateScenarioBase({ scenarioId }: Props) {
               size="md"
             />
 
-            <div className="mt-6 mr-4 mb-4 ml-4 flex items-start gap-4">
-              <label className="w-24 pt-2 text-lg font-medium">Parâmetro</label>
+            <div className="mx-4 mt-6 mb-4 flex flex-col items-start gap-4 md:flex-row">
+              <label className="w-full pt-2 text-lg font-medium md:w-24">
+                Parâmetro
+              </label>
               <Input
                 name="parameter"
                 placeholder={`Parâmetro - ${currentStep}`}
@@ -435,8 +446,10 @@ export function CreateScenarioBase({ scenarioId }: Props) {
               />
             </div>
 
-            <div className="mr-4 mb-4 ml-4 flex items-start gap-4">
-              <label className="w-24 pt-2 text-lg font-medium">Ação</label>
+            <div className="mx-4 mb-4 flex flex-col items-start gap-4 md:flex-row">
+              <label className="w-full pt-2 text-lg font-medium md:w-24">
+                Ação
+              </label>
               <Input
                 name="action"
                 placeholder={`Ação - ${currentStep}`}
@@ -465,14 +478,14 @@ export function CreateScenarioBase({ scenarioId }: Props) {
               }
             />
 
-            <div className="mt-8 mr-4 ml-4 flex items-center justify-between">
+            <div className="mx-4 mt-8 flex flex-col items-center justify-between gap-4 md:flex-row">
               {scenarioId ? (
                 <Button
                   variant="secondary"
                   size="md"
                   onClick={() => setPublishModalOpen(true)}
                   leftIcon={<Upload size={16} />}
-                  className="disabled:cursor-not-allowed disabled:opacity-70"
+                  className="w-full disabled:cursor-not-allowed disabled:opacity-70 md:w-auto"
                   disabled={!!existingScenario?.published}
                   title={
                     existingScenario?.published
@@ -483,10 +496,10 @@ export function CreateScenarioBase({ scenarioId }: Props) {
                   {existingScenario?.published ? 'Publicado' : 'Publicar'}
                 </Button>
               ) : (
-                <div className="w-[130px]" />
+                <div className="hidden w-[130px] md:block" />
               )}
 
-              <div className="flex gap-4">
+              <div className="flex w-full flex-col gap-4 md:w-auto md:flex-row">
                 <Button
                   variant="outline"
                   size="md"
