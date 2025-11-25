@@ -1,0 +1,34 @@
+stages:
+  - deploy
+
+deploy_frontend:
+  stage: deploy
+  only:
+    - main
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client git
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -p ${VPS_PORT:-22} $VPS_HOST >> ~/.ssh/known_hosts
+  script:
+    - |
+      ssh -p ${VPS_PORT:-22} $VPS_USER@$VPS_HOST << 'ENDSSH'
+        set -e
+        echo "🚀 Deploying Frontend..."
+        cd /opt/app/frontend
+        git pull origin main
+        docker compose down
+        docker compose build --no-cache
+        docker compose up -d
+        sleep 10
+        if docker ps | grep -q hopeful-frontend; then
+          echo "✅ Frontend deployed!"
+        else
+          echo "❌ Failed!"
+          exit 1
+        fi
+        docker image prune -af
+      ENDSSH
